@@ -137,6 +137,8 @@ class Profesional(models.Model):
     mail = models.CharField(max_length=255, blank=True, null=True)
     matricula = models.CharField(max_length=15)
     firma = models.TextField(null=True)
+    legajo = models.IntegerField()
+    estado = models.IntegerField()
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
 
     class Meta:
