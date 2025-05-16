@@ -1687,6 +1687,8 @@ CREATE TABLE
         telefono VARCHAR(15) NULL,
         mail VARCHAR(255) NULL,
         matricula VARCHAR(15) NOT NULL,
+        legajo INT NOT NULL,
+        estado TINYINT(1) NOT NULL,
         firma TEXT NULL
     );
 
