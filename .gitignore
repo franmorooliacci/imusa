@@ -3,3 +3,5 @@ venv/
 backend/core/__pycache__/
 backend/src/__pycache__/
 backend/src/migrations/__pycache__/
+backend/.env
+frontend/.env
