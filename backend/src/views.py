@@ -1,3 +1,5 @@
+import requests
+import urllib.parse
 from .models import Responsable, Especie, Raza, Efector, Animal, Atencion, Insumo, Domicilio, AtencionInsumo, Profesional
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -5,6 +7,7 @@ from rest_framework import viewsets, status
 from rest_framework.exceptions import NotFound
 from .serializers import ResponsableSerializer, AnimalSerializer, RazaSerializer, EfectorSerializer, AtencionSerializer, InsumoSerializer, DomicilioSerializer, AtencionInsumoSerializer, ProfesionalSerializer, CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from decouple import config
 
 
 class ResponsableViewSet(viewsets.ModelViewSet):
@@ -43,7 +46,8 @@ class AnimalViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         animal = self.get_object()
-        serializer = self.get_serializer(animal, data=request.data, partial=True)
+        serializer = self.get_serializer(
+            animal, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
@@ -158,7 +162,8 @@ class DomicilioViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset().filter(**filters)
 
         if not queryset.exists():
-            raise NotFound('El domicilio no está registrado en la base de datos.')
+            raise NotFound(
+                'El domicilio no está registrado en la base de datos.')
 
         result = queryset.first()
         serializer = DomicilioSerializer(result)
@@ -186,7 +191,7 @@ class AtencionInsumoViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='buscar')
     def search(self, request):
         id_atencion = request.query_params.get('id_atencion')
-        
+
         queryset = self.queryset
 
         if id_atencion:
@@ -194,7 +199,7 @@ class AtencionInsumoViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
 
 class ProfesionalViewSet(viewsets.ModelViewSet):
     queryset = Profesional.objects.all()
@@ -204,3 +209,108 @@ class ProfesionalViewSet(viewsets.ModelViewSet):
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
+
+class ExternalDataViewSet(viewsets.ViewSet):
+
+    @action(detail=False, methods=['get'], url_path='features')
+    def features(self, request):
+        domicilio = request.query_params.get('domicilio')
+
+        if not domicilio:
+            return Response(
+                {'error': '`domicilio` parameter is required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        url = f"{config('API_GEO1')}{domicilio}"
+
+        try:
+            response = requests.get(url, timeout=10, proxies={
+                                    'http': None, 'https': None}, verify=False)
+            response.raise_for_status()
+            data = response.json()
+            result = data.get('features')
+            return Response(result)
+        except requests.RequestException as exc:
+            return Response(
+                {'error': f'External API error: {str(exc)}'},
+                status=status.HTTP_502_BAD_GATEWAY
+            )
+
+    @action(detail=False, methods=['get'], url_path='direccion')
+    def direccion(self, request):
+        codigo_calle = request.query_params.get('codigoCalle')
+        altura = request.query_params.get('altura')
+        bis = request.query_params.get('bis')
+        letra = request.query_params.get('letra')
+
+        if not (codigo_calle and altura and bis):
+            return Response(
+                {'error': '`codigoCalle`, `altura` are required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        url = (
+            f"{config('API_GEO2')}?idCalle={codigo_calle}&altura={altura}&bis={bis}"
+            f"{f'&letra={letra}' if letra != '' else ''}"
+        )
+
+        try:
+            response = requests.get(url, timeout=10, proxies={
+                                    'http': None, 'https': None}, verify=False)
+            response.raise_for_status()
+            return Response(response.json())
+        except requests.RequestException as exc:
+            return Response(
+                {'error': f'External API error: {str(exc)}'},
+                status=status.HTTP_502_BAD_GATEWAY
+            )
+
+    @action(detail=False, methods=['get'], url_path='latitud-longitud')
+    def latitud_longitud(self, request):
+        punto_x = request.query_params.get('punto_x')
+        punto_y = request.query_params.get('punto_y')
+
+        if not (punto_x and punto_y):
+            return Response(
+                {'error': '`punto_x` and `punto_y` are required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        url = f"{config('API_GEO3')}{punto_x}/{punto_y}/"
+
+        try:
+            response = requests.get(url, timeout=10, proxies={
+                                    'http': None, 'https': None}, verify=False)
+            response.raise_for_status()
+            return Response(response.json())
+        except requests.RequestException as exc:
+            return Response(
+                {'error': f'External API error: {str(exc)}'},
+                status=status.HTTP_502_BAD_GATEWAY
+            )
+
+    @action(detail=False, methods=['get'], url_path='ciudadano')
+    def ciudadano(self, request):
+        dni = request.query_params.get('dni')
+        sexo = request.query_params.get('sexo')
+
+        if not (dni and sexo):
+            return Response(
+                {'error': '`dni` and `sexo` are required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        url = f"{config('API_CIUDADANO')}?dni={dni}&sexo={sexo}&api_key={config('CIUDADANO_KEY')}"
+
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            result = data.get('ciudadano')
+            return Response(result)
+        except requests.RequestException as exc:
+            return Response(
+                {'error': f'External API error: {str(exc)}'},
+                status=status.HTTP_502_BAD_GATEWAY
+            )

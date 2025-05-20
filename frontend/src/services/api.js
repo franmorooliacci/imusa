@@ -1,11 +1,4 @@
-import axios from 'axios';
 import http from './axiosClient';
-
-const apiCiudadano = process.env.REACT_APP_API_CIUDADANO;
-const ciudadanoKey = process.env.REACT_APP_CIUDADANO_KEY;
-const apiGeo1 = process.env.REACT_APP_API_GEO1;
-const apiGeo2 = process.env.REACT_APP_API_GEO2;
-const apiGeo3 = process.env.REACT_APP_API_GEO3;
 
 export const getResponsable = async (dni, sexo) => {
     try {
@@ -193,47 +186,36 @@ export const loginUser = async (username, password) => {
     }
 };
 
-// API Ciudadanos
 export const getCiudadano = async (dni, sexo) => {
     try {
-        const response = await axios.get(`${apiCiudadano}?dni=${dni}&sexo=${sexo}&api_key=${ciudadanoKey}`);
-        return response.data.ciudadano;
+        const response = await http.get('external_data/ciudadano/', { params: {dni, sexo} });
+        return response.data;
     } catch (error) {
         throw error;
     }
 };
 
-// APIs Geolocalizacion (3)
-// 1
 export const getFeatures = async (domicilio) => {
     try {
-        const response = await axios.get(`${apiGeo1}${domicilio}`);
-
-        if (!response.data.features || response.data.features.length === 0) {
-            throw new Error('Not Found');
-        }
-
-        return response.data.features;
-    } catch(error){
-        throw error
-    }
-};
-
-// 2
-export const getDireccion = async (codigoCalle, altura, bis, letra) => {
-    try {
-        const response = await axios.get(
-            `${apiGeo2}?idCalle=${codigoCalle}&altura=${altura}&bis=${bis}${letra !== '' ? `&letra=${letra}` : ''}`);
+        const response = await http.get('external_data/features/', { params: {domicilio} });
         return response.data;
     } catch(error){
         throw error
     }
 };
 
-// 3
+export const getDireccion = async (codigoCalle, altura, bis, letra) => {
+    try {
+        const response = await http.get('external_data/direccion/', { params: {codigoCalle, altura, bis, letra} });
+        return response.data;
+    } catch(error){
+        throw error
+    }
+};
+
 export const getLatitudLongitud = async (punto_x, punto_y) => {
     try {
-        const response = await axios.get(`${apiGeo3}${punto_x}/${punto_y}/`);
+        const response = await http.get('external_data/latitud-longitud/', { params: {punto_x, punto_y} });
         return response.data;
     } catch(error){
         throw error
