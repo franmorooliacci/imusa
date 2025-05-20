@@ -1,7 +1,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
-from .views import ResponsableViewSet, AnimalViewSet, RazaViewSet, EfectorViewSet, AtencionViewSet, InsumoViewSet, DomicilioViewSet, AtencionInsumoViewSet, ProfesionalViewSet, CustomTokenObtainPairView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView, TokenRefreshView)
+from .views import ResponsableViewSet, AnimalViewSet, RazaViewSet, EfectorViewSet, AtencionViewSet, InsumoViewSet, DomicilioViewSet, AtencionInsumoViewSet, ProfesionalViewSet, CustomTokenObtainPairView, ExternalDataViewSet
 
 router = DefaultRouter()
 router.register('responsables', ResponsableViewSet, basename='responsable')
@@ -11,8 +12,10 @@ router.register('efectores', EfectorViewSet, basename='efector')
 router.register('atenciones', AtencionViewSet, basename='atencion')
 router.register('insumos', InsumoViewSet, basename='insumo')
 router.register('domicilios', DomicilioViewSet, basename='domicilio')
-router.register('atencion_insumo', AtencionInsumoViewSet, basename='atencion_insumo')
+router.register('atencion_insumo', AtencionInsumoViewSet,
+                basename='atencion_insumo')
 router.register('profesionales', ProfesionalViewSet, basename='profesional')
+router.register('external_data', ExternalDataViewSet, basename='external_data')
 
 urlpatterns = [
     path('', include(router.urls)),
