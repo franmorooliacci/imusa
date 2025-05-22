@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from .models import Responsable, Animal, Especie, Raza, Efector, Insumo, Atencion, Domicilio, AtencionInsumo, Profesional, ProfesionalEfector
+from .models import (
+    Responsable, Animal, Especie, Raza,
+    Efector, Insumo, Atencion, Domicilio,
+    AtencionInsumo, Profesional, ProfesionalEfector,
+    Candidato, Institucion, PeticionAdopcion,
+    InstitucionAnimal, Adopcion, AdopcionFoto
+)
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
@@ -26,10 +32,10 @@ class AnimalSerializer(serializers.ModelSerializer):
 
     def get_raza_nombre(self, obj):
         return obj.id_raza.nombre
-    
+
     def get_raza_tamaño(self, obj):
         return obj.id_raza.tamaño
-    
+
     def get_edad(self, obj):
         from datetime import date
         if obj.año_nacimiento:
@@ -48,7 +54,8 @@ class ResponsableSerializer(serializers.ModelSerializer):
     felinos = serializers.SerializerMethodField()
     caninos = serializers.SerializerMethodField()
     edad = serializers.SerializerMethodField()
-    domicilio_actual = DomicilioSerializer(source='id_domicilio_actual', required=False)
+    domicilio_actual = DomicilioSerializer(
+        source='id_domicilio_actual', required=False)
 
     class Meta:
         model = Responsable
@@ -98,12 +105,12 @@ class AtencionSerializer(serializers.ModelSerializer):
 
     def get_efector_nombre(self, obj):
         return obj.id_efector.nombre
-    
-    def get_profesional_nombre(self,obj):
+
+    def get_profesional_nombre(self, obj):
         nombre = obj.id_profesional.nombre
         apellido = obj.id_profesional.apellido
         return nombre + ' ' + apellido
-    
+
 
 class AtencionInsumoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -118,12 +125,12 @@ class ProfesionalSerializer(serializers.ModelSerializer):
 
 
 class ProfesionalEfectorSerializer(serializers.ModelSerializer):
-    id_efector   = serializers.IntegerField(source='id_efector.id_efector')
-    nombre       = serializers.CharField( source='id_efector.nombre')
+    id_efector = serializers.IntegerField(source='id_efector.id_efector')
+    nombre = serializers.CharField(source='id_efector.nombre')
     unidad_movil = serializers.IntegerField(source='id_efector.unidad_movil')
 
     class Meta:
-        model  = ProfesionalEfector
+        model = ProfesionalEfector
         fields = ['id_efector', 'nombre', 'unidad_movil']
 
 
@@ -134,20 +141,55 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         user = self.user
         data['username'] = user.username
 
-        # 1) Include the full Profesional object
         profesional = getattr(user, 'profesional', None)
         data['profesional'] = (
             ProfesionalSerializer(profesional).data
             if profesional else None
         )
 
-        # 2) Include every ProfesionalEfector + nested Efector
         if profesional:
             prof_efecs = profesional.profesionalefector_set\
                 .filter(estado=1)\
                 .select_related('id_efector')
-            data['efectores'] = ProfesionalEfectorSerializer(prof_efecs, many=True).data
+            data['efectores'] = ProfesionalEfectorSerializer(
+                prof_efecs, many=True).data
         else:
             data['efectores'] = []
 
         return data
+
+
+class CandidatoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Candidato
+        fields = '__all__'
+
+
+class InstitucionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Institucion
+        fields = '__all__'
+
+
+class PeticionAdopcionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PeticionAdopcion
+        fields = '__all__'
+
+
+class InstitucionAnimalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InstitucionAnimal
+        fields = '__all__'
+
+
+class AdopcionFotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdopcionFoto
+        fields = '__all__'
+
+
+class AdopcionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Adopcion
+        fields = '__all__'
