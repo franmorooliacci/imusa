@@ -1,11 +1,24 @@
 import requests
-import urllib.parse
-from .models import Responsable, Especie, Raza, Efector, Animal, Atencion, Insumo, Domicilio, AtencionInsumo, Profesional
+from .models import (
+    Responsable, Especie, Raza,
+    Efector, Animal, Atencion,
+    Insumo, Domicilio, AtencionInsumo,
+    Profesional, Candidato, Institucion,
+    InstitucionAnimal, PeticionAdopcion, Adopcion,
+    AdopcionFoto
+)
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.exceptions import NotFound
-from .serializers import ResponsableSerializer, AnimalSerializer, RazaSerializer, EfectorSerializer, AtencionSerializer, InsumoSerializer, DomicilioSerializer, AtencionInsumoSerializer, ProfesionalSerializer, CustomTokenObtainPairSerializer
+from .serializers import (
+    ResponsableSerializer, AnimalSerializer, RazaSerializer,
+    EfectorSerializer, AtencionSerializer, InsumoSerializer,
+    DomicilioSerializer, AtencionInsumoSerializer, ProfesionalSerializer,
+    CustomTokenObtainPairSerializer, CandidatoSerializer, InstitucionSerializer,
+    InstitucionAnimalSerializer, PeticionAdopcionSerializer, AdopcionSerializer,
+    AdopcionFotoSerializer
+)
 from rest_framework_simplejwt.views import TokenObtainPairView
 from decouple import config
 
@@ -314,3 +327,33 @@ class ExternalDataViewSet(viewsets.ViewSet):
                 {'error': f'External API error: {str(exc)}'},
                 status=status.HTTP_502_BAD_GATEWAY
             )
+
+
+class CandidatoViewSet(viewsets.ModelViewSet):
+    queryset = Candidato.objects.all()
+    serializer_class = CandidatoSerializer
+
+
+class InstitucionViewSet(viewsets.ModelViewSet):
+    queryset = Institucion.objects.all()
+    serializer_class = InstitucionSerializer
+
+
+class PeticionAdopcionViewSet(viewsets.ModelViewSet):
+    queryset = PeticionAdopcion.objects.all()
+    serializer_class = PeticionAdopcionSerializer
+
+
+class InstitucionAnimalViewSet(viewsets.ModelViewSet):
+    queryset = InstitucionAnimal.objects.all()
+    serializer_class = InstitucionAnimalSerializer
+
+
+class AdopcionFotoViewSet(viewsets.ModelViewSet):
+    queryset = AdopcionFoto.objects.all()
+    serializer_class = AdopcionFotoSerializer
+
+
+class AdopcionViewSet(viewsets.ModelViewSet):
+    queryset = Adopcion.objects.all()
+    serializer_class = AdopcionSerializer
