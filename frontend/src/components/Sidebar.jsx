@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Divider, Drawer, IconButton, List, ListItemButton, ListItemText } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faFileMedical, faHouse, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faFileMedical, faHouse, faMagnifyingGlass, faShieldDog } from '@fortawesome/free-solid-svg-icons';
 const NAVBAR_HEIGHT = 64;
 const DRAWER_WIDTH = 200;
 
@@ -76,6 +76,20 @@ const Sidebar = ({ open, toggleSidebar }) => {
                 >
                     <FontAwesomeIcon icon={faFileMedical} size='1x' />
                     <ListItemText primary='Atenciones' />
+                </ListItemButton>
+
+                <Divider variant='middle' />
+
+                <ListItemButton 
+                    component={Link} 
+                    to='/adopcion' 
+                    sx={{ 
+                        color: (theme) => theme.palette.text.primary, 
+                        gap: 2
+                    }}
+                >
+                    <FontAwesomeIcon icon={faShieldDog} size='1x' />
+                    <ListItemText primary='Adopción' />
                 </ListItemButton>
             </List>
         </Drawer>
