@@ -12,6 +12,7 @@ import PrivateRoute from './components/PrivateRoute';
 import RedirectOnLogout from './components/RedirectOnLogout';
 import AtencionesListPage from './pages/AtencionesListPage';
 import AtencionPage from './pages/AtencionPage';
+import AdopcionPage from './pages/AdopcionPage';
 
 const App = () => {
 
@@ -90,6 +91,14 @@ const App = () => {
                         element={
                             <PrivateRoute>
                                 <AtencionPage />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route 
+                        path='/adopcion' 
+                        element={
+                            <PrivateRoute>
+                                <AdopcionPage />
                             </PrivateRoute>
                         }
                     />
