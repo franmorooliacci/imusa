@@ -45,6 +45,24 @@ export const addAnimal = async (newAnimal) => {
     }
 };
 
+export const addInstitucionAnimal = async (newAnimal) => {
+    try {
+        const response = await http.post(`institucion_animales/`, newAnimal);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getInstitucionAnimal = async (id_institucion) => {
+    try {
+        const response = await http.get(`institucion_animales/institucion/`, id_institucion);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const getAnimalById = async (id) => {
     try {
         const response = await http.get(`animales/${id}/`);
@@ -188,7 +206,7 @@ export const loginUser = async (username, password) => {
 
 export const getCiudadano = async (dni, sexo) => {
     try {
-        const response = await http.get('external_data/ciudadano/', { params: {dni, sexo} });
+        const response = await http.get('external_data/ciudadano/', { params: { dni, sexo } });
         return response.data;
     } catch (error) {
         throw error;
@@ -197,27 +215,27 @@ export const getCiudadano = async (dni, sexo) => {
 
 export const getFeatures = async (domicilio) => {
     try {
-        const response = await http.get('external_data/features/', { params: {domicilio} });
+        const response = await http.get('external_data/features/', { params: { domicilio } });
         return response.data;
-    } catch(error){
+    } catch (error) {
         throw error
     }
 };
 
 export const getDireccion = async (codigoCalle, altura, bis, letra) => {
     try {
-        const response = await http.get('external_data/direccion/', { params: {codigoCalle, altura, bis, letra} });
+        const response = await http.get('external_data/direccion/', { params: { codigoCalle, altura, bis, letra } });
         return response.data;
-    } catch(error){
+    } catch (error) {
         throw error
     }
 };
 
 export const getLatitudLongitud = async (punto_x, punto_y) => {
     try {
-        const response = await http.get('external_data/latitud-longitud/', { params: {punto_x, punto_y} });
+        const response = await http.get('external_data/latitud-longitud/', { params: { punto_x, punto_y } });
         return response.data;
-    } catch(error){
+    } catch (error) {
         throw error
     }
 };
