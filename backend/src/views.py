@@ -71,8 +71,12 @@ class AnimalViewSet(viewsets.ModelViewSet):
         return Response(status=204)
 
     def perform_create(self, serializer):
-        responsable = Responsable.objects.get(
-            id_responsable=self.request.data['id_responsable'])
+        id_responsable = self.request.data.get('id_responsable')
+        if id_responsable is not None:
+            responsable = Responsable.objects.get(
+                id_responsable=id_responsable)
+        else:
+            responsable = None
         especie = Especie.objects.get(
             id_especie=self.request.data['id_especie'])
         raza = Raza.objects.get(id_raza=self.request.data['id_raza'])
@@ -347,6 +351,18 @@ class PeticionAdopcionViewSet(viewsets.ModelViewSet):
 class InstitucionAnimalViewSet(viewsets.ModelViewSet):
     queryset = InstitucionAnimal.objects.all()
     serializer_class = InstitucionAnimalSerializer
+
+    @action(detail=False, methods=['get'], url_path='institucion')
+    def search(self, request):
+        id_institucion = request.query_params.get('id_institucion')
+
+        queryset = self.queryset
+
+        if id_institucion:
+            queryset = queryset.filter(id_institucion=id_institucion, estado=1)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class AdopcionFotoViewSet(viewsets.ModelViewSet):
