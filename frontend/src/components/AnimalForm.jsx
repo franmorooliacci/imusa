@@ -5,7 +5,7 @@ import { TextField, Button, Box, Divider, Grid2, MenuItem, Typography, CircularP
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCat, faDog } from '@fortawesome/free-solid-svg-icons';
 import { animalSchema } from '../validation/animalSchema';
-import { addAnimal, updateAnimal, getRazas } from '../services/api';
+import { addAnimal, updateAnimal, getRazas, addInstitucionAnimal } from '../services/api';
 import AlertMessage from './AlertMessage';
 import SkeletonList from './SkeletonList';
 
@@ -75,6 +75,27 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
                 setTimeout(() => {
                     onSuccess(`/responsable/${data.id_responsable}/${data.id_especie === 1 ? 'canino' : 'felino'}/${response.id_animal}`);
                 }, 3000);
+            } else if (mode === 'addToImusa') {
+                const response = await addAnimal(data);
+                
+                const currentDate = new Date();
+                const dateOnly = currentDate.toISOString().slice(0, 10);
+                const institucionAnimal = {
+                    id_institucion: 1,
+                    id_animal: response.id_animal,
+                    ingreso: dateOnly,
+                    adopcion: 0,
+                    estado: 1
+                }
+                await addInstitucionAnimal(institucionAnimal);
+
+                setAlertSuccess(true);
+                setAlertMsg(`${data.id_especie === 1 ? 'Canino' : 'Felino'} agregado con éxito!`);
+                setAlertOpen(true);
+
+                setTimeout(() => {
+                    onSuccess('/adopcion');
+                }, 3000);
             } else {
                 const response = await updateAnimal(initialData.id_animal, data);
 
@@ -86,7 +107,7 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
                 }, 3000);
             }
         } catch (error) {
-            if (mode === 'add') {
+            if (mode.includes('add')) {
                 setAlertSuccess(false);
                 setAlertMsg(`No se ha podido agregar ${data.id_especie === 1 ? 'canino' : 'felino'}.`);
                 setAlertOpen(true);
@@ -121,7 +142,7 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
                 <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
                     <FontAwesomeIcon icon={initialData.id_especie === 1 ? faDog : faCat} size="2x" />
                     <Typography variant="h5">
-                        {mode === 'add' ? 'Agregar' : 'Editar'} {initialData.id_especie === 1 ? 'Canino' : 'Felino'}
+                        {mode.includes('add') ? 'Agregar' : 'Editar'} {initialData.id_especie === 1 ? 'Canino' : 'Felino'}
                     </Typography>
                 </Box>
                 </Divider>
@@ -249,7 +270,7 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
                 <Button variant="outlined" color="error" onClick={onCancel} disabled={isSubmitting}>Cancelar</Button>
                 <Button type="submit" variant="contained" disabled={isSubmitting}>
-                    {isSubmitting ? <CircularProgress size={24}/> : mode === 'add' ? 'Agregar' : 'Guardar'}
+                    {isSubmitting ? <CircularProgress size={24}/> : mode.includes('add') ? 'Agregar' : 'Guardar'}
                 </Button>
                 </Box>
             </Box>
