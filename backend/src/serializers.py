@@ -178,6 +178,9 @@ class PeticionAdopcionSerializer(serializers.ModelSerializer):
 
 
 class InstitucionAnimalSerializer(serializers.ModelSerializer):
+    animal = AnimalSerializer(
+        source='id_animal', read_only=True, required=False)
+
     class Meta:
         model = InstitucionAnimal
         fields = '__all__'

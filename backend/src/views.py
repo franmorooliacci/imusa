@@ -349,7 +349,7 @@ class PeticionAdopcionViewSet(viewsets.ModelViewSet):
 
 
 class InstitucionAnimalViewSet(viewsets.ModelViewSet):
-    queryset = InstitucionAnimal.objects.all()
+    queryset = InstitucionAnimal.objects.select_related('id_animal')
     serializer_class = InstitucionAnimalSerializer
 
     @action(detail=False, methods=['get'], url_path='institucion')
