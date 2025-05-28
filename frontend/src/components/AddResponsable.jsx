@@ -119,12 +119,12 @@ const AddResponsable = ({ responsable }) => {
             const formattedDomRNP = formatDomicilio(data.domicilioRenaper);
 
             const domicilio = await domicilioExists(formattedDomRNP);
-            formattedResponsable.id_domicilio_renaper = domicilio.id_domicilio;
+            formattedResponsable.id_domicilio_renaper = domicilio.id;
 
             if(data.mismoDomicilio === 'no'){
                 const formattedDomAct = formatDomicilio(data.domicilioActual);
                 const domicilio = await domicilioExists(formattedDomAct);
-                formattedResponsable.id_domicilio_actual = domicilio.id_domicilio;
+                formattedResponsable.id_domicilio_actual = domicilio.id;
             } else {
                 formattedResponsable.id_domicilio_actual = formattedResponsable.id_domicilio_renaper;
             }
@@ -136,7 +136,7 @@ const AddResponsable = ({ responsable }) => {
             setAlertOpen(true);
         
             setTimeout(() => {
-                navigate(`/responsable/${response.id_responsable}`);
+                navigate(`/responsable/${response.id}`);
             }, 3000); // Timeout para que se muestre la alerta
         } catch (error) {
             setAlertSuccess(false);

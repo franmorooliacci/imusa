@@ -102,7 +102,7 @@ const AddResponsablePage = () => {
             const formattedDomicilio = formatDomicilio(data.domicilioActual);
             
             const domicilio = await domicilioExists(formattedDomicilio);
-            formattedResponsable.id_domicilio_actual = domicilio.id_domicilio;
+            formattedResponsable.id_domicilio_actual = domicilio.id;
             
             const response = await addResponsable(formattedResponsable);
 
@@ -111,7 +111,7 @@ const AddResponsablePage = () => {
             setAlertOpen(true);
 
             setTimeout(() => {
-                navigate(`/responsable/${response.id_responsable}`);
+                navigate(`/responsable/${response.id}`);
             }, 3000);
         } catch (error) {
             setAlertSuccess(false);

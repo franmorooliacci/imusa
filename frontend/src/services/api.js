@@ -117,9 +117,9 @@ export const updateAtencion = async (id, data) => {
     }
 };
 
-export const getInsumosByIdAtencion = async (params) => {
+export const getInsumosByIdAtencion = async (id_atencion) => {
     try {
-        const response = await http.get(`atencion_insumo/buscar`, { params });
+        const response = await http.get(`atencion_insumo/buscar`, { params: { id_atencion } });
         return response.data;
     } catch (error) {
         throw error;
@@ -188,7 +188,7 @@ export const loginUser = async (username, password) => {
 
 export const getCiudadano = async (dni, sexo) => {
     try {
-        const response = await http.get('external_data/ciudadano/', { params: {dni, sexo} });
+        const response = await http.get('external_data/ciudadano/', { params: { dni, sexo } });
         return response.data;
     } catch (error) {
         throw error;
@@ -197,27 +197,27 @@ export const getCiudadano = async (dni, sexo) => {
 
 export const getFeatures = async (domicilio) => {
     try {
-        const response = await http.get('external_data/features/', { params: {domicilio} });
+        const response = await http.get('external_data/features/', { params: { domicilio } });
         return response.data;
-    } catch(error){
+    } catch (error) {
         throw error
     }
 };
 
 export const getDireccion = async (codigoCalle, altura, bis, letra) => {
     try {
-        const response = await http.get('external_data/direccion/', { params: {codigoCalle, altura, bis, letra} });
+        const response = await http.get('external_data/direccion/', { params: { codigoCalle, altura, bis, letra } });
         return response.data;
-    } catch(error){
+    } catch (error) {
         throw error
     }
 };
 
 export const getLatitudLongitud = async (punto_x, punto_y) => {
     try {
-        const response = await http.get('external_data/latitud-longitud/', { params: {punto_x, punto_y} });
+        const response = await http.get('external_data/latitud-longitud/', { params: { punto_x, punto_y } });
         return response.data;
-    } catch(error){
+    } catch (error) {
         throw error
     }
 };

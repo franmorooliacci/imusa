@@ -96,13 +96,13 @@ const AtencionesListPage = () => {
             </Grid2>
 
             {sortedAtenciones.map((atencion) => (
-                <Grid2 key={atencion.id_atencion} size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
+                <Grid2 key={atencion.id} size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
                     <ListItem
                         disablePadding 
                         sx={{ bgcolor: 'background.paper', boxShadow: 3, borderRadius: 4, overflow: 'hidden' }}
                     >
                         <ListItemButton 
-                            onClick={() => navigate(`/atencion/finalizar/${atencion.id_atencion}/${atencion.id_responsable}/${atencion.id_animal}`)} 
+                            onClick={() => navigate(`/atencion/finalizar/${atencion.id}/${atencion.id_responsable}/${atencion.id_animal}`)} 
                             sx={
                                 (theme) => ({
                                     '&:hover': {

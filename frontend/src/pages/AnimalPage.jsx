@@ -69,7 +69,7 @@ const AnimalPage = () => {
     // };
 
     const handleAddAtencion = () => {
-        navigate(`/atencion/agregar/${animal.id_responsable}/${animal.id_animal}`);
+        navigate(`/atencion/agregar/${animal.id_responsable}/${animal.id}`);
     }
 
     if (loading) {

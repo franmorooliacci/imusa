@@ -60,7 +60,7 @@ const AtencionTable = ({atenciones, animalDetails}) => {
                 </TableHead>
                 <TableBody>
                     {paginatedAtenciones.map((atencion) => (
-                        <TableRow key={atencion.id_atencion}>
+                        <TableRow key={atencion.id}>
                             {animalDetails &&
                                 <TableCell>
                                     <FontAwesomeIcon icon={atencion.animal.id_especie === 1 ? faDog : faCat} size='2x' sx={{ color: (theme) => theme.palette.text.primary }} />
@@ -80,7 +80,7 @@ const AtencionTable = ({atenciones, animalDetails}) => {
                                 <IconButton 
                                     variant="outlined" 
                                     color="primary" 
-                                    onClick={() => navigate(`/atencion/${atencion.id_atencion}`)}
+                                    onClick={() => navigate(`/atencion/${atencion.id}`)}
                                     sx={{
                                         '&:hover': {
                                             backgroundColor: 'rgba(0, 0, 0, 0.08)',

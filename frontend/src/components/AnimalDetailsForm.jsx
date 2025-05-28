@@ -122,7 +122,7 @@ const AnimalDetailsForm = ({ formData, onChange = () => {}, readOnly }) => {
                     <TextField
                         label='Observaciones'
                         placeholder='Observaciones del animal'
-                        name='observaciones_reseña'
+                        name='observaciones_animal'
                         value={formData.atencion.observaciones_animal ?? ''}
                         slotProps={{
                             input: {

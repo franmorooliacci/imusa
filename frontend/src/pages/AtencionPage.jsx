@@ -127,12 +127,12 @@ const AtencionPage = () => {
                 estado: 1
             };
                 
-            await updateAtencion(formData.atencion.id_atencion, finishedAtencion);
+            await updateAtencion(formData.atencion.id, finishedAtencion);
 
             const insumos = Object.entries(options)
                 .filter(([_, insumo]) => insumo.selected && Number(insumo.value) > 0)
                 .map(([_, insumo]) => ({
-                    id_atencion: formData.atencion.id_atencion,
+                    id_atencion: formData.atencion.id,
                     id_insumo: insumo.id,
                     cant_ml: Number(insumo.value)
                 }))
@@ -144,7 +144,7 @@ const AtencionPage = () => {
 
             if(keta_induccion > 0 || keta_prequirurgico > 0 || keta_quirofano > 0){
                 insumos.push({
-                    id_atencion: formData.atencion.id_atencion,
+                    id_atencion: formData.atencion.id,
                     id_insumo: 13,
                     cant_ml: keta_induccion + keta_prequirurgico + keta_quirofano,
                     cant_ml_prequirurgico: keta_prequirurgico === 0 ? null : keta_prequirurgico,

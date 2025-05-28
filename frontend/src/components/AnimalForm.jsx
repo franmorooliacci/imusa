@@ -73,10 +73,10 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
                 setAlertOpen(true);
 
                 setTimeout(() => {
-                    onSuccess(`/responsable/${data.id_responsable}/${data.id_especie === 1 ? 'canino' : 'felino'}/${response.id_animal}`);
+                    onSuccess(`/responsable/${data.id_responsable}/${data.id_especie === 1 ? 'canino' : 'felino'}/${response.id}`);
                 }, 3000);
             } else {
-                const response = await updateAnimal(initialData.id_animal, data);
+                const response = await updateAnimal(initialData.id, data);
 
                 setAlertSuccess(true);
                 setAlertMsg(`${data.id_especie === 1 ? 'Canino' : 'Felino'} modificado con éxito!`);
@@ -157,7 +157,7 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
                                     fullWidth
                                 >
                                     {razas.map(r => (
-                                        <MenuItem key={r.id_raza} value={r.id_raza}>
+                                        <MenuItem key={r.id} value={r.id}>
                                         {r.nombre}
                                         </MenuItem>
                                     ))}

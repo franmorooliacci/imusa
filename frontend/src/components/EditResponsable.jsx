@@ -86,7 +86,7 @@ const EditResponsable = ({ editDomicilio, setEditDomicilio, editContacto, setEdi
 
     const onSubmitContacto = async (data) => {
         try{
-            await updateResponsable(responsable.id_responsable, data.contacto);
+            await updateResponsable(responsable.id, data.contacto);
             
             setResponsable(prev => ({
                 ...prev,
@@ -120,7 +120,7 @@ const EditResponsable = ({ editDomicilio, setEditDomicilio, editContacto, setEdi
             }));
 
             // Actualizo el nuevo domicilio en la db
-            await updateResponsable(responsable.id_responsable, { id_domicilio_actual: newDomicilio.id_domicilio });
+            await updateResponsable(responsable.id, { id_domicilio_actual: newDomicilio.id });
 
             setAlertSuccess(true);
             setAlertMsg('Modificación realizada con éxito!');
