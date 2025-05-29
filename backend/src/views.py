@@ -72,8 +72,10 @@ class AnimalViewSet(viewsets.ModelViewSet):
         return Response(status=204)
 
     def perform_create(self, serializer):
-        responsable = Responsable.objects.get(
-            id=self.request.data['id_responsable'])
+        id_responsable = self.request.data.get('id_responsable')
+        responsable = None
+        if id_responsable:
+            responsable = Responsable.objects.get(id=id_responsable)
         especie = Especie.objects.get(
             id=self.request.data['id_especie'])
         raza = Raza.objects.get(id=self.request.data['id_raza'])
