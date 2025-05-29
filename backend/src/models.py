@@ -155,7 +155,7 @@ class Profesional(models.Model):
     legajo = models.IntegerField()
     estado = models.IntegerField()
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+        settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, null=True)
 
     class Meta:
         managed = False
