@@ -82,7 +82,7 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
                 const dateOnly = currentDate.toISOString().slice(0, 10);
                 const institucionAnimal = {
                     id_institucion: 1,
-                    id_animal: response.id_animal,
+                    id_animal: response.id,
                     ingreso: dateOnly,
                     adopcion: 0,
                     estado: 1
@@ -94,7 +94,7 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
                 setAlertOpen(true);
 
                 setTimeout(() => {
-                    onSuccess('/adopcion');
+                    onSuccess();
                 }, 3000);
             } else {
                 const response = await updateAnimal(initialData.id, data);
