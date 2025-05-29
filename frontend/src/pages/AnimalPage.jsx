@@ -16,6 +16,7 @@ const AnimalPage = () => {
     const [loading, setLoading] = useState(true);
     const [atenciones, setAtenciones] = useState([]);
     const visibleAtenciones = atenciones.filter(a => a.estado === 1);
+    const hasValidId = responsableId && responsableId !== 'null' && responsableId !== 'undefined';
     
     const navigate = useNavigate();
 
@@ -104,7 +105,7 @@ const AnimalPage = () => {
             ) : (
                 <Grid2 container spacing={2} sx={{ width: '100%' }}>
                     <Grid2 size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
-                        <BackHeader navigateTo = {`/responsable/${responsableId}`} />
+                        <BackHeader navigateTo = {hasValidId ? `/responsable/${responsableId}` : '/adopcion'} />
                     </Grid2>
                     <Grid2 size={{ xs: 12, sm: 12, md: 4, lg: 4 }} sx={{ bgcolor: 'background.paper', p: 2, boxShadow: 3, borderRadius: 4, flexGrow: 1 }}>    
                         
