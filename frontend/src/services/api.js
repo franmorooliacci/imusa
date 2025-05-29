@@ -56,7 +56,7 @@ export const addInstitucionAnimal = async (newAnimal) => {
 
 export const getInstitucionAnimal = async (id_institucion) => {
     try {
-        const response = await http.get(`institucion_animales/institucion/`, id_institucion);
+        const response = await http.get(`institucion_animales/institucion/`, { params: { id_institucion } });
         return response.data;
     } catch (error) {
         throw error;
