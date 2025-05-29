@@ -33,7 +33,7 @@ const AnimalTable = ({animalList}) => {
                 </TableHead>
                 <TableBody>
                     {animalList.map((animal) => (
-                        <TableRow key={animal.id_animal}>
+                        <TableRow key={animal.id}>
                             <TableCell>{animal.nombre}</TableCell>
                             <TableCell>{animal.sexo}</TableCell>
                             <TableCell>{animal.edad}</TableCell>
@@ -42,7 +42,7 @@ const AnimalTable = ({animalList}) => {
                                 <IconButton 
                                     variant="outlined" 
                                     color="primary" 
-                                    onClick={() => navigate(`/responsable/${animal.id_responsable}/${animal.id_especie === 1 ? 'canino' : 'felino'}/${animal.id_animal}`)}
+                                    onClick={() => navigate(`/responsable/${animal.id_responsable}/${animal.id_especie === 1 ? 'canino' : 'felino'}/${animal.id}`)}
                                     sx={{
                                         '&:hover': {
                                             backgroundColor: 'rgba(0, 0, 0, 0.08)',

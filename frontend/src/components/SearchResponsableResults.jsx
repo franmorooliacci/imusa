@@ -5,7 +5,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const SearchResultsTable = ({ searched, responsable, isLoading, isInDb, 
-    addingResponsable, setAddingResponsable, editDomicilio, setEditDomicilio, editContacto, setEditContacto }) => {
+    addingResponsable, setAddingResponsable, editDomicilio, setEditDomicilio, editContacto, setEditContacto, renaperFound }) => {
     const navigate = useNavigate();
 
     return (
@@ -15,7 +15,7 @@ const SearchResultsTable = ({ searched, responsable, isLoading, isInDb,
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2 }}>
                         <CircularProgress />
                     </Box>
-                ) : (responsable && isInDb) ? (
+                ) : (renaperFound === true && isInDb) ? (
                     <Box>
                         <Alert severity='info' sx={{ display: 'flex', justifyContent: 'center' }} > 
                             La persona está registrada en el IMuSA.
@@ -38,7 +38,7 @@ const SearchResultsTable = ({ searched, responsable, isLoading, isInDb,
                                         size='small' 
                                         variant='contained' 
                                         color='primary' 
-                                        onClick={() => navigate(`/responsable/${responsable.id_responsable}`)}
+                                        onClick={() => navigate(`/responsable/${responsable.id}`)}
                                     >
                                         Continuar
                                     </Button>
@@ -129,7 +129,7 @@ const SearchResultsTable = ({ searched, responsable, isLoading, isInDb,
                             </Grid2>
                         }
                     </Box>
-                ) : (responsable && !isInDb) ? (
+                ) : (renaperFound === true && !isInDb) ? (
                     <Box>
                         {responsable.fallecido ? (
                             <Box>
@@ -174,7 +174,7 @@ const SearchResultsTable = ({ searched, responsable, isLoading, isInDb,
                             </Box>
                         )}
                     </Box>
-                ) : (
+                ) : (renaperFound === false) ? (
                     <Box>
                         <Alert severity='error' sx={{ display: 'flex', justifyContent: 'center' }} > 
                             No se encontraron resultados.
@@ -190,7 +190,7 @@ const SearchResultsTable = ({ searched, responsable, isLoading, isInDb,
                             </Button>
                         </Box>
                     </Box>
-                )
+                ) : null
             )}
         </Box>
     );

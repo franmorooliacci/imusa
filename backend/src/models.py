@@ -3,7 +3,7 @@ from django.conf import settings
 
 
 class Animal(models.Model):
-    id_animal = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=255)
     sexo = models.CharField(max_length=1)
     año_nacimiento = models.IntegerField()
@@ -21,7 +21,7 @@ class Animal(models.Model):
 
 
 class Atencion(models.Model):
-    id_atencion = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     id_efector = models.ForeignKey(
         'Efector', models.DO_NOTHING, db_column='id_efector')
     id_responsable = models.ForeignKey(
@@ -54,7 +54,7 @@ class Atencion(models.Model):
 
 
 class AtencionInsumo(models.Model):
-    id_ate_ins = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     id_atencion = models.ForeignKey(
         Atencion, models.DO_NOTHING, db_column='id_atencion')
     id_insumo = models.ForeignKey(
@@ -70,7 +70,7 @@ class AtencionInsumo(models.Model):
 
 
 class Domicilio(models.Model):
-    id_domicilio = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     calle = models.CharField(max_length=255)
     altura = models.IntegerField()
     bis = models.IntegerField()
@@ -99,7 +99,7 @@ class Domicilio(models.Model):
 
 
 class Efector(models.Model):
-    id_efector = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=255)
     domicilio = models.CharField(max_length=255)
     latitud = models.CharField(max_length=255, blank=True, null=True)
@@ -122,7 +122,7 @@ class Efector(models.Model):
 
 
 class Especie(models.Model):
-    id_especie = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=255)
 
     class Meta:
@@ -131,7 +131,7 @@ class Especie(models.Model):
 
 
 class Insumo(models.Model):
-    id_insumo = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     descripcion = models.CharField(max_length=255)
     tope_max = models.IntegerField(blank=True, null=True)
     tope_min = models.IntegerField(blank=True, null=True)
@@ -142,7 +142,7 @@ class Insumo(models.Model):
 
 
 class Profesional(models.Model):
-    id_profesional = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=255)
     apellido = models.CharField(max_length=255)
     dni = models.IntegerField()
@@ -163,7 +163,7 @@ class Profesional(models.Model):
 
 
 class ProfesionalEfector(models.Model):
-    id_prof_efec = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     id_profesional = models.ForeignKey(
         Profesional, models.DO_NOTHING, db_column='id_profesional')
     id_efector = models.ForeignKey(
@@ -176,7 +176,7 @@ class ProfesionalEfector(models.Model):
 
 
 class Raza(models.Model):
-    id_raza = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     id_especie = models.ForeignKey(
         Especie, models.DO_NOTHING, db_column='id_especie')
     nombre = models.CharField(max_length=255)
@@ -192,7 +192,7 @@ class Raza(models.Model):
 
 
 class Responsable(models.Model):
-    id_responsable = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=255)
     apellido = models.CharField(max_length=255)
     dni = models.IntegerField()
@@ -212,7 +212,7 @@ class Responsable(models.Model):
 
 
 class Servicio(models.Model):
-    id_servicio = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     descripcion = models.CharField(max_length=255)
 
     class Meta:

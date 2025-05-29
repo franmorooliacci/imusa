@@ -7,7 +7,7 @@ import EditResponsable from '../components/EditResponsable';
 
 const SearchPage = () => {
     const [responsable, setResponsable] = useState({
-        id_responsable: '',
+        id: '',
         nombre: '',
         apellido: '',
         dni: '',
@@ -26,6 +26,11 @@ const SearchPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     // Indica si la persona esta en la db del imusa
     const [isInDb, setIsInDb] = useState(false);
+    // Indica si la persona esta en renaper
+    // null = no se realizo la busqueda
+    // true = la persona esta en renaper
+    // false = la persona no esta en renaper
+    const [renaperFound, setRenaperFound] = useState(null)
     const [addingResponsable, setAddingResponsable] = useState(false);
     const [editDomicilio, setEditDomicilio] = useState(false);
     const [editContacto, setEditContacto] = useState(false);
@@ -42,6 +47,7 @@ const SearchPage = () => {
                     setAddingResponsable = {setAddingResponsable}
                     setEditDomicilio = {setEditDomicilio}
                     setEditContacto = {setEditContacto}
+                    setRenaperFound = {setRenaperFound}
                 />
                 
                 <SearchResponsableResults 
@@ -55,6 +61,7 @@ const SearchPage = () => {
                     setEditDomicilio = {setEditDomicilio}
                     editContacto = {editContacto}
                     setEditContacto = {setEditContacto}
+                    renaperFound =  {renaperFound}
                 />
                 
                 {addingResponsable &&

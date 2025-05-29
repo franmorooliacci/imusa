@@ -10,7 +10,7 @@ from .models import (
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, APIException
 from .serializers import (
     ResponsableSerializer, AnimalSerializer, RazaSerializer,
     EfectorSerializer, AtencionSerializer, InsumoSerializer,
@@ -24,7 +24,7 @@ from decouple import config
 
 
 class ResponsableViewSet(viewsets.ModelViewSet):
-    queryset = Responsable.objects.all()
+    queryset = Responsable.objects.prefetch_related('animal_set').all()
     serializer_class = ResponsableSerializer
 
     @action(detail=False, methods=['get'], url_path='buscar')
@@ -54,7 +54,8 @@ class ResponsableViewSet(viewsets.ModelViewSet):
 
 
 class AnimalViewSet(viewsets.ModelViewSet):
-    queryset = Animal.objects.all()
+    queryset = Animal.objects.select_related(
+        'id_responsable', 'id_especie', 'id_raza').all()
     serializer_class = AnimalSerializer
 
     def update(self, request, pk=None):
@@ -71,22 +72,18 @@ class AnimalViewSet(viewsets.ModelViewSet):
         return Response(status=204)
 
     def perform_create(self, serializer):
-        id_responsable = self.request.data.get('id_responsable')
-        if id_responsable is not None:
-            responsable = Responsable.objects.get(
-                id_responsable=id_responsable)
-        else:
-            responsable = None
+        responsable = Responsable.objects.get(
+            id=self.request.data['id_responsable'])
         especie = Especie.objects.get(
-            id_especie=self.request.data['id_especie'])
-        raza = Raza.objects.get(id_raza=self.request.data['id_raza'])
+            id=self.request.data['id_especie'])
+        raza = Raza.objects.get(id=self.request.data['id_raza'])
 
         serializer.save(id_responsable=responsable,
                         id_especie=especie, id_raza=raza)
 
 
 class RazaViewSet(viewsets.ModelViewSet):
-    queryset = Raza.objects.all()
+    queryset = Raza.objects.select_related('id_especie').all()
     serializer_class = RazaSerializer
     lookup_field = 'id_especie'
 
@@ -103,7 +100,8 @@ class EfectorViewSet(viewsets.ModelViewSet):
 
 
 class AtencionViewSet(viewsets.ModelViewSet):
-    queryset = Atencion.objects.all()
+    queryset = Atencion.objects.select_related(
+        'id_animal__id_especie', 'id_responsable', 'id_efector', 'id_profesional').all()
     serializer_class = AtencionSerializer
 
     @action(detail=False, methods=['get'], url_path='buscar')
@@ -244,15 +242,16 @@ class ExternalDataViewSet(viewsets.ViewSet):
         try:
             response = requests.get(url, timeout=10, proxies={
                                     'http': None, 'https': None}, verify=False)
+            if response.status_code == 404:
+                raise NotFound()
             response.raise_for_status()
             data = response.json()
             result = data.get('features')
             return Response(result)
+        except NotFound:
+            raise
         except requests.RequestException as exc:
-            return Response(
-                {'error': f'External API error: {str(exc)}'},
-                status=status.HTTP_502_BAD_GATEWAY
-            )
+            raise APIException(detail=f'External API error: {str(exc)}')
 
     @action(detail=False, methods=['get'], url_path='direccion')
     def direccion(self, request):
@@ -275,13 +274,14 @@ class ExternalDataViewSet(viewsets.ViewSet):
         try:
             response = requests.get(url, timeout=10, proxies={
                                     'http': None, 'https': None}, verify=False)
+            if response.status_code == 404:
+                raise NotFound()
             response.raise_for_status()
             return Response(response.json())
+        except NotFound:
+            raise
         except requests.RequestException as exc:
-            return Response(
-                {'error': f'External API error: {str(exc)}'},
-                status=status.HTTP_502_BAD_GATEWAY
-            )
+            raise APIException(detail=f'External API error: {str(exc)}')
 
     @action(detail=False, methods=['get'], url_path='latitud-longitud')
     def latitud_longitud(self, request):
@@ -299,13 +299,14 @@ class ExternalDataViewSet(viewsets.ViewSet):
         try:
             response = requests.get(url, timeout=10, proxies={
                                     'http': None, 'https': None}, verify=False)
+            if response.status_code == 404:
+                raise NotFound()
             response.raise_for_status()
             return Response(response.json())
+        except NotFound:
+            raise
         except requests.RequestException as exc:
-            return Response(
-                {'error': f'External API error: {str(exc)}'},
-                status=status.HTTP_502_BAD_GATEWAY
-            )
+            raise APIException(detail=f'External API error: {str(exc)}')
 
     @action(detail=False, methods=['get'], url_path='ciudadano')
     def ciudadano(self, request):
@@ -322,15 +323,16 @@ class ExternalDataViewSet(viewsets.ViewSet):
 
         try:
             response = requests.get(url, timeout=10)
+            if response.status_code == 404:
+                raise NotFound()
             response.raise_for_status()
             data = response.json()
             result = data.get('ciudadano')
             return Response(result)
+        except NotFound:
+            raise
         except requests.RequestException as exc:
-            return Response(
-                {'error': f'External API error: {str(exc)}'},
-                status=status.HTTP_502_BAD_GATEWAY
-            )
+            raise APIException(detail=f'External API error: {str(exc)}')
 
 
 class CandidatoViewSet(viewsets.ModelViewSet):
@@ -373,3 +375,4 @@ class AdopcionFotoViewSet(viewsets.ModelViewSet):
 class AdopcionViewSet(viewsets.ModelViewSet):
     queryset = Adopcion.objects.all()
     serializer_class = AdopcionSerializer
+

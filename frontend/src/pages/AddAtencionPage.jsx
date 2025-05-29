@@ -69,7 +69,13 @@ const AddAtencionPage = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({
+            ...prev,
+            atencion: {
+                ...prev.atencion,
+                [name]: value,
+            }
+        }));
     };
 
     const handleCloseAlert = () => {
@@ -83,11 +89,11 @@ const AddAtencionPage = () => {
         try{ 
             const newAtencion = {
                 id_efector: selectedEfectorId,
-                id_responsable: formData.responsable.id_responsable,
+                id_responsable: formData.responsable.id,
                 id_domicilio_responsable: formData.responsable.id_domicilio_actual,
-                id_animal: formData.animal.id_animal,
+                id_animal: formData.animal.id,
                 id_servicio: 1,
-                id_profesional: profesional.id_profesional,
+                id_profesional: profesional.id,
                 señas_particulares: formData.atencion.señas_particulares === '' ? null : formData.atencion.señas_particulares,
                 observaciones_animal: formData.atencion.observaciones_animal === '' ? null : formData.atencion.observaciones_animal,
                 fecha_ingreso: now.toISOString().split('T')[0],

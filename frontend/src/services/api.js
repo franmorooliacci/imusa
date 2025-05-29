@@ -135,9 +135,9 @@ export const updateAtencion = async (id, data) => {
     }
 };
 
-export const getInsumosByIdAtencion = async (params) => {
+export const getInsumosByIdAtencion = async (id_atencion) => {
     try {
-        const response = await http.get(`atencion_insumo/buscar`, { params });
+        const response = await http.get(`atencion_insumo/buscar`, { params: { id_atencion } });
         return response.data;
     } catch (error) {
         throw error;

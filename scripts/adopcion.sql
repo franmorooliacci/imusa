@@ -29,7 +29,7 @@ CREATE TABLE
         id_candidato INT NOT NULL,
         fecha DATETIME NOT NULL,
         estado ENUM ('Pendiente', 'Aprobada', 'Rechazada') NOT NULL,
-        FOREIGN KEY (id_animal) REFERENCES animal (id_animal),
+        FOREIGN KEY (id_animal) REFERENCES animal (id),
         FOREIGN KEY (id_candidato) REFERENCES candidato (id)
     );
 
@@ -45,7 +45,7 @@ CREATE TABLE
         observaciones TEXT NULL,
         estado TINYINT (1) NOT NULL,
         FOREIGN KEY (id_institucion) REFERENCES institucion (id),
-        FOREIGN KEY (id_animal) REFERENCES animal (id_animal)
+        FOREIGN KEY (id_animal) REFERENCES animal (id)
     );
 
 CREATE TABLE
@@ -67,7 +67,7 @@ CREATE TABLE
         fecha DATE NOT NULL,
         regreso DATE NULL,
         observaciones TEXT NULL,
-        FOREIGN KEY (id_responsable) REFERENCES responsable (id_responsable),
-        FOREIGN KEY (id_animal) REFERENCES animal (id_animal),
+        FOREIGN KEY (id_responsable) REFERENCES responsable (id),
+        FOREIGN KEY (id_animal) REFERENCES animal (id),
         FOREIGN KEY (id_institucion) REFERENCES institucion (id)
     );

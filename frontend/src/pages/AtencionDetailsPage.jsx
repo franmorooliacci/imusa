@@ -8,7 +8,7 @@ import BackHeader from '../components/BackHeader';
 const AtencionDetailsPage = () => {
     const { id } = useParams();
     const [ids, setIds] = useState({ id_responsable: '', id_animal: '', id_especie: ''});
-    const [pdfData, setPdfData] = useState(null);
+    const [pdfData, setPdfData] = useState({});
     const [efector, setEfector] = useState('');
     const [loading, setLoading] = useState(true);
 
@@ -55,9 +55,11 @@ const AtencionDetailsPage = () => {
                 });
 
                 // Traigo datos del responsable, profesional e insumos para completar al pdf
-                const responsable = await getResponsableById(atencion.id_responsable);
-                const profesional = await getProfesionalById(atencion.id_profesional);
-                const insumos = await getInsumosByIdAtencion({id_atencion: id});
+                const [responsable, profesional, insumos] = await Promise.all([
+                    getResponsableById(atencion.id_responsable),
+                    getProfesionalById(atencion.id_profesional),
+                    getInsumosByIdAtencion(id)
+                ]);
 
                 // Mapeo los valores de los insumos usados en la atencion
                 const newState = {
@@ -93,8 +95,7 @@ const AtencionDetailsPage = () => {
                 });
 
                 // Seteo los valores del pdf
-                setPdfData(prev => ({
-                    ...prev,
+                const dataObj = {
                     recogido_imusa: 'NO',
                     nombre_completo: responsable.nombre + ' ' + responsable.apellido,
                     domicilio: `${responsable.domicilio_actual.calle} ${responsable.domicilio_actual.altura}${responsable.domicilio_actual.bis === 0 ? '' : ' BIS'}${responsable.domicilio_actual.letra ? ` ${responsable.domicilio_actual.letra}` : ''}${responsable.domicilio_actual.piso ? ` ${responsable.domicilio_actual.piso}` : ''}${responsable.domicilio_actual.depto ? ` ${responsable.domicilio_actual.depto}` : ''}${responsable.domicilio_actual.monoblock ? ` ${responsable.domicilio_actual.monoblock}` : ''}`,
@@ -125,7 +126,9 @@ const AtencionDetailsPage = () => {
                     veterinario_nombre: profesional.nombre + ' ' + profesional.apellido,
                     firma_veterinario: profesional.firma,
                     ...newState
-                }));
+                };
+
+                setPdfData(dataObj);
 
             } catch(error) {
 

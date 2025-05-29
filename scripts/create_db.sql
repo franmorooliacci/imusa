@@ -1,22 +1,24 @@
+DROP DATABASE IF EXISTS imusa;
+
 CREATE DATABASE imusa;
 
 USE imusa;
 
 CREATE TABLE
     especie (
-        id_especie INT AUTO_INCREMENT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         nombre VARCHAR(255) NOT NULL
     );
 
 INSERT INTO
-    especie (id_especie, nombre)
+    especie (id, nombre)
 VALUES
     (1, 'Canino'),
     (2, 'Felino');
 
 CREATE TABLE
     servicio (
-        id_servicio INT AUTO_INCREMENT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         descripcion VARCHAR(255) NOT NULL
     );
 
@@ -27,7 +29,7 @@ VALUES
 
 CREATE TABLE
     insumo (
-        id_insumo INT AUTO_INCREMENT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         descripcion VARCHAR(255) NOT NULL,
         tope_max INT NULL,
         tope_min INT NULL
@@ -52,7 +54,7 @@ VALUES
 
 CREATE TABLE
     efector (
-        id_efector INT AUTO_INCREMENT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         nombre VARCHAR(255) NOT NULL,
         domicilio VARCHAR(255) NOT NULL,
         latitud VARCHAR(255) NULL,
@@ -1452,7 +1454,7 @@ VALUES
 
 CREATE TABLE
     domicilio (
-        id_domicilio INT AUTO_INCREMENT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         calle VARCHAR(255) NOT NULL,
         altura INT NOT NULL,
         bis TINYINT (1) NOT NULL,
@@ -1477,7 +1479,7 @@ CREATE TABLE
 
 CREATE TABLE
     responsable (
-        id_responsable INT AUTO_INCREMENT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         nombre VARCHAR(255) NOT NULL,
         apellido VARCHAR(255) NOT NULL,
         dni INT NOT NULL,
@@ -1488,13 +1490,13 @@ CREATE TABLE
         telefono VARCHAR(15) NULL,
         mail VARCHAR(255) NULL,
         firma TEXT NULL,
-        FOREIGN KEY (id_domicilio_renaper) REFERENCES domicilio (id_domicilio),
-        FOREIGN KEY (id_domicilio_actual) REFERENCES domicilio (id_domicilio)
+        FOREIGN KEY (id_domicilio_renaper) REFERENCES domicilio (id),
+        FOREIGN KEY (id_domicilio_actual) REFERENCES domicilio (id)
     );
 
 CREATE TABLE
     raza (
-        id_raza INT AUTO_INCREMENT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         id_especie INT NOT NULL,
         nombre VARCHAR(255) NOT NULL,
         tamaño VARCHAR(10) NOT NULL,
@@ -1502,7 +1504,7 @@ CREATE TABLE
         limite_sup_altura_cm INT NULL,
         limite_inf_peso_kg INT NULL,
         limite_sup_peso_kg INT NULL,
-        FOREIGN KEY (id_especie) REFERENCES especie (id_especie)
+        FOREIGN KEY (id_especie) REFERENCES especie (id)
     );
 
 INSERT INTO
@@ -1661,7 +1663,7 @@ VALUES
 
 CREATE TABLE
     animal (
-        id_animal INT AUTO_INCREMENT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         nombre VARCHAR(255) NOT NULL,
         sexo CHAR(1) NOT NULL,
         año_nacimiento INT NOT NULL,
@@ -1670,14 +1672,14 @@ CREATE TABLE
         id_especie INT NOT NULL,
         id_raza INT NOT NULL,
         fallecido TINYINT (1) NOT NULL,
-        FOREIGN KEY (id_especie) REFERENCES especie (id_especie),
-        FOREIGN KEY (id_raza) REFERENCES raza (id_raza),
-        FOREIGN KEY (id_responsable) REFERENCES responsable (id_responsable)
+        FOREIGN KEY (id_especie) REFERENCES especie (id),
+        FOREIGN KEY (id_raza) REFERENCES raza (id),
+        FOREIGN KEY (id_responsable) REFERENCES responsable (id)
     );
 
 CREATE TABLE
     profesional (
-        id_profesional INT AUTO_INCREMENT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NULL,
         nombre VARCHAR(255) NOT NULL,
         apellido VARCHAR(255) NOT NULL,
@@ -1688,13 +1690,13 @@ CREATE TABLE
         mail VARCHAR(255) NULL,
         matricula VARCHAR(15) NOT NULL,
         legajo INT NOT NULL,
-        estado TINYINT(1) NOT NULL,
+        estado TINYINT (1) NOT NULL,
         firma TEXT NULL
     );
 
 CREATE TABLE
     atencion (
-        id_atencion INT AUTO_INCREMENT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         id_efector INT NOT NULL,
         id_responsable INT NOT NULL,
         id_domicilio_responsable INT NULL,
@@ -1710,33 +1712,33 @@ CREATE TABLE
         estado_sanitario_egreso VARCHAR(255) NULL,
         observaciones_atencion VARCHAR(255) NULL,
         estado TINYINT (1) NOT NULL,
-        FOREIGN KEY (id_efector) REFERENCES efector (id_efector),
-        FOREIGN KEY (id_responsable) REFERENCES responsable (id_responsable),
-        FOREIGN KEY (id_domicilio_responsable) REFERENCES domicilio (id_domicilio),
-        FOREIGN KEY (id_animal) REFERENCES animal (id_animal),
-        FOREIGN KEY (id_servicio) REFERENCES servicio (id_servicio),
-        FOREIGN KEY (id_profesional) REFERENCES profesional (id_profesional)
+        FOREIGN KEY (id_efector) REFERENCES efector (id),
+        FOREIGN KEY (id_responsable) REFERENCES responsable (id),
+        FOREIGN KEY (id_domicilio_responsable) REFERENCES domicilio (id),
+        FOREIGN KEY (id_animal) REFERENCES animal (id),
+        FOREIGN KEY (id_servicio) REFERENCES servicio (id),
+        FOREIGN KEY (id_profesional) REFERENCES profesional (id)
     );
 
 CREATE TABLE
     atencion_insumo (
-        id_ate_ins INT AUTO_INCREMENT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         id_atencion INT NOT NULL,
         id_insumo INT NOT NULL,
         cant_ml INT NULL,
         cant_ml_prequirurgico INT NULL,
         cant_ml_induccion INT NULL,
         cant_ml_quirofano INT NULL,
-        FOREIGN KEY (id_atencion) REFERENCES atencion (id_atencion),
-        FOREIGN KEY (id_insumo) REFERENCES insumo (id_insumo)
+        FOREIGN KEY (id_atencion) REFERENCES atencion (id),
+        FOREIGN KEY (id_insumo) REFERENCES insumo (id)
     );
 
 CREATE TABLE
     profesional_efector (
-        id_prof_efec INT AUTO_INCREMENT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         id_profesional INT NOT NULL,
         id_efector INT NOT NULL,
         estado TINYINT (1) NOT NULL,
-        FOREIGN KEY (id_profesional) REFERENCES profesional (id_profesional),
-        FOREIGN KEY (id_efector) REFERENCES efector (id_efector)
+        FOREIGN KEY (id_profesional) REFERENCES profesional (id),
+        FOREIGN KEY (id_efector) REFERENCES efector (id)
     );

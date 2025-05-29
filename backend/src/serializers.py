@@ -9,9 +9,15 @@ from .models import (
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
+class EspecieSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Especie
+        fields = '__all__'
+
+
 class RazaSerializer(serializers.ModelSerializer):
-    id_especie = serializers.PrimaryKeyRelatedField(
-        queryset=Especie.objects.all())
+    especie = EspecieSerializer(
+        source='id_especie', read_only=True, required=False)
 
     class Meta:
         model = Raza
@@ -19,9 +25,10 @@ class RazaSerializer(serializers.ModelSerializer):
 
 
 class AnimalSerializer(serializers.ModelSerializer):
-    id_especie = serializers.PrimaryKeyRelatedField(
-        queryset=Especie.objects.all())
-    id_raza = serializers.PrimaryKeyRelatedField(queryset=Raza.objects.all())
+    especie = EspecieSerializer(
+        source='id_especie', read_only=True, required=False)
+    raza = RazaSerializer(source='id_raza', read_only=True, required=False)
+
     raza_nombre = serializers.SerializerMethodField()
     edad = serializers.SerializerMethodField()
     raza_tamaño = serializers.SerializerMethodField()
@@ -55,7 +62,7 @@ class ResponsableSerializer(serializers.ModelSerializer):
     caninos = serializers.SerializerMethodField()
     edad = serializers.SerializerMethodField()
     domicilio_actual = DomicilioSerializer(
-        source='id_domicilio_actual', required=False)
+        source='id_domicilio_actual', read_only=True, required=False)
 
     class Meta:
         model = Responsable
@@ -63,12 +70,12 @@ class ResponsableSerializer(serializers.ModelSerializer):
 
     def get_felinos(self, obj):
         felinos = Animal.objects.filter(
-            id_responsable=obj.id_responsable, id_especie=2)
+            id_responsable=obj.id, id_especie=2)
         return AnimalSerializer(felinos, many=True).data
 
     def get_caninos(self, obj):
         caninos = Animal.objects.filter(
-            id_responsable=obj.id_responsable, id_especie=1)
+            id_responsable=obj.id, id_especie=1)
         return AnimalSerializer(caninos, many=True).data
 
     def get_edad(self, obj):
@@ -85,7 +92,7 @@ class ResponsableSerializer(serializers.ModelSerializer):
 class EfectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Efector
-        fields = ['id_efector', 'nombre', 'unidad_movil']
+        fields = ['id', 'nombre', 'unidad_movil']
 
 
 class InsumoSerializer(serializers.ModelSerializer):
@@ -97,7 +104,8 @@ class InsumoSerializer(serializers.ModelSerializer):
 class AtencionSerializer(serializers.ModelSerializer):
     efector_nombre = serializers.SerializerMethodField()
     profesional_nombre = serializers.SerializerMethodField()
-    animal = AnimalSerializer(source='id_animal', required=False)
+    animal = AnimalSerializer(
+        source='id_animal', read_only=True, required=False)
 
     class Meta:
         model = Atencion
@@ -125,7 +133,7 @@ class ProfesionalSerializer(serializers.ModelSerializer):
 
 
 class ProfesionalEfectorSerializer(serializers.ModelSerializer):
-    id_efector = serializers.IntegerField(source='id_efector.id_efector')
+    id_efector = serializers.IntegerField(source='id_efector.id')
     nombre = serializers.CharField(source='id_efector.nombre')
     unidad_movil = serializers.IntegerField(source='id_efector.unidad_movil')
 

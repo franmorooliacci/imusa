@@ -7,7 +7,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import searchSchema from '../validation/searchSchema';
 
-const SearchResponsable = ({ setResponsable, setIsLoading, setSearched, setIsInDb, setAddingResponsable, setEditDomicilio, setEditContacto }) => {
+const SearchResponsable = ({ setResponsable, setIsLoading, setSearched, setIsInDb, setAddingResponsable, setEditDomicilio, setEditContacto, setRenaperFound }) => {
     const {
         control,
         handleSubmit,
@@ -24,8 +24,9 @@ const SearchResponsable = ({ setResponsable, setIsLoading, setSearched, setIsInD
     // Realiza la busqueda
     const onSubmit = async ({dni, sexo}) => {
         // Limpia los resultados de la busqueda anterior
+        setRenaperFound(null);
         setResponsable({
-            id_responsable: '',
+            id: '',
             nombre: '',
             apellido: '',
             dni: '',
@@ -53,6 +54,7 @@ const SearchResponsable = ({ setResponsable, setIsLoading, setSearched, setIsInD
             setResponsable(data);
             foundInDb = true;
             setIsInDb(true);
+            setRenaperFound(true);
 
         } catch (error) {
 
@@ -62,7 +64,7 @@ const SearchResponsable = ({ setResponsable, setIsLoading, setSearched, setIsInD
             try {
                 const response = await getCiudadano(dni, sexo);
                 setResponsable({
-                    id_responsable: '',
+                    id: '',
                     nombre: response.nombre,
                     apellido: response.apellido,
                     dni: response.nroDocumento,
@@ -76,8 +78,9 @@ const SearchResponsable = ({ setResponsable, setIsLoading, setSearched, setIsInD
                     firma: '',
                     fallecido: response.fechaFallecido
                 });
+                setRenaperFound(true);
             } catch (error) {
-
+                setRenaperFound(false);
             }
         }
 
