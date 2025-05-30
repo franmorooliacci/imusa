@@ -63,6 +63,15 @@ export const getInstitucionAnimal = async (id_institucion) => {
     }
 };
 
+export const updateInstitucionAnimal = async (id, data) => {
+    try {
+        const response = await http.put(`institucion_animales/${id}/`, data);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const getAnimalById = async (id) => {
     try {
         const response = await http.get(`animales/${id}/`);
