@@ -1,11 +1,11 @@
 import { faPaw } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Button, Divider, Grid2, Menu, MenuItem, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import AnimalForm from '../components/AnimalForm';
-import { useNavigate } from 'react-router-dom';
 import { getInstitucionAnimal } from '../services/api';
 import InstitucionAnimalTable from '../components/InstitucionAnimalTable';
+import AlertMessage from '../components/AlertMessage';
 
 const AdopcionPage = () => {
 	const [especie, setEspecie] = useState('');
@@ -13,17 +13,21 @@ const AdopcionPage = () => {
 	const [instAnimalList, setInstAnimalList] = useState([]);
 	const [anchorEl, setAnchorEl] = useState(null);
 	const open = Boolean(anchorEl);
-	const navigate = useNavigate();
+	const [alertOpen, setAlertOpen] = useState(false);
+	const [alertMsg, setAlertMsg] = useState('');
+	const [alertSuccess, setAlertSuccess] = useState(false);
+
+	const fetchInstitucionAnimal = useCallback(async () => {
+		// loading true
+		// try
+		const response = await getInstitucionAnimal(1);
+		setInstAnimalList(response);
+		// finally loading false
+	}, []);
 
 	useEffect(() => {
-		const fetchInstitucionAnimal = async () => {
-			const response = await getInstitucionAnimal(1);
-			setInstAnimalList(response);
-			// loading
-		};
-
 		fetchInstitucionAnimal();
-	}, []);
+	}, [fetchInstitucionAnimal]);
 
 	const handleMenuOpen = (event) => {
 		setAnchorEl(event.currentTarget);
@@ -39,13 +43,23 @@ const AdopcionPage = () => {
 		setAnchorEl(null);
 	};
 
+	const handleAddAnimal = () => {
+		setEspecie(''); 
+		setAddingAnimal(false);
+		fetchInstitucionAnimal();
+	};
+
+	const handleCloseAlert = () => {
+        setAlertOpen(false);
+    };
+
 	return (
 		<Box>
 			{addingAnimal ? (
 				<AnimalForm
 					mode = { 'addToImusa'} 
 					initialData = {{ id_especie: especie === 'canino' ? 1 : 2, id_responsable: null}}
-					onSuccess = {(path) => navigate(path)}
+					onSuccess = {handleAddAnimal}
 					onCancel = {() => { setEspecie(''); setAddingAnimal(false) }}
 				/>
 			) : (
@@ -90,12 +104,24 @@ const AdopcionPage = () => {
 						<Divider sx={{ mt: 2, mb: 2 }} />
 						
 						{instAnimalList.length > 0 &&
-							<InstitucionAnimalTable instAnimalList = {instAnimalList} />
+							<InstitucionAnimalTable 
+								instAnimalList = {instAnimalList} 
+								setAlertSuccess = {setAlertSuccess}
+								setAlertMsg = {setAlertMsg}
+								setAlertOpen = {setAlertOpen}	
+							/>
 						}
 						
 					</Grid2>
 				</Grid2>
 			)}
+
+			<AlertMessage
+				open = {alertOpen}
+				handleClose = {handleCloseAlert}
+				message = {alertMsg}
+				success = {alertSuccess}
+			/>
 		</Box>
 	);
 };
