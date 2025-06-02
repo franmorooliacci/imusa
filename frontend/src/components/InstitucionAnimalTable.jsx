@@ -2,15 +2,13 @@ import { Box, IconButton, Paper, Table, TableBody, TableCell, TableContainer, Ta
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCat, faCheck, faCircleInfo, faDog, faFloppyDisk, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { updateInstitucionAnimal } from '../services/api';
+import { faCat, faCheck, faCircleInfo, faDog, faFloppyDisk, faHandHoldingHeart, faXmark } from '@fortawesome/free-solid-svg-icons';
 
-const InstitucionAnimalTable = ({ instAnimalList, setAlertSuccess, setAlertOpen, setAlertMsg }) => {
+const InstitucionAnimalTable = ({ instAnimalList, onSave, setAdopcionMode, setRowData }) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const navigate = useNavigate();
     const [rows, setRows] = useState([]);
-    const [savingId, setSavingId] = useState(null);
     
     const sortedList = rows.sort((a, b) => {
         return new Date(b.ingreso) - new Date(a.ingreso);
@@ -23,23 +21,6 @@ const InstitucionAnimalTable = ({ instAnimalList, setAlertSuccess, setAlertOpen,
     useEffect(() => {
         setRows(instAnimalList.map(r => ({ ...r })));
     }, [instAnimalList]);
-
-    const handleSave = async (row) => {
-        setSavingId(row.id);
-        try {
-            await updateInstitucionAnimal(row.id, row);
-
-            setAlertSuccess(true);
-            setAlertMsg('Cambios guardados con éxito!');
-            setAlertOpen(true);
-        } catch (error) {
-            setAlertSuccess(false);
-            setAlertMsg('No se han podido guardar los cambios.');
-            setAlertOpen(true);
-        } finally {
-            setSavingId(null);
-        }
-    };
   
     const paginatedList = sortedList.slice(
         page * rowsPerPage,
@@ -77,7 +58,6 @@ const InstitucionAnimalTable = ({ instAnimalList, setAlertSuccess, setAlertOpen,
                 </TableHead>
                 <TableBody>
                     {paginatedList.map((row) => {
-                        const isSaving = savingId === row.id;
                         return (
                             <TableRow key={row.id}>
                                 <TableCell align='center'>
@@ -124,13 +104,31 @@ const InstitucionAnimalTable = ({ instAnimalList, setAlertSuccess, setAlertOpen,
                                             </IconButton>
                                         </Tooltip>
 
+                                        {Number(row.adopcion) === 0 &&
+                                            <Tooltip title='Poner en adopción' arrow>
+                                                <IconButton 
+                                                    variant='outlined' 
+                                                    color='primary'
+                                                    onClick={() => {setRowData(row); setAdopcionMode(true);}}
+                                                    sx={{
+                                                        '&:hover': {
+                                                            backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                                                            transform: 'scale(1.1)',
+                                                            transition: 'transform 0.2s'
+                                                        }
+                                                    }}
+                                                >
+                                                    <FontAwesomeIcon icon={faHandHoldingHeart} size='1x' />
+                                                </IconButton>
+                                            </Tooltip>
+                                        }
+
                                         <Tooltip title='Guardar cambios' arrow>
                                             <span>
                                                 <IconButton
                                                     variant='outlined'
                                                     color='primary'
-                                                    disabled={isSaving}
-                                                    onClick={() => handleSave(row)}
+                                                    onClick={() => onSave(row)}
                                                     sx={{
                                                         '&:hover': {
                                                             backgroundColor: 'rgba(0, 0, 0, 0.08)',
