@@ -21,6 +21,7 @@ from .serializers import (
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
 from decouple import config
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 class ResponsableViewSet(viewsets.ModelViewSet):
@@ -370,8 +371,75 @@ class InstitucionAnimalViewSet(viewsets.ModelViewSet):
 
 
 class AdopcionFotoViewSet(viewsets.ModelViewSet):
-    queryset = AdopcionFoto.objects.all()
+    """
+    GET    /api/adopcion_foto/                  → lista todas las fotos (filtro opcional por id_institucion_animal)
+    POST   /api/adopcion_foto/                  → crear nueva foto (recibe multipart con 'file', 'descripcion', 'orden', 'id_institucion_animal')
+    PUT    /api/adopcion_foto/{id}/             → actualizar descripción/orden (o reemplazar file si envías 'file')
+    """
+    queryset = AdopcionFoto.objects.all().order_by('orden')
     serializer_class = AdopcionFotoSerializer
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get_queryset(self):
+        # Si ?id_institucion_animal=5, filtra solo las de esa publicacion
+        qs = super().get_queryset()
+        id_ia = self.request.query_params.get('id_institucion_animal')
+        if id_ia:
+            return qs.filter(id_institucion_animal_id=id_ia).order_by('orden')
+        return qs
+
+    def create(self, request, *args, **kwargs):
+        """
+        Espera multipart/form-data con:
+          - id_institucion_animal (int)
+          - file (imagen)
+          - descripcion (string, opcional)
+          - orden (int, opcional)
+        """
+        id_ia = request.data.get('id_institucion_animal')
+        descripcion = request.data.get('descripcion', '')
+        orden = request.data.get('orden', 0)
+        file_obj = request.FILES.get('file')
+
+        if not file_obj or not id_ia:
+            return Response(
+                {'detail': "Falta 'file' o 'id_institucion_animal'"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Crear la instancia: ImageField guarda el archivo en MEDIA_ROOT/adopcion_fotos/
+        foto = AdopcionFoto.objects.create(
+            id_institucion_animal=id_ia,
+            url=file_obj,
+            descripcion=descripcion,
+            orden=orden or 0
+        )
+        serializer = self.get_serializer(foto)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        """
+        Si PUT incluye 'file', 
+        Django sobrescribe el ImageField con la nueva imagen.
+        """
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+
+        file_obj = request.FILES.get('file')
+        if file_obj:
+            instance.url = file_obj
+
+        descripcion = request.data.get('descripcion')
+        if descripcion is not None:
+            instance.descripcion = descripcion
+
+        orden = request.data.get('orden')
+        if orden is not None:
+            instance.orden = int(orden)
+
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 
 class AdopcionViewSet(viewsets.ModelViewSet):
