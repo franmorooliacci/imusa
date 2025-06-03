@@ -72,6 +72,41 @@ export const updateInstitucionAnimal = async (id, data) => {
     }
 };
 
+export const getAdopcionFotos = async (id_institucion_animal) => {
+    try {
+        const response = await http.get(`adopcion_fotos/`, { params: { id_institucion_animal: id_institucion_animal } });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const addAdopcionFotos = async (formData) => {
+    try {
+        const response = await http.post(`adopcion_fotos/`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateAdopcionFotos = async (id, formData) => {
+    try {
+        const response = await http.put(`adopcion_fotos/${id}/`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const getAnimalById = async (id) => {
     try {
         const response = await http.get(`animales/${id}/`);
