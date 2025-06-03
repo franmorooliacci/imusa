@@ -133,7 +133,7 @@ const AdopcionPage = () => {
 								instAnimalList = {instAnimalList}
 								onSave={(row) => handleSave(row)}
 								setAdopcionMode = {setAdopcionMode}
-								setRow = {setRowData}
+								setRowData = {setRowData}
 							/>
 						}
 						
