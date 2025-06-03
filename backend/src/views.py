@@ -409,7 +409,7 @@ class AdopcionFotoViewSet(viewsets.ModelViewSet):
 
         # Crear la instancia: ImageField guarda el archivo en MEDIA_ROOT/adopcion_fotos/
         foto = AdopcionFoto.objects.create(
-            id_institucion_animal=id_ia,
+            id_institucion_animal_id=id_ia,
             url=file_obj,
             descripcion=descripcion,
             orden=orden or 0
