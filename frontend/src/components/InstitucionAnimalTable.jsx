@@ -128,7 +128,7 @@ const InstitucionAnimalTable = ({ instAnimalList, onSave, setAdopcionMode, setRo
                                                 <IconButton
                                                     variant='outlined'
                                                     color='primary'
-                                                    onClick={() => onSave(row)}
+                                                    onClick={() => onSave(row.id, row.observaciones)}
                                                     sx={{
                                                         '&:hover': {
                                                             backgroundColor: 'rgba(0, 0, 0, 0.08)',
