@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Button, Divider, Grid2, Menu, MenuItem, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 import AnimalForm from '../components/AnimalForm';
-import { getInstitucionAnimal, updateInstitucionAnimal } from '../services/api';
+import { addAdopcionFotos, getInstitucionAnimal, updateInstitucionAnimal } from '../services/api';
 import InstitucionAnimalTable from '../components/InstitucionAnimalTable';
 import AlertMessage from '../components/AlertMessage';
 import AdopcionForm from '../components/AdopcionForm';
@@ -19,6 +19,7 @@ const AdopcionPage = () => {
 	const [alertSuccess, setAlertSuccess] = useState(false);
 	const [adopcionMode, setAdopcionMode] = useState(false);
 	const [rowData, setRowData] = useState(null);
+	const [images, setImages] = useState([]);
 
 	const fetchInstitucionAnimal = useCallback(async () => {
 		// loading true
@@ -56,9 +57,9 @@ const AdopcionPage = () => {
         setAlertOpen(false);
     };
 
-	const handleSave = async (row) => {
+	const handleSaveRow = async (id, obs) => {
         try {
-            await updateInstitucionAnimal(row.id, row);
+            await updateInstitucionAnimal(id, {observaciones: obs});
 
             setAlertSuccess(true);
             setAlertMsg('Cambios guardados con éxito!');
@@ -69,6 +70,31 @@ const AdopcionPage = () => {
             setAlertMsg('No se han podido guardar los cambios.');
             setAlertOpen(true);
         } 
+    };
+
+    const handleAddAdopcion = async ({ idInstitucionAnimal, descripcion, images }) => {
+        
+		try {
+			await updateInstitucionAnimal(idInstitucionAnimal, { descripcion_adopcion: descripcion, adopcion: 1 });
+		} catch (error){
+			console.error('Error updating institucion_animal:', error);
+		}
+
+		const formData = new FormData();
+		formData.append('id_institucion_animal', idInstitucionAnimal);
+
+		images.forEach((img, index) => {
+			formData.append('files', img.file);
+			formData.append(`descripciones[${index}]`, img.descripcion);
+			formData.append(`ordenes[${index}]`, img.orden);
+		});
+
+		await addAdopcionFotos(formData);
+
+		setRowData(null);
+        setAdopcionMode(false);
+
+		fetchInstitucionAnimal();
     };
 
 	return (
@@ -86,6 +112,9 @@ const AdopcionPage = () => {
 					rowData = {rowData}
 					setRowData = {setRowData}
 					setAdopcionMode = {setAdopcionMode}
+					imagesValue={images}
+					onImagesChange={setImages}
+                    onFormSubmit={handleAddAdopcion}
 				/>
 			) : (
 				<Grid2 container spacing={2} sx={{ width: '100%' }}>
@@ -131,7 +160,7 @@ const AdopcionPage = () => {
 						{instAnimalList.length > 0 &&
 							<InstitucionAnimalTable 
 								instAnimalList = {instAnimalList}
-								onSave={(row) => handleSave(row)}
+								onSave={(id, obs) => handleSaveRow(id, obs)}
 								setAdopcionMode = {setAdopcionMode}
 								setRowData = {setRowData}
 							/>
