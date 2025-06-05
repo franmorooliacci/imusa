@@ -1,4 +1,4 @@
-import requests
+import requests, re
 from .models import (
     Responsable, Especie, Raza,
     Efector, Animal, Atencion,
@@ -22,6 +22,7 @@ from .serializers import (
 from rest_framework_simplejwt.views import TokenObtainPairView
 from decouple import config
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.db import transaction
 
 
 class ResponsableViewSet(viewsets.ModelViewSet):
@@ -372,16 +373,15 @@ class InstitucionAnimalViewSet(viewsets.ModelViewSet):
 
 class AdopcionFotoViewSet(viewsets.ModelViewSet):
     """
-    GET    /api/adopcion_foto/                  → lista todas las fotos (filtro opcional por id_institucion_animal)
-    POST   /api/adopcion_foto/                  → crear nueva foto (recibe multipart con 'file', 'descripcion', 'orden', 'id_institucion_animal')
-    PUT    /api/adopcion_foto/{id}/             → actualizar descripción/orden (o reemplazar file si envías 'file')
+    GET    /api/adopcion_foto/?id_institucion_animal=5  → filtra por publicación
+    POST   /api/adopcion_foto/                         → agrega UNA o VARIAS fotos
+    PUT    /api/adopcion_foto/{id}/                    → actualizar descripción/orden (o reemplazar file)
     """
     queryset = AdopcionFoto.objects.all().order_by('orden')
     serializer_class = AdopcionFotoSerializer
     parser_classes = (MultiPartParser, FormParser)
 
     def get_queryset(self):
-        # Si ?id_institucion_animal=5, filtra solo las de esa publicacion
         qs = super().get_queryset()
         id_ia = self.request.query_params.get('id_institucion_animal')
         if id_ia:
@@ -390,37 +390,119 @@ class AdopcionFotoViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """
-        Espera multipart/form-data con:
-          - id_institucion_animal (int)
-          - file (imagen)
-          - descripcion (string, opcional)
-          - orden (int, opcional)
-        """
-        id_ia = request.data.get('id_institucion_animal')
-        descripcion = request.data.get('descripcion', '')
-        orden = request.data.get('orden', 0)
-        file_obj = request.FILES.get('file')
+        Soporta dos modos de POST:
+          1) BULK: si vienen múltiples archivos, 
+                junta todas las keys con los índices, los ordena
+                por <índice>, y hace bulk_create().
 
-        if not file_obj or not id_ia:
+          2) SINGLE: si viene un solo archivo, crea una sola instancia.
+        """
+        data = request.data
+
+        # 1) Extrae el id_institucion_animal (si no existe → 400)
+        id_ia = data.get('id_institucion_animal')
+        if not id_ia:
             return Response(
-                {'detail': "Falta 'file' o 'id_institucion_animal'"},
-                status=status.HTTP_400_BAD_REQUEST
+                {'detail': "Falta 'id_institucion_animal' en el request."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Crear la instancia: ImageField guarda el archivo en MEDIA_ROOT/adopcion_fotos/
+        # 2) Verifica si vienen múltiples archivos bajo "files"
+        all_files = request.FILES.getlist('files')
+        if all_files:
+            desc_pattern = re.compile(r"^descripciones\[(\d+)\]$")
+            orden_pattern = re.compile(r"^ordenes\[(\d+)\]$")
+
+            indexed_desc = []
+            indexed_ord = []
+
+            # Recorre todos los campos de request.data
+            for key, val in data.items():
+                m1 = desc_pattern.match(key)
+                if m1:
+                    idx = int(m1.group(1))
+                    indexed_desc.append((idx, val))
+                    continue
+
+                m2 = orden_pattern.match(key)
+                if m2:
+                    idx = int(m2.group(1))
+                    # “val” puede venir como string; convertimos a int si es posible
+                    try:
+                        idx_ord = int(val)
+                    except (TypeError, ValueError):
+                        idx_ord = 0
+                    indexed_ord.append((idx, idx_ord))
+                    continue
+
+            # Ordena las listas por <índice>
+            indexed_desc.sort(key=lambda x: x[0])
+            indexed_ord.sort(key=lambda x: x[0])
+
+            # Extrae solo los valores (en el orden correcto)
+            descripciones = [v for _, v in indexed_desc]
+            ordenes = [v for _, v in indexed_ord]
+
+            # Valida que las listas tengan la misma longitud
+            if len(all_files) != len(descripciones) or len(all_files) != len(ordenes):
+                return Response(
+                    {
+                        'detail': (
+                            "Si envía varios archivos en 'files', debe incluir "
+                            "tanto 'descripciones[<i>]’ como 'ordenes[<i>]' para cada índice."
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Arma la lista de AdopcionFoto
+            fotos = []
+            for idx, uploaded_file in enumerate(all_files):
+                desc = descripciones[idx] or ''
+                orden_val = ordenes[idx] if idx < len(ordenes) else idx + 1
+
+                foto = AdopcionFoto(
+                    id_institucion_animal_id=id_ia,
+                    url=uploaded_file,
+                    descripcion=desc,
+                    orden=orden_val,
+                )
+                fotos.append(foto)
+
+            # Hace el Bulk‐create en una sola transacción
+            with transaction.atomic():
+                created_list = AdopcionFoto.objects.bulk_create(fotos)
+
+            serializer = self.get_serializer(created_list, many=True)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        # 3) Si vino un solo file
+        single_file = request.FILES.get('file')
+        if not single_file:
+            return Response(
+                {'detail': "Debe enviar al menos un 'file' o un conjunto 'files'."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        descripcion = data.get('descripcion', '')
+        try:
+            orden = int(data.get('orden', 0))
+        except (TypeError, ValueError):
+            orden = 0
+
         foto = AdopcionFoto.objects.create(
             id_institucion_animal_id=id_ia,
-            url=file_obj,
+            url=single_file,
             descripcion=descripcion,
-            orden=orden or 0
+            orden=orden,
         )
         serializer = self.get_serializer(foto)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         """
-        Si PUT incluye 'file', 
-        Django sobrescribe el ImageField con la nueva imagen.
+        PUT /api/adopcion_foto/{id}/ 
+        Actualiza descripción, orden y reemplaza 'file' (si corresponde)
         """
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
@@ -435,7 +517,10 @@ class AdopcionFotoViewSet(viewsets.ModelViewSet):
 
         orden = request.data.get('orden')
         if orden is not None:
-            instance.orden = int(orden)
+            try:
+                instance.orden = int(orden)
+            except (TypeError, ValueError):
+                pass
 
         instance.save()
         serializer = self.get_serializer(instance)
