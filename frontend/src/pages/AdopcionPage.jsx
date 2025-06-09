@@ -73,28 +73,36 @@ const AdopcionPage = () => {
     };
 
     const handleAddAdopcion = async ({ idInstitucionAnimal, descripcion, images }) => {
-        
 		try {
 			await updateInstitucionAnimal(idInstitucionAnimal, { descripcion_adopcion: descripcion, adopcion: 1 });
+
+			const formData = new FormData();
+			formData.append('id_institucion_animal', idInstitucionAnimal);
+
+			images.forEach((img, index) => {
+				formData.append('files', img.file);
+				formData.append(`descripciones[${index}]`, img.descripcion);
+				formData.append(`ordenes[${index}]`, img.orden);
+			});
+
+			await addAdopcionFotos(formData);
+
+			setAlertSuccess(true);
+            setAlertMsg('Agregado a la lista de adopción con éxito!');
+            setAlertOpen(true);
+
+			fetchInstitucionAnimal();
+			
+			setTimeout(() => {
+                setRowData(null);
+				setAdopcionMode(false);
+            }, 3000);
 		} catch (error){
 			console.error('Error updating institucion_animal:', error);
+			setAlertSuccess(false);
+            setAlertMsg('No se ha podido agregar a la lista de adopción.');
+            setAlertOpen(true);
 		}
-
-		const formData = new FormData();
-		formData.append('id_institucion_animal', idInstitucionAnimal);
-
-		images.forEach((img, index) => {
-			formData.append('files', img.file);
-			formData.append(`descripciones[${index}]`, img.descripcion);
-			formData.append(`ordenes[${index}]`, img.orden);
-		});
-
-		await addAdopcionFotos(formData);
-
-		setRowData(null);
-        setAdopcionMode(false);
-
-		fetchInstitucionAnimal();
     };
 
 	return (
