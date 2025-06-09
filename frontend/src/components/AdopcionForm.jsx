@@ -27,7 +27,7 @@ const AdopcionForm = ({ mode, rowData, setRowData, setAdopcionMode, imagesValue,
             onSubmit={handleSubmit}
             sx={{
                 bgcolor: 'background.paper',
-                p: 2,
+                p: 4,
                 borderRadius: 4,
                 boxShadow: 3,
                 display: 'flex',
@@ -47,9 +47,10 @@ const AdopcionForm = ({ mode, rowData, setRowData, setAdopcionMode, imagesValue,
                 fullWidth
                 size='small'
                 multiline
+                sx={{ mt: 2 }}
             />
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: -2 }}>
                 <Button
                     variant='outlined'
                     color='error'
