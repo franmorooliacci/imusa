@@ -286,7 +286,8 @@ class AdopcionFoto(models.Model):
     id = models.AutoField(primary_key=True)
     id_institucion_animal = models.ForeignKey(
         InstitucionAnimal, on_delete=models.DO_NOTHING, db_column='id_institucion_animal', related_name='fotos')
-    url = models.ImageField(upload_to='adopcion_fotos/')
+    image_data = models.BinaryField()
+    mime_type = models.CharField(max_length=50)
     descripcion = models.CharField(max_length=255, blank=True, null=True)
     orden = models.IntegerField(default=0)
 
