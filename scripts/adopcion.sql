@@ -52,7 +52,8 @@ CREATE TABLE
     adopcion_foto (
         id INT AUTO_INCREMENT PRIMARY KEY,
         id_institucion_animal INT NOT NULL,
-        url VARCHAR(255) NOT NULL,
+        image_data LONGBLOB NOT NULL,
+        mime_type VARCHAR(50) NOT NULL,
         descripcion VARCHAR(255) NULL,
         orden INT NOT NULL DEFAULT 0,
         FOREIGN KEY (id_institucion_animal) REFERENCES institucion_animal (id)
