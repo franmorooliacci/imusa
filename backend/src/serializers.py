@@ -1,3 +1,4 @@
+import base64
 from rest_framework import serializers
 from .models import (
     Responsable, Animal, Especie, Raza,
@@ -195,9 +196,29 @@ class InstitucionAnimalSerializer(serializers.ModelSerializer):
 
 
 class AdopcionFotoSerializer(serializers.ModelSerializer):
+    # POST/PUT
+    file = serializers.FileField(write_only=True, required=False)
+    # GET
+    image_b64 = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = AdopcionFoto
-        fields = '__all__'
+        fields = (
+            'id',
+            'id_institucion_animal',
+            'file',
+            'descripcion',
+            'orden',
+            'mime_type',
+            'image_b64'
+        )
+        read_only_fields = ['mime_type']
+
+    def get_image_b64(self, obj):
+        blob = obj.image_data
+        if not blob:
+            return None
+        return base64.b64encode(blob).decode('utf-8')
 
 
 class AdopcionSerializer(serializers.ModelSerializer):
