@@ -387,6 +387,11 @@ class AdopcionFotoViewSet(viewsets.ModelViewSet):
         if id_ia:
             return qs.filter(id_institucion_animal_id=id_ia).order_by('orden')
         return qs
+    
+    def perform_save(self, foto, file_obj):
+        foto.image_data = file_obj.read()
+        foto.mime_type  = file_obj.content_type
+        foto.save()
 
     def create(self, request, *args, **kwargs):
         """
@@ -457,16 +462,15 @@ class AdopcionFotoViewSet(viewsets.ModelViewSet):
 
             # Arma la lista de AdopcionFoto
             fotos = []
-            for idx, uploaded_file in enumerate(all_files):
-                desc = descripciones[idx] or ''
-                orden_val = ordenes[idx] if idx < len(ordenes) else idx + 1
-
+            for idx, file_obj in enumerate(all_files):
                 foto = AdopcionFoto(
                     id_institucion_animal_id=id_ia,
-                    url=uploaded_file,
-                    descripcion=desc,
-                    orden=orden_val,
+                    descripcion=descripciones[idx],
+                    orden=ordenes[idx],
                 )
+
+                foto.image_data = file_obj.read()
+                foto.mime_type  = file_obj.content_type
                 fotos.append(foto)
 
             # Hace el Bulk‐create en una sola transacción
@@ -477,55 +481,39 @@ class AdopcionFotoViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         # 3) Si vino un solo file
-        single_file = request.FILES.get('file')
-        if not single_file:
-            return Response(
-                {'detail': "Debe enviar al menos un 'file' o un conjunto 'files'."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        file_obj = request.FILES.get('file')
+        if not file_obj:
+            return Response({'detail': "Debe enviar al menos un 'file'."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        descripcion = data.get('descripcion', '')
-        try:
-            orden = int(data.get('orden', 0))
-        except (TypeError, ValueError):
-            orden = 0
-
-        foto = AdopcionFoto.objects.create(
+        foto = AdopcionFoto(
             id_institucion_animal_id=id_ia,
-            url=single_file,
-            descripcion=descripcion,
-            orden=orden,
+            descripcion=request.data.get('descripcion', ''),
+            orden=int(request.data.get('orden', 0) or 0),
         )
+        self.perform_save(foto, file_obj)
+
         serializer = self.get_serializer(foto)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
-        """
-        PUT /api/adopcion_foto/{id}/ 
-        Actualiza descripción, orden y reemplaza 'file' (si corresponde)
-        """
-        partial = kwargs.pop('partial', False)
         instance = self.get_object()
-
         file_obj = request.FILES.get('file')
         if file_obj:
-            instance.url = file_obj
+            instance.image_data = file_obj.read()
+            instance.mime_type  = file_obj.content_type
 
-        descripcion = request.data.get('descripcion')
-        if descripcion is not None:
-            instance.descripcion = descripcion
-
-        orden = request.data.get('orden')
-        if orden is not None:
+        if 'descripcion' in request.data:
+            instance.descripcion = request.data['descripcion']
+        if 'orden' in request.data:
             try:
-                instance.orden = int(orden)
-            except (TypeError, ValueError):
+                instance.orden = int(request.data['orden'])
+            except ValueError:
                 pass
 
         instance.save()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
+        return Response(self.get_serializer(instance).data)
+    
 
 class AdopcionViewSet(viewsets.ModelViewSet):
     queryset = Adopcion.objects.all()
