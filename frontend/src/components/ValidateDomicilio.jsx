@@ -1,4 +1,4 @@
-import { Box, Button, Grid2, List, ListItemButton, ListItemText, TextField } from '@mui/material';
+import { Box, Button, CircularProgress, Grid2, List, ListItemButton, ListItemText, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { getDireccion, getFeatures, getLatitudLongitud } from '../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,14 +14,16 @@ const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
     const [alertSuccess, setAlertSuccess] = useState(false);
-    const { setValue, trigger, formState: { errors, isSubmitted } } = useFormContext();
+    const { setValue, getValues, trigger, formState: { errors, isSubmitted } } = useFormContext();
     const domicilioErrors = errors[name] || {};
+    const [loading, setLoading] = useState(false);
 
     const handleCloseAlert = () => {
         setAlertOpen(false);
     };
 
     const validate = async () => {
+        setLoading(true);
         try {
             const response = await getFeatures(toValidate);
             setFeatures(response);
@@ -31,6 +33,8 @@ const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
             setAlertSuccess(false);
             setAlertMsg('No se ha podido validar el domicilio.');
             setAlertOpen(true);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -84,7 +88,8 @@ const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
         //console.log(domicilioData);
 
         //setDomicilio(domicilioData);
-        setValue(name, domicilioData, {shouldValidate: true});
+        const previous = getValues(name) || {};
+        setValue(name, { ...previous, ...domicilioData }, { shouldValidate: true });
     };
 
     const handleSeleccionar = async () => {
@@ -115,7 +120,14 @@ const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
                 </Grid2>
                 
                 <Grid2>
-                    <Button variant='outlined' color='primary' onClick={validate}>Validar</Button>
+                    <Button 
+                        variant='outlined' 
+                        color='primary' 
+                        onClick={validate}
+                        startIcon={loading && <CircularProgress size={20} />}
+                    >
+                        {loading ?  'Buscando…' : 'Validar'}
+                    </Button>
                 </Grid2>
             </Grid2>
 
