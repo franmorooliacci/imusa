@@ -31,7 +31,7 @@ const AddResponsable = ({ responsable }) => {
     const [alertMsg, setAlertMsg] = useState('');
     const [alertSuccess, setAlertSuccess] = useState(false);
     const navigate = useNavigate();
-    const canSubmit = domRenaperDone && (mismoDom === 'no' ? domActualDone : true) && isValid;
+    //const canSubmit = domRenaperDone && (mismoDom === 'no' ? domActualDone : true) && isValid;
     
     useEffect(() => {
         if (mismoDom === 'si') {
@@ -189,7 +189,7 @@ const AddResponsable = ({ responsable }) => {
                 <FirmaForm name = {'firma'} />
 
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                    <Button type='submit' variant='contained' color='primary' disabled={!canSubmit}>Agregar</Button>
+                    <Button type='submit' variant='contained' color='primary' disabled={!domRenaperDone}>Agregar</Button>
                 </Box>
 
                 <AlertMessage
