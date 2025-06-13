@@ -14,7 +14,7 @@ const AddResponsable = ({ responsable }) => {
     const methods = useForm({
         mode: 'onChange',
         resolver: yupResolver(responsableSchema),
-        shouldUnregister: true,
+        //shouldUnregister: true,
         defaultValues: {
             mismoDomicilio: 'si',
             domicilioRenaper: {},
@@ -31,7 +31,7 @@ const AddResponsable = ({ responsable }) => {
     const [alertMsg, setAlertMsg] = useState('');
     const [alertSuccess, setAlertSuccess] = useState(false);
     const navigate = useNavigate();
-    //const canSubmit = domRenaperDone && (mismoDom === 'no' ? domActualDone : true) && isValid;
+    const canSubmit = domRenaperDone && (mismoDom === 'no' ? domActualDone : true) && isValid;
     
     useEffect(() => {
         if (mismoDom === 'si') {
@@ -41,6 +41,12 @@ const AddResponsable = ({ responsable }) => {
             setDomActualDone(false);
         }
     }, [mismoDom, trigger]);
+
+    // useEffect(() => {
+    //     if (mismoDom==='no') {
+    //         trigger('domicilioActual').then(valid => setDomActualDone(valid));
+    //     } 
+    // }, [mismoDom, trigger]);
 
     const handleCloseAlert = () => {
         setAlertOpen(false);
@@ -189,7 +195,7 @@ const AddResponsable = ({ responsable }) => {
                 <FirmaForm name = {'firma'} />
 
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                    <Button type='submit' variant='contained' color='primary' disabled={!domRenaperDone}>Agregar</Button>
+                    <Button type='submit' variant='contained' color='primary' disabled={!canSubmit}>Agregar</Button>
                 </Box>
 
                 <AlertMessage
