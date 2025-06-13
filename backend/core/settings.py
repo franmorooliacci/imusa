@@ -12,7 +12,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STATICFILES_DIRS = [
-    BASE_DIR.parent / 'frontend' / 'build' / 'static',
+    BASE_DIR.parent / 'frontend' / 'build',
 ]
 
 SECRET_KEY = config('DJANGO_SECRET_KEY')
