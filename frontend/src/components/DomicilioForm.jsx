@@ -45,7 +45,7 @@ const DomicilioForm = ({ name, title, domicilioRenaper = '', setDomicilioDone}) 
                                     setValue(`${name}.bis`, false);
                                     setValue(`${name}.letra`, '');
                                     setValue(`${name}.piso`, '');
-                                    setValue(`${name}.departamento`, '');
+                                    setValue(`${name}.depto`, '');
                                     setValue(`${name}.monoblock`, '');
                                 }
                             }}
@@ -208,7 +208,7 @@ const DomicilioForm = ({ name, title, domicilioRenaper = '', setDomicilioDone}) 
                                     </Grid2>
                                     <Grid2>
                                         <Controller
-                                            name = {`${name}.departamento`}
+                                            name = {`${name}.depto`}
                                             control = {control}
                                             defaultValue={''}
                                             render = {({field, fieldState}) => (
