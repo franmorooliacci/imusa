@@ -1,13 +1,27 @@
-import requests
-import urllib.parse
-from .models import Responsable, Especie, Raza, Efector, Animal, Atencion, Insumo, Domicilio, AtencionInsumo, Profesional
+import requests, base64
+from decouple import config
+from wkhtmltopdf.views import PDFTemplateView
+from django.shortcuts import get_object_or_404
+from pathlib import Path
+from django.conf import settings
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.exceptions import NotFound, APIException
-from .serializers import ResponsableSerializer, AnimalSerializer, RazaSerializer, EfectorSerializer, AtencionSerializer, InsumoSerializer, DomicilioSerializer, AtencionInsumoSerializer, ProfesionalSerializer, CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from decouple import config
+from rest_framework.views import APIView
+from .models import (
+    Responsable, Especie, Raza, 
+    Efector, Animal, Atencion, 
+    Insumo, Domicilio, AtencionInsumo, 
+    Profesional
+)
+from .serializers import (
+    ResponsableSerializer, AnimalSerializer, RazaSerializer, 
+    EfectorSerializer, AtencionSerializer, InsumoSerializer, 
+    DomicilioSerializer, AtencionInsumoSerializer, ProfesionalSerializer, 
+    CustomTokenObtainPairSerializer
+)
 
 
 class ResponsableViewSet(viewsets.ModelViewSet):
@@ -320,3 +334,77 @@ class ExternalDataViewSet(viewsets.ViewSet):
             raise
         except requests.RequestException as exc:
             raise APIException(detail=f'External API error: {str(exc)}')
+
+
+class PdfApiView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        id_atencion = request.GET.get('id_atencion')
+        if not id_atencion:
+            return Response({'error': 'id_atencion parameter is required'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # Busca la atencion por id, 404 if not found
+        atencion = get_object_or_404(Atencion, pk=id_atencion)
+
+        # Construye los objetos
+        animal      = atencion.id_animal
+        responsable = atencion.id_responsable
+        medicamentos = AtencionInsumo.objects.filter(id_atencion=atencion)
+        veterinario = atencion.id_profesional
+
+        # Calcula la edad
+        import datetime
+        hoy = datetime.date.today()
+        born = animal.año_nacimiento
+        edad_years = hoy.year - born - ((hoy.month, hoy.day) < (1, 1))
+        edad_str = f"{edad_years} año{'es' if edad_years != 1 else ''}"
+
+        # Arma el path para los archivos estaticos
+        base_static = Path(settings.BASE_DIR) / 'src' / 'static'
+        css_file   = base_static / 'css'    / 'esterilizacion.css'
+        logo_file  = base_static / 'images' / 'logo.jpeg'
+
+        # Convierte css a string
+        try:
+            css_content = css_file.read_text(encoding='utf-8')
+        except FileNotFoundError:
+            return Response({'error': 'CSS file not found.'}, status=500)
+
+        # Convierte el logo de base64 a imagen
+        try:
+            logo_data = logo_file.read_bytes()
+        except FileNotFoundError:
+            return Response({'error': 'Logo file not found.'}, status=500)
+        logo_b64 = base64.b64encode(logo_data).decode('ascii')
+        logo_data_uri = f"data:image/jpeg;base64,{logo_b64}"
+
+        # Convierte las firmas de base64 a imagen
+        def make_data_uri(b64_string, mime='image/png'):
+            if not b64_string:
+                return None
+            if b64_string.startswith('data:'):
+                return b64_string
+            return f'data:{mime};base64,{b64_string}'
+
+        responsable_uri = make_data_uri(responsable.firma, mime='image/png')
+        veterinario_uri = make_data_uri(veterinario.firma, mime='image/png')
+
+        extra_context = {
+            'animal'          : animal,
+            'atencion'        : atencion,
+            'responsable'     : responsable,
+            'medicamentos'    : medicamentos,
+            'veterinario'     : veterinario,
+            'edad'            : edad_str,
+            'css_content'     : css_content,
+            'logo_data_uri'   : logo_data_uri,
+            'responsable_firma_uri': responsable_uri,
+            'veterinario_firma_uri': veterinario_uri
+        }
+
+        return PDFTemplateView.as_view(
+            template_name='esterilizacion.html',
+            extra_context=extra_context
+        )(request._request, *args, **kwargs)
+
