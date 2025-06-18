@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    {{ css_content|safe }}
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    {% if atencion %}
+      <!-- Datos de la mascota y responsable -->
+      <div class="superior">
+        <img src="{{ logo_data_uri }}" height="70" style="width:100%" />
+        <h4>PROGRAMA DE ESTERILIZACIÓN</h4>
+      </div>
+
+      <div class="cuadro" id="datos_animal">
+        <h3>Datos del Animal</h3>
+        {% if animal_rescatado %}
+          <h4>Animal rescatado por IMUSA</h4>
+        {% endif %}
+        <div class="mi-row">
+          <div class="column">
+            <p><strong>Nombre:</strong> {{ animal.nombre|default:"No especificado" }}</p>
+            <p><strong>Especie:</strong> {{ animal.id_especie.nombre }}</p>
+            <p><strong>Raza:</strong> {{ animal.id_raza.nombre }}</p>
+            <p><strong>Sexo:</strong> {{ animal.sexo }}</p>
+          </div>
+          <div class="column">
+            <p><strong>Edad:</strong> {{ edad }}</p>
+            <p><strong>Peso:</strong> {{ atencion.peso|default:"No especificado" }} kg</p>
+            <p><strong>Tamaño:</strong> {{ animal.id_raza.tamaño }}</p>
+            <p><strong>Color pelaje:</strong> {{ animal.pelaje_color|default:"No especificado" }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cuadro" id="datos_responsable">
+        <h3>Datos del Responsable</h3>
+        <div class="mi-row">
+          <div class="column">
+            <p><strong>Nombre:</strong> {{ responsable.nombre }}</p>
+            <p><strong>Apellido:</strong> {{ responsable.apellido }}</p>
+            <p><strong>DNI:</strong> {{ responsable.dni }}</p>
+          </div>
+          <div class="column">
+            <p><strong>Dirección:</strong> {{ responsable.id_domicilio_actual.full_address }}</p>
+            <p><strong>Teléfono:</strong> {{ responsable.telefono|default:"No especificado" }}</p>
+            <p><strong>Correo:</strong> {{ responsable.mail|default:"No especificado" }}</p>
+          </div>
+        </div>
+      </div>
+
+      {% if medicamentos %}
+        <div class="cuadro" id="medicamento">
+          <h3>Medicamentos Suministrados</h3>
+          <div class="mi-row">
+            {% for mi in medicamentos %}
+              <div class="column_35">
+                <p><strong>Medicamento:</strong> {{ mi.id_insumo.descripcion }}</p>
+              </div>
+              <div class="column_35">
+                <p><strong>Cantidad:</strong> {{ mi.cant_ml }} ml</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="cuadro" id="datos_veterinario">
+        <h3>Datos del Veterinario</h3>
+        <div class="mi-row">
+          <div class="column">
+            <p><strong>Nombre:</strong> {{ veterinario.nombre }}</p>
+            <p><strong>Apellido:</strong> {{ veterinario.apellido }}</p>
+            <p><strong>DNI:</strong> {{ veterinario.dni }}</p>
+            <p><strong>Matricula:</strong> {{ veterinario.matricula }}</p>
+          </div>
+          <div class="column">
+            <img src="{{ veterinario_firma_uri }}" style="max-width:200px" />
+          </div>
+        </div>
+      </div>
+
+      <div class="cuadro" id="autorizacion">
+        <h3>Autorización</h3>
+        <div class="mi-row">
+          <p>
+            <strong>Quien entrega Animal:</strong>
+            {{ responsable.nombre }} {{ responsable.apellido }} (DNI {{ responsable.dni }})
+          </p>
+          <div class="column">
+            {% if responsable_firma_uri %}
+              <img src="{{ responsable_firma_uri }}" style="max-width:300px" />
+            {% endif %}
+            <p><strong>Ingreso</strong></p>
+            <p>
+              <strong>Fecha:</strong> {{ atencion.fecha_ingreso|date:"d/m/Y" }}
+              <strong>Hora:</strong> {{ atencion.hora_ingreso|time:"H:i" }}
+            </p>
+          </div>
+          <div class="column">
+            {% if responsable_firma_uri %}
+              <img src="{{ responsable_firma_uri }}" style="max-width:300px" />
+            {% endif %}
+            <p><strong>Egreso</strong></p>
+            <p>
+              <strong>Fecha:</strong> {{ atencion.fecha_egreso|date:"d/m/Y" }}
+              <strong>Hora:</strong> {{ atencion.hora_egreso|time:"H:i" }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+    {% else %}
+      <p>No hay datos de esterilización.</p>
+    {% endif %}
+  </div>
+</body>
+</html>
