@@ -13,6 +13,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STATICFILES_DIRS = [
     BASE_DIR.parent / 'frontend' / 'build',
+    BASE_DIR / 'src' / 'static',
 ]
 
 SECRET_KEY = config('DJANGO_SECRET_KEY')
@@ -30,7 +31,8 @@ INSTALLED_APPS = [
     'src',
     'rest_framework',
     'corsheaders',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'wkhtmltopdf',
 ]
 
 MIDDLEWARE = [
@@ -51,7 +53,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [ BASE_DIR / 'src' / 'templates' ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
