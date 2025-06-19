@@ -352,6 +352,7 @@ class PdfApiView(APIView):
         responsable = atencion.id_responsable
         medicamentos = AtencionInsumo.objects.filter(id_atencion=atencion)
         veterinario = atencion.id_profesional
+        efector = atencion.id_efector
 
         # Calcula la edad
         import datetime
@@ -396,6 +397,7 @@ class PdfApiView(APIView):
             'responsable'     : responsable,
             'medicamentos'    : medicamentos,
             'veterinario'     : veterinario,
+            'efector'         : efector,
             'edad'            : edad_str,
             'css_content'     : css_content,
             'logo_data_uri'   : logo_data_uri,
