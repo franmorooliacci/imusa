@@ -6,7 +6,7 @@ from .views import (
     ResponsableViewSet, AnimalViewSet, RazaViewSet, 
     EfectorViewSet, AtencionViewSet, InsumoViewSet, 
     DomicilioViewSet, AtencionInsumoViewSet, ProfesionalViewSet, 
-    CustomTokenObtainPairView, ExternalDataViewSet, PdfApiView
+    CustomTokenObtainPairView, ExternalDataViewSet, PDFAPIView
 )
 
 router = DefaultRouter()
@@ -26,6 +26,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('pdf/', PdfApiView.as_view(), name='pdf'),
+    path('pdf/', PDFAPIView.as_view(), name='pdf'),
 
 ]
