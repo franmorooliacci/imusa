@@ -221,3 +221,13 @@ export const getLatitudLongitud = async (punto_x, punto_y) => {
         throw error
     }
 };
+
+export const getPdf = async (id_atencion) => {
+    try {
+        const response = await http.get('pdf/', { params: { id_atencion }, responseType: 'blob', });
+        const url  = URL.createObjectURL(response.data);    
+        return url;
+    } catch (error) {
+        throw error;
+    }
+};
