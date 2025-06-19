@@ -11,7 +11,7 @@ import AlertMessage from '../components/AlertMessage';
 import SkeletonList from '../components/SkeletonList';
 import BackHeader from '../components/BackHeader';
 
-const AtencionPage = () => {
+const FinishAtencionPage = () => {
     const { atencionId, responsableId, animalId } = useParams();
     const [formData, setFormData] = useState({
         atencion: {},
@@ -306,4 +306,4 @@ const AtencionPage = () => {
     );
 };
 
-export default AtencionPage;
+export default FinishAtencionPage;

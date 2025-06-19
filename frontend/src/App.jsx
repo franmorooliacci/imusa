@@ -5,13 +5,13 @@ import AddResponsablePage from './pages/AddResponsablePage';
 import React from 'react';
 import Layout from './pages/Layout';
 import AnimalPage from './pages/AnimalPage';
-import AtencionDetailsPage from './pages/AtencionDetailsPage';
+import AtencionPDFViewerPage from './pages/AtencionPDFViewerPage';
 import AddAtencionPage from './pages/AddAtencionPage';
 import LoginPage from './pages/LoginPage';
 import PrivateRoute from './components/PrivateRoute';
 import RedirectOnLogout from './components/RedirectOnLogout';
 import AtencionesListPage from './pages/AtencionesListPage';
-import AtencionPage from './pages/AtencionPage';
+import FinishAtencionPage from './pages/FinishAtencionPage';
 
 const App = () => {
 
@@ -65,7 +65,7 @@ const App = () => {
                         path='/atencion/:id' 
                         element={
                             <PrivateRoute>
-                                <AtencionDetailsPage />
+                                <AtencionPDFViewerPage />
                             </PrivateRoute>
                         }
                     />
@@ -89,7 +89,7 @@ const App = () => {
                         path='/atencion/finalizar/:atencionId/:responsableId/:animalId' 
                         element={
                             <PrivateRoute>
-                                <AtencionPage />
+                                <FinishAtencionPage />
                             </PrivateRoute>
                         }
                     />
