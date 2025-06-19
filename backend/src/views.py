@@ -336,7 +336,7 @@ class ExternalDataViewSet(viewsets.ViewSet):
             raise APIException(detail=f'External API error: {str(exc)}')
 
 
-class PdfApiView(APIView):
+class PDFAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         id_atencion = request.GET.get('id_atencion')
