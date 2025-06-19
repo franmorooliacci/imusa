@@ -3,6 +3,7 @@ certifi==2025.4.26
 chardet==4.0.0
 Django==5.1.7
 django-cors-headers==4.7.0
+django-wkhtmltopdf==3.4.0
 djangorestframework==3.15.2
 djangorestframework_simplejwt==5.5.0
 gunicorn==23.0.0
@@ -12,6 +13,7 @@ PyJWT==2.9.0
 PyMySQL==1.1.1
 python-decouple==3.8
 requests==2.25.1
+six==1.17.0
 sqlparse==0.5.3
 typing_extensions==4.12.2
 urllib3==1.26.20
