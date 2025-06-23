@@ -4,6 +4,8 @@ from wkhtmltopdf.views import PDFTemplateView
 from django.shortcuts import get_object_or_404
 from pathlib import Path
 from django.conf import settings
+from django.db.models import Prefetch, Value, F, CharField
+from django.db.models.functions import Concat
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
@@ -14,18 +16,33 @@ from .models import (
     Responsable, Especie, Raza, 
     Efector, Animal, Atencion, 
     Insumo, Domicilio, AtencionInsumo, 
-    Profesional
+    Profesional, Color, Tamaño
 )
 from .serializers import (
     ResponsableSerializer, AnimalSerializer, RazaSerializer, 
     EfectorSerializer, AtencionSerializer, InsumoSerializer, 
     DomicilioSerializer, AtencionInsumoSerializer, ProfesionalSerializer, 
-    CustomTokenObtainPairSerializer
+    CustomTokenObtainPairSerializer, ColorSerializer, TamañoSerializer
 )
 
 
 class ResponsableViewSet(viewsets.ModelViewSet):
-    queryset = Responsable.objects.prefetch_related('animal_set').all()
+    queryset = (
+        Responsable.objects
+            .select_related('id_domicilio_actual')
+            .prefetch_related(
+                Prefetch(
+                    'animal_set',
+                    queryset=Animal.objects.filter(id_especie=2),
+                    to_attr='felinos_cache'
+                ),
+                Prefetch(
+                    'animal_set',
+                    queryset=Animal.objects.filter(id_especie=1),
+                    to_attr='caninos_cache'
+                )
+            )
+    )
     serializer_class = ResponsableSerializer
 
     @action(detail=False, methods=['get'], url_path='buscar')
@@ -55,8 +72,12 @@ class ResponsableViewSet(viewsets.ModelViewSet):
 
 
 class AnimalViewSet(viewsets.ModelViewSet):
-    queryset = Animal.objects.select_related(
-        'id_responsable', 'id_especie', 'id_raza').all()
+    queryset = (
+        Animal.objects
+            .select_related('id_responsable')
+            .prefetch_related('colores')   
+            .all()
+    )
     serializer_class = AnimalSerializer
 
     def update(self, request, pk=None):
@@ -100,9 +121,31 @@ class EfectorViewSet(viewsets.ModelViewSet):
     serializer_class = EfectorSerializer
 
 
+class ColorViewSet(viewsets.ModelViewSet):
+    queryset = Color.objects.all()
+    serializer_class = ColorSerializer
+
+
+class TamañoViewSet(viewsets.ModelViewSet):
+    queryset = Tamaño.objects.all()
+    serializer_class = TamañoSerializer
+
+
 class AtencionViewSet(viewsets.ModelViewSet):
-    queryset = Atencion.objects.select_related(
-        'id_animal__id_especie', 'id_responsable', 'id_efector', 'id_profesional').all()
+    queryset = (
+        Atencion.objects
+            .select_related('id_efector', 'id_profesional', 'id_animal')
+            .prefetch_related('insumos')
+            .annotate(
+                profesional_full_name=Concat(
+                    F('id_profesional__nombre'),
+                    Value(' '),
+                    F('id_profesional__apellido'),
+                    output_field=CharField()
+                )
+            )
+            .all()
+    )
     serializer_class = AtencionSerializer
 
     @action(detail=False, methods=['get'], url_path='buscar')
@@ -218,7 +261,7 @@ class AtencionInsumoViewSet(viewsets.ModelViewSet):
 
 
 class ProfesionalViewSet(viewsets.ModelViewSet):
-    queryset = Profesional.objects.all()
+    queryset = Profesional.objects.prefetch_related('efectores').all()
     serializer_class = ProfesionalSerializer
 
 
