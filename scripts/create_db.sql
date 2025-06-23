@@ -4,39 +4,30 @@ CREATE DATABASE imusa;
 
 USE imusa;
 
-CREATE TABLE
-    especie (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        nombre VARCHAR(255) NOT NULL
-    );
+CREATE TABLE especie (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL
+);
 
-INSERT INTO
-    especie (id, nombre)
-VALUES
-    (1, 'Canino'),
-    (2, 'Felino');
+INSERT INTO especie (id, nombre)
+VALUES (1, 'Canino'), (2, 'Felino');
 
-CREATE TABLE
-    servicio (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        descripcion VARCHAR(255) NOT NULL
-    );
+CREATE TABLE servicio (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL
+);
 
-INSERT INTO
-    servicio (descripcion)
-VALUES
-    ('Esterilización');
+INSERT INTO servicio (nombre)
+VALUES ('Esterilización');
 
-CREATE TABLE
-    insumo (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        descripcion VARCHAR(255) NOT NULL,
-        tope_max INT NULL,
-        tope_min INT NULL
-    );
+CREATE TABLE insumo (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    tope_max INT NULL,
+    tope_min INT NULL
+);
 
-INSERT INTO
-    insumo (descripcion)
+INSERT INTO insumo (nombre)
 VALUES
     ('Acepromacina'),
     ('Triancinolona'),
@@ -52,25 +43,24 @@ VALUES
     ('Dipirona'),
     ('Ketamina');
 
-CREATE TABLE
-    efector (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        nombre VARCHAR(255) NOT NULL,
-        domicilio VARCHAR(255) NOT NULL,
-        latitud VARCHAR(255) NULL,
-        longitud VARCHAR(255) NULL,
-        coordenadas VARCHAR(255) NULL,
-        distrito VARCHAR(255) NULL,
-        vecinal VARCHAR(255) NULL,
-        punto_x VARCHAR(255) NULL,
-        punto_y VARCHAR(255) NULL,
-        lineas_tup VARCHAR(500) NULL,
-        barrio VARCHAR(255) NULL,
-        fraccion_censal VARCHAR(255) NULL,
-        radio_censal VARCHAR(255) NULL,
-        tipo_efector VARCHAR(255) NULL,
-        unidad_movil TINYINT (1) NOT NULL
-    );
+CREATE TABLE efector (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    domicilio VARCHAR(255) NOT NULL,
+    latitud VARCHAR(255) NULL,
+    longitud VARCHAR(255) NULL,
+    coordenadas VARCHAR(255) NULL,
+    distrito VARCHAR(255) NULL,
+    vecinal VARCHAR(255) NULL,
+    punto_x VARCHAR(255) NULL,
+    punto_y VARCHAR(255) NULL,
+    lineas_tup VARCHAR(500) NULL,
+    barrio VARCHAR(255) NULL,
+    fraccion_censal VARCHAR(255) NULL,
+    radio_censal VARCHAR(255) NULL,
+    tipo_efector VARCHAR(255) NULL,
+    unidad_movil TINYINT (1) NOT NULL
+);
 
 INSERT INTO
     efector (
@@ -1452,293 +1442,215 @@ VALUES
         1
     );
 
-CREATE TABLE
-    domicilio (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        calle VARCHAR(255) NOT NULL,
-        altura INT NOT NULL,
-        bis TINYINT (1) NOT NULL,
-        letra CHAR(1) NULL,
-        piso INT NULL,
-        depto VARCHAR(10) NULL,
-        monoblock INT NULL,
-        barrio VARCHAR(255) NULL,
-        vecinal VARCHAR(255) NULL,
-        distrito VARCHAR(255) NULL,
-        seccional_policial VARCHAR(255) NULL,
-        localidad VARCHAR(255) NOT NULL,
-        coordenada_x VARCHAR(255) NULL,
-        coordenada_y VARCHAR(255) NULL,
-        punto_x VARCHAR(255) NULL,
-        punto_y VARCHAR(255) NULL,
-        latitud VARCHAR(255) NULL,
-        longitud VARCHAR(255) NULL,
-        fraccion_censal VARCHAR(255) NULL,
-        radio_censal VARCHAR(255) NULL
-    );
+CREATE TABLE domicilio (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    calle VARCHAR(255) NOT NULL,
+    altura INT NOT NULL,
+    bis TINYINT (1) NOT NULL,
+    letra CHAR(1) NULL,
+    piso INT NULL,
+    depto VARCHAR(10) NULL,
+    monoblock INT NULL,
+    barrio VARCHAR(255) NULL,
+    vecinal VARCHAR(255) NULL,
+    distrito VARCHAR(255) NULL,
+    seccional_policial VARCHAR(255) NULL,
+    localidad VARCHAR(255) NOT NULL,
+    coordenada_x VARCHAR(255) NULL,
+    coordenada_y VARCHAR(255) NULL,
+    punto_x VARCHAR(255) NULL,
+    punto_y VARCHAR(255) NULL,
+    latitud VARCHAR(255) NULL,
+    longitud VARCHAR(255) NULL,
+    fraccion_censal VARCHAR(255) NULL,
+    radio_censal VARCHAR(255) NULL
+);
 
-CREATE TABLE
-    responsable (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        nombre VARCHAR(255) NOT NULL,
-        apellido VARCHAR(255) NOT NULL,
-        dni INT NOT NULL,
-        sexo CHAR(1) NOT NULL,
-        fecha_nacimiento DATE NULL,
-        id_domicilio_renaper INT NULL,
-        id_domicilio_actual INT NOT NULL,
-        telefono VARCHAR(15) NULL,
-        mail VARCHAR(255) NULL,
-        firma TEXT NULL,
-        FOREIGN KEY (id_domicilio_renaper) REFERENCES domicilio (id),
-        FOREIGN KEY (id_domicilio_actual) REFERENCES domicilio (id)
-    );
+CREATE TABLE responsable (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    apellido VARCHAR(255) NOT NULL,
+    dni INT NOT NULL,
+    sexo CHAR(1) NOT NULL,
+    fecha_nacimiento DATE NULL,
+    id_domicilio_renaper INT NULL,
+    id_domicilio_actual INT NOT NULL,
+    telefono VARCHAR(15) NULL,
+    mail VARCHAR(255) NULL,
+    firma TEXT NULL,
+    FOREIGN KEY (id_domicilio_renaper) REFERENCES domicilio (id),
+    FOREIGN KEY (id_domicilio_actual) REFERENCES domicilio (id)
+);
 
-CREATE TABLE
-    raza (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        id_especie INT NOT NULL,
-        nombre VARCHAR(255) NOT NULL,
-        tamaño VARCHAR(10) NOT NULL,
-        limite_inf_altura_cm INT NULL,
-        limite_sup_altura_cm INT NULL,
-        limite_inf_peso_kg INT NULL,
-        limite_sup_peso_kg INT NULL,
-        FOREIGN KEY (id_especie) REFERENCES especie (id)
-    );
+CREATE TABLE raza (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_especie INT NOT NULL,
+    nombre VARCHAR(255) NOT NULL,
+    FOREIGN KEY (id_especie) REFERENCES especie (id)
+);
 
-INSERT INTO
-    raza (
-        id_especie,
-        nombre,
-        tamaño,
-        limite_inf_altura_cm,
-        limite_sup_altura_cm,
-        limite_inf_peso_kg,
-        limite_sup_peso_kg
-    )
+INSERT INTO raza (id_especie, nombre)
 VALUES
-    (1, 'Caniche', 'pequeño', 24, 28, 2, 4),
-    (1, 'Chihuahua', 'pequeño', 15, 23, 1, 3),
-    (
-        1,
-        'Cocker Spaniel Inglés',
-        'mediano',
-        36,
-        43,
-        12,
-        16
-    ),
-    (1, 'Beagle', 'mediano', 33, 40, 9, 14),
-    (1, 'Rottweiler', 'grande', 56, 69, 35, 60),
-    (1, 'Golden Retriever', 'grande', 51, 61, 25, 34),
-    (1, 'Gran Danés', 'gigante', 71, 86, 50, 90),
-    (1, 'Mastín Inglés', 'gigante', 70, 91, 54, 100),
-    (2, 'Singapura', 'pequeño', 20, 25, 2, 3),
-    (2, 'Devon Rex', 'pequeño', 22, 25, 2, 4),
-    (
-        2,
-        'Americano de pelo corto',
-        'mediano',
-        23,
-        30,
-        4,
-        7
-    ),
-    (2, 'Siamés', 'mediano', 23, 28, 3, 6),
-    (2, 'Grande de Noruega', 'grande', 30, 35, 6, 8),
-    (2, 'Maine Coon', 'grande', 30, 35, 6, 9),
-    (2, 'Savannah', 'gigante', 35, 40, 10, 14),
-    (2, 'Chausie', 'gigante', 35, 45, 8, 13),
-    (2, 'Burmés', 'pequeño', 20, 25, 3, 4),
-    (2, 'Tonquinés', 'pequeño', 20, 24, 2, 4),
-    (2, 'Manx', 'pequeño', 22, 25, 3, 4),
-    (
-        2,
-        'Exótico de pelo corto',
-        'pequeño',
-        20,
-        25,
-        3,
-        4
-    ),
-    (2, 'Abisinio', 'pequeño', 23, 25, 2, 4),
-    (1, 'Yorkshire Terrier', 'pequeño', 20, 23, 2, 3),
-    (1, 'Pomerania', 'pequeño', 18, 22, 1, 4),
-    (1, 'Shih Tzu', 'pequeño', 20, 28, 4, 7),
-    (1, 'Bichón Frisé', 'pequeño', 23, 28, 5, 7),
-    (1, 'Dachshund Miniatura', 'pequeño', 20, 25, 4, 5),
-    (2, 'Birmano', 'mediano', 25, 30, 4, 5),
-    (2, 'Russian Blue', 'mediano', 24, 28, 4, 6),
-    (
-        2,
-        'Oriental de pelo corto',
-        'mediano',
-        25,
-        30,
-        4,
-        6
-    ),
-    (2, 'Bengala', 'mediano', 25, 30, 4, 6),
-    (2, 'British Shorthair', 'mediano', 27, 30, 4, 6),
-    (1, 'Bulldog Francés', 'mediano', 28, 33, 10, 14),
-    (1, 'Border Collie', 'mediano', 46, 53, 12, 20),
-    (1, 'Schnauzer Mediano', 'mediano', 45, 50, 15, 20),
-    (1, 'Basset Hound', 'mediano', 33, 38, 20, 25),
-    (1, 'Cocker Americano', 'mediano', 37, 39, 11, 14),
-    (2, 'Ragdoll', 'grande', 30, 35, 6, 9),
-    (2, 'Selkirk Rex', 'grande', 30, 34, 6, 8),
-    (2, 'Himalayo', 'grande', 30, 35, 6, 9),
-    (2, 'Ragamuffin', 'grande', 30, 35, 6, 9),
-    (2, 'Persa', 'grande', 30, 34, 5, 8),
-    (1, 'Dálmata', 'grande', 48, 60, 20, 32),
-    (1, 'Husky Siberiano', 'grande', 50, 60, 20, 27),
-    (1, 'Doberman Pinscher', 'grande', 63, 72, 32, 45),
-    (1, 'Setter Irlandés', 'grande', 55, 67, 25, 30),
-    (1, 'Labrador Retriever', 'grande', 54, 62, 25, 36),
-    (2, 'Bosque de Noruega', 'gigante', 35, 40, 6, 10),
-    (2, 'Maine Coon', 'gigante', 35, 40, 7, 10),
-    (2, 'Savannah', 'gigante', 35, 45, 8, 13),
-    (2, 'Pixie-Bob', 'gigante', 35, 40, 8, 12),
-    (2, 'Highlander', 'gigante', 35, 42, 9, 13),
-    (1, 'Mastín Napolitano', 'gigante', 60, 80, 50, 70),
-    (1, 'San Bernardo', 'gigante', 70, 90, 60, 90),
-    (1, 'Terranova', 'gigante', 66, 71, 50, 68),
-    (1, 'Leonberger', 'gigante', 65, 80, 54, 77),
-    (1, 'Mastín Tibetiano', 'gigante', 66, 76, 45, 72),
-    (
-        1,
-        'Mestizo Pequeño',
-        'pequeño',
-        NULL,
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        1,
-        'Mestizo Mediano',
-        'mediano',
-        NULL,
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        1,
-        'Mestizo Grande',
-        'grande',
-        NULL,
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        2,
-        'Mestizo Pequeño',
-        'pequeño',
-        NULL,
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        2,
-        'Mestizo Mediano',
-        'mediano',
-        NULL,
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        2,
-        'Mestizo Grande',
-        'grande',
-        NULL,
-        NULL,
-        NULL,
-        NULL
-    );
+    (1, 'Caniche'),
+    (1, 'Chihuahua'),
+    (1, 'Cocker Spaniel Inglés'),
+    (1, 'Beagle'),
+    (1, 'Rottweiler'),
+    (1, 'Golden Retriever'),
+    (1, 'Gran Danés'),
+    (1, 'Mastín Inglés'),
+    (2, 'Singapura'),
+    (2, 'Devon Rex'),
+    (2,'Americano de pelo corto'),
+    (2, 'Siamés'),
+    (2, 'Grande de Noruega'),
+    (2, 'Maine Coon'),
+    (2, 'Savannah'),
+    (2, 'Chausie'),
+    (2, 'Burmés'),
+    (2, 'Tonquinés'),
+    (2, 'Manx'),
+    (2,'Exótico de pelo corto'),
+    (2, 'Abisinio'),
+    (1, 'Yorkshire Terrier'),
+    (1, 'Pomerania'),
+    (1, 'Shih Tzu'),
+    (1, 'Bichón Frisé'),
+    (1, 'Dachshund Miniatura'),
+    (2, 'Birmano'),
+    (2, 'Russian Blue'),
+    (2, 'Oriental de pelo corto'),
+    (2, 'Bengala'),
+    (2, 'British Shorthair'),
+    (1, 'Bulldog Francés'),
+    (1, 'Border Collie'),
+    (1, 'Schnauzer Mediano'),
+    (1, 'Basset Hound'),
+    (1, 'Cocker Americano'),
+    (2, 'Ragdoll'),
+    (2, 'Selkirk Rex'),
+    (2, 'Himalayo'),
+    (2, 'Ragamuffin'),
+    (2, 'Persa'),
+    (1, 'Dálmata'),
+    (1, 'Husky Siberiano'),
+    (1, 'Doberman Pinscher'),
+    (1, 'Setter Irlandés'),
+    (1, 'Labrador Retriever'),
+    (2, 'Bosque de Noruega'),
+    (2, 'Maine Coon'),
+    (2, 'Savannah'),
+    (2, 'Pixie-Bob'),
+    (2, 'Highlander'),
+    (1, 'Mastín Napolitano'),
+    (1, 'San Bernardo'),
+    (1, 'Terranova'),
+    (1, 'Leonberger'),
+    (1, 'Mastín Tibetiano'),
+    (1, 'Mestizo'),
+    (2, 'Mestizo');
 
-CREATE TABLE
-    animal (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        nombre VARCHAR(255) NOT NULL,
-        sexo CHAR(1) NOT NULL,
-        año_nacimiento INT NOT NULL,
-        pelaje_color VARCHAR(255) NULL,
-        id_responsable INT NULL,
-        id_especie INT NOT NULL,
-        id_raza INT NOT NULL,
-        fallecido TINYINT (1) NOT NULL,
-        FOREIGN KEY (id_especie) REFERENCES especie (id),
-        FOREIGN KEY (id_raza) REFERENCES raza (id),
-        FOREIGN KEY (id_responsable) REFERENCES responsable (id)
-    );
+CREATE TABLE color (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL
+);
 
-CREATE TABLE
-    profesional (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT NULL,
-        nombre VARCHAR(255) NOT NULL,
-        apellido VARCHAR(255) NOT NULL,
-        dni INT NOT NULL,
-        sexo CHAR(1) NULL,
-        fecha_nacimiento DATE NULL,
-        telefono VARCHAR(15) NULL,
-        mail VARCHAR(255) NULL,
-        matricula VARCHAR(15) NOT NULL,
-        legajo INT NOT NULL,
-        estado TINYINT (1) NOT NULL,
-        firma TEXT NULL
-    );
+INSERT INTO color (nombre) 
+VALUES ('Blanco'), ('Negro'), ('Gris'), ('Marrón'), ('Naranja'), ('Crema');
 
-CREATE TABLE
-    atencion (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        id_efector INT NOT NULL,
-        id_responsable INT NOT NULL,
-        id_domicilio_responsable INT NULL,
-        id_animal INT NOT NULL,
-        id_servicio INT NOT NULL,
-        id_profesional INT NOT NULL,
-        señas_particulares VARCHAR(255) NULL,
-        observaciones_animal VARCHAR(255) NULL,
-        fecha_ingreso DATE NULL,
-        hora_ingreso TIME NULL,
-        fecha_egreso DATE NULL,
-        hora_egreso TIME NULL,
-        estado_sanitario_egreso VARCHAR(255) NULL,
-        observaciones_atencion VARCHAR(255) NULL,
-        estado TINYINT (1) NOT NULL,
-        FOREIGN KEY (id_efector) REFERENCES efector (id),
-        FOREIGN KEY (id_responsable) REFERENCES responsable (id),
-        FOREIGN KEY (id_domicilio_responsable) REFERENCES domicilio (id),
-        FOREIGN KEY (id_animal) REFERENCES animal (id),
-        FOREIGN KEY (id_servicio) REFERENCES servicio (id),
-        FOREIGN KEY (id_profesional) REFERENCES profesional (id)
-    );
+CREATE TABLE tamaño (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL
+);
 
-CREATE TABLE
-    atencion_insumo (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        id_atencion INT NOT NULL,
-        id_insumo INT NOT NULL,
-        cant_ml INT NULL,
-        cant_ml_prequirurgico INT NULL,
-        cant_ml_induccion INT NULL,
-        cant_ml_quirofano INT NULL,
-        FOREIGN KEY (id_atencion) REFERENCES atencion (id),
-        FOREIGN KEY (id_insumo) REFERENCES insumo (id)
-    );
+INSERT INTO tamaño (nombre)
+VALUES ('Mini'), ('Pequeño'), ('Mediano'), ('Grande'), ('Gigante');
 
-CREATE TABLE
-    profesional_efector (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        id_profesional INT NOT NULL,
-        id_efector INT NOT NULL,
-        estado TINYINT (1) NOT NULL,
-        FOREIGN KEY (id_profesional) REFERENCES profesional (id),
-        FOREIGN KEY (id_efector) REFERENCES efector (id)
-    );
+CREATE TABLE animal (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    sexo CHAR(1) NOT NULL,
+    fecha_nacimiento DATE NULL,
+    id_tamaño INT NULL,
+    id_responsable INT NULL,
+    id_especie INT NOT NULL,
+    id_raza INT NULL,
+    fallecido TINYINT (1) NOT NULL,
+    esterilizado TINYINT(1) NOT NULL,
+    adoptado_imusa TINYINT(1) NOT NULL,
+    FOREIGN KEY (id_tamaño) REFERENCES tamaño (id),
+    FOREIGN KEY (id_especie) REFERENCES especie (id),
+    FOREIGN KEY (id_raza) REFERENCES raza (id),
+    FOREIGN KEY (id_responsable) REFERENCES responsable (id)
+);
+
+CREATE TABLE animal_color (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_animal INT NOT NULL,
+    id_color INT NOT NULL,
+    FOREIGN KEY (id_animal) REFERENCES animal (id),
+    FOREIGN KEY (id_color) REFERENCES color (id)
+);
+
+CREATE TABLE profesional (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NULL,
+    nombre VARCHAR(255) NOT NULL,
+    apellido VARCHAR(255) NOT NULL,
+    dni INT NOT NULL,
+    sexo CHAR(1) NULL,
+    fecha_nacimiento DATE NULL,
+    telefono VARCHAR(15) NULL,
+    mail VARCHAR(255) NULL,
+    matricula VARCHAR(15) NOT NULL,
+    legajo INT NOT NULL,
+    estado TINYINT (1) NOT NULL,
+    firma TEXT NULL
+);
+
+CREATE TABLE atencion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_efector INT NOT NULL,
+    id_responsable INT NOT NULL,
+    id_domicilio_responsable INT NULL,
+    id_animal INT NOT NULL,
+    id_servicio INT NOT NULL,
+    id_profesional INT NOT NULL,
+    peso_kg FLOAT NULL,
+    señas_particulares VARCHAR(255) NULL,
+    observaciones_animal VARCHAR(255) NULL,
+    fecha_ingreso DATE NULL,
+    hora_ingreso TIME NULL,
+    fecha_egreso DATE NULL,
+    hora_egreso TIME NULL,
+    estado_sanitario_egreso VARCHAR(255) NULL,
+    observaciones_atencion VARCHAR(255) NULL,
+    estado TINYINT (1) NOT NULL,
+    FOREIGN KEY (id_efector) REFERENCES efector (id),
+    FOREIGN KEY (id_responsable) REFERENCES responsable (id),
+    FOREIGN KEY (id_domicilio_responsable) REFERENCES domicilio (id),
+    FOREIGN KEY (id_animal) REFERENCES animal (id),
+    FOREIGN KEY (id_servicio) REFERENCES servicio (id),
+    FOREIGN KEY (id_profesional) REFERENCES profesional (id)
+);
+
+CREATE TABLE atencion_insumo (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_atencion INT NOT NULL,
+    id_insumo INT NOT NULL,
+    cant_ml INT NULL,
+    cant_ml_prequirurgico INT NULL,
+    cant_ml_induccion INT NULL,
+    cant_ml_quirofano INT NULL,
+    FOREIGN KEY (id_atencion) REFERENCES atencion (id),
+    FOREIGN KEY (id_insumo) REFERENCES insumo (id)
+);
+
+CREATE TABLE profesional_efector (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_profesional INT NOT NULL,
+    id_efector INT NOT NULL,
+    estado TINYINT (1) NOT NULL,
+    FOREIGN KEY (id_profesional) REFERENCES profesional (id),
+    FOREIGN KEY (id_efector) REFERENCES efector (id)
+);
