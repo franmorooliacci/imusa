@@ -231,3 +231,21 @@ export const getPdf = async (id_atencion) => {
         throw error;
     }
 };
+
+export const getTamaños = async () => {
+    try {
+        const response = await http.get('tamaños/');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getColores = async () => {
+    try {
+        const response = await http.get('colores/');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
