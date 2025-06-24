@@ -37,7 +37,7 @@ const AnimalTable = ({animalList}) => {
                             <TableCell>{animal.nombre}</TableCell>
                             <TableCell>{animal.sexo}</TableCell>
                             <TableCell>{animal.edad}</TableCell>
-                            <TableCell>{animal.raza_nombre}</TableCell>
+                            <TableCell>{animal.raza}</TableCell>
                             <TableCell>
                                 <IconButton 
                                     variant="outlined" 
