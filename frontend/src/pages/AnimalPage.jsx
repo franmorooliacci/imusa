@@ -11,7 +11,7 @@ import BackHeader from '../components/BackHeader';
 
 const AnimalPage = () => {
     const { especie, animalId, responsableId } = useParams();
-    const [animal, setAnimal] = useState(null);
+    const [animal, setAnimal] = useState({});
     const [editMode, setEditMode] = useState(false);
     const [loading, setLoading] = useState(true);
     const [atenciones, setAtenciones] = useState([]);
@@ -20,26 +20,16 @@ const AnimalPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchAnimalDetails = async () => {
-            try {
-                const data = await getAnimalById(animalId);
-                setAnimal(data);
-            } catch (error) {
-            }
-        };
-
-        const fetchAtenciones = async () => {
-            try {
-                const params = {id_animal: animalId};
-                const data = await getAtenciones(params);
-                setAtenciones(data);
-            } catch (error) {
-            }
-        }
-
         const fetchData = async () => {
-            await Promise.all([fetchAnimalDetails(), fetchAtenciones()]);
-            setLoading(false);
+            try {
+                const [animalList, atencionesList] = await Promise.all([getAnimalById(animalId), getAtenciones({ id_animal: animalId })]);
+                setAnimal(animalList);
+                setAtenciones(atencionesList);
+            } catch (error) {
+
+            } finally {
+                setLoading(false);
+            }
         };
 
         fetchData();
@@ -70,7 +60,7 @@ const AnimalPage = () => {
 
     const handleAddAtencion = () => {
         navigate(`/atencion/agregar/${animal.id_responsable}/${animal.id}`);
-    }
+    };
 
     if (loading) {
         return (
@@ -135,15 +125,27 @@ const AnimalPage = () => {
                             </Typography>
 
                             <Typography variant='body1'>
-                                <strong>Pelaje:</strong> {animal.pelaje_color}
-                            </Typography>
-
-                            <Typography variant='body1'>
                                 <strong>Especie:</strong> {animal.id_especie === 1 ? 'Canino' : 'Felino'}
                             </Typography>
                             
                             <Typography variant='body1'>
-                                <strong>Raza:</strong> {animal.raza_nombre}
+                                <strong>Raza:</strong> {animal.raza}
+                            </Typography>
+
+                            <Typography variant='body1'>
+                                <strong>Tamaño:</strong> {animal.tamaño}
+                            </Typography>
+
+                            <Typography variant="body1">
+                                <strong>Pelaje:</strong> {animal.colores?.map(c => c.nombre).join(', ') || 'No especificado'}
+                            </Typography>
+
+                            <Typography variant='body1'>
+                                <strong>Esterilizado:</strong> {animal.esterilizado === 1 ? 'Si' : 'No'}
+                            </Typography>
+
+                            <Typography variant='body1'>
+                                <strong>Adoptado en IMuSA:</strong> {animal.adoptado_imusa === 1 ? 'Si' : 'No'}
                             </Typography>
 
                             {animal.fallecido === 1 &&
