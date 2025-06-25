@@ -94,13 +94,10 @@ class Animal(models.Model):
     nombre = models.CharField(max_length=255)
     sexo = models.CharField(max_length=1)
     fecha_nacimiento = models.DateField(blank=True, null=True)
-    id_tamaño = models.ForeignKey(
-        Tamaño, models.DO_NOTHING, db_column='id_tamaño', blank=True, null=True)
-    id_responsable = models.ForeignKey(
-        Responsable, models.DO_NOTHING, db_column='id_responsable', blank=True, null=True)
-    id_especie = models.ForeignKey(
-        Especie, models.DO_NOTHING, db_column='id_especie')
-    id_raza = models.ForeignKey('Raza', models.DO_NOTHING, db_column='id_raza', blank=True, null=True)
+    id_tamaño = models.ForeignKey(Tamaño, models.DO_NOTHING, db_column='id_tamaño')
+    id_responsable = models.ForeignKey(Responsable, models.DO_NOTHING, db_column='id_responsable', blank=True, null=True)
+    id_especie = models.ForeignKey(Especie, models.DO_NOTHING, db_column='id_especie')
+    id_raza = models.ForeignKey('Raza', models.DO_NOTHING, db_column='id_raza')
     fallecido = models.IntegerField()
     esterilizado = models.IntegerField()
     adoptado_imusa = models.IntegerField()
