@@ -27,29 +27,55 @@ class TamañoSerializer(serializers.ModelSerializer):
 
 
 class AnimalSerializer(serializers.ModelSerializer):
-    raza = serializers.CharField(source='id_raza.nombre', read_only=True, required=False)
+    colores = serializers.PrimaryKeyRelatedField(
+        queryset=Color.objects.all(),
+        many=True
+    )
+    raza   = serializers.CharField(source='id_raza.nombre', read_only=True, required=False)
     tamaño = serializers.CharField(source='id_tamaño.nombre', read_only=True)
-    colores = ColorSerializer(many=True, read_only=True)
-    edad = serializers.SerializerMethodField()
+    edad   = serializers.SerializerMethodField()
 
     class Meta:
-        model = Animal
-        fields = '__all__'
+        model  = Animal
+        fields = [
+            'id', 'nombre', 'sexo', 'fecha_nacimiento',
+            'id_tamaño', 'id_responsable', 'id_especie', 'id_raza',
+            'fallecido', 'esterilizado', 'adoptado_imusa',
+            'colores',
+            'raza', 'tamaño', 'edad',
+        ]
+
+    def create(self, validated_data):
+        colores = validated_data.pop('colores', [])
+        animal = super().create(validated_data)
+        animal.colores.set(colores)
+        return animal
+
+    def update(self, instance, validated_data):
+        colores = validated_data.pop('colores', None)
+        animal = super().update(instance, validated_data)
+        if colores is not None:
+            animal.colores.set(colores)
+        return animal
+
+    # POST/PUT/PATCH -> colores: [ids]
+    # GET            -> colores: [{id, nombre}]
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['colores'] = ColorSerializer(instance.colores.all(), many=True).data
+        return data
 
     def get_edad(self, obj):
         birth = obj.fecha_nacimiento
         if not birth:
             return None
-
         from datetime import date
         today  = date.today()
         years  = today.year  - birth.year
         months = today.month - birth.month
-
         if months < 0:
             years  -= 1
             months += 12
-
         return f"{years} años {months} meses"
 
 
