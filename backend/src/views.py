@@ -397,12 +397,48 @@ class PDFAPIView(APIView):
         veterinario = atencion.id_profesional
         efector = atencion.id_efector
 
+        # Obtiene los colores del animal
+        colores = animal.colores.all()
+        colores_nombres = ', '.join(c.nombre for c in colores)
+
         # Calcula la edad
-        import datetime
-        hoy = datetime.date.today()
-        born = animal.año_nacimiento
-        edad_years = hoy.year - born - ((hoy.month, hoy.day) < (1, 1))
-        edad_str = f"{edad_years} año{'es' if edad_years != 1 else ''}"
+        birth = animal.fecha_nacimiento
+        if not birth:
+            edad = None
+        else:
+            from datetime import date
+            today  = date.today()
+            years  = today.year  - birth.year
+            months = today.month - birth.month
+            if months < 0:
+                years  -= 1
+                months += 12
+            edad = f"{years} años {months} meses"
+
+        # Arma el domicilio
+        dom = responsable.id_domicilio_actual
+        if dom:
+            parts = []
+
+            calle_altura = f"{dom.calle} {dom.altura}"
+            if dom.bis:
+                calle_altura += " bis"
+            if dom.letra:
+                calle_altura += f" {dom.letra}"
+            parts.append(calle_altura)
+
+            if dom.piso is not None:
+                parts.append(f"piso {dom.piso}")
+
+            if dom.depto:
+                parts.append(f"depto {dom.depto}")
+
+            if dom.monoblock is not None:
+                parts.append(f"monoblock {dom.monoblock}")
+
+            localidad = dom.localidad
+            domicilio_actual = ' '.join(parts) + f", {localidad}"
+
 
         # Arma el path para los archivos estaticos
         base_static = Path(settings.BASE_DIR) / 'src' / 'static'
@@ -438,10 +474,12 @@ class PDFAPIView(APIView):
             'animal'          : animal,
             'atencion'        : atencion,
             'responsable'     : responsable,
+            'domicilio_actual': domicilio_actual,
             'medicamentos'    : medicamentos,
             'veterinario'     : veterinario,
             'efector'         : efector,
-            'edad'            : edad_str,
+            'colores_nombres' : colores_nombres,
+            'edad'            : edad,
             'css_content'     : css_content,
             'logo_data_uri'   : logo_data_uri,
             'responsable_firma_uri': responsable_uri,
