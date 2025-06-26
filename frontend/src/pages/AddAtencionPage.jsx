@@ -15,6 +15,7 @@ const AddAtencionPage = () => {
     const { responsableId, animalId } = useParams();
     const [formData, setFormData] = useState({
         atencion: {
+            peso_kg: '',
             señas_particulares: '',
             observaciones_animal: ''
         },
@@ -67,16 +68,22 @@ const AddAtencionPage = () => {
         // }, 3000);
     }, [responsableId, animalId]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            atencion: {
-                ...prev.atencion,
-                [name]: value,
-            }
-        }));
-    };
+const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === 'peso_kg') {
+        const isValid = /^[0-9]*[.,]?[0-9]*$/.test(value);
+        if (!isValid) return;
+    }
+
+    setFormData((prev) => ({
+        ...prev,
+        atencion: {
+            ...prev.atencion,
+            [name]: value,
+        }
+    }));
+};
 
     const handleCloseAlert = () => {
         setAlertOpen(false);
@@ -94,6 +101,7 @@ const AddAtencionPage = () => {
                 id_animal: formData.animal.id,
                 id_servicio: 1,
                 id_profesional: profesional.id,
+                peso_kg: formData.atencion.peso_kg === '' ? null : parseFloat(formData.atencion.peso_kg.replace(',', '.')),
                 señas_particulares: formData.atencion.señas_particulares === '' ? null : formData.atencion.señas_particulares,
                 observaciones_animal: formData.atencion.observaciones_animal === '' ? null : formData.atencion.observaciones_animal,
                 fecha_ingreso: now.toISOString().split('T')[0],
@@ -155,6 +163,7 @@ const AddAtencionPage = () => {
                     flexDirection: 'column',
                     mt: 2
                 }}
+                noValidate
             >
                 <Divider>
                     <Stack direction='row' alignItems='center' spacing={1} sx={{ mb: 1 }}>
