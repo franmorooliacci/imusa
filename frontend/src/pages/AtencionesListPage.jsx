@@ -127,7 +127,7 @@ const AtencionesListPage = () => {
                                 secondary={
                                     <>
                                         <Typography variant='body2' component='span' color='text.secondary'>
-                                            {`${atencion.animal.raza_nombre} • ${atencion.animal.pelaje_color}`}
+                                            {`${atencion.animal.raza} • ${atencion.animal.tamaño} • ${atencion.animal.colores.map(c => c.nombre).join(', ')}`}
                                         </Typography>
                                         <br />
                                         <Typography variant='body2' component='span' color='text.secondary'>
