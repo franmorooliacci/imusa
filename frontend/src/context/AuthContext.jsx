@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }) => {
         ) {
             const defaultEfector = efectores.find(e => e.unidad_movil === 0) || efectores[0];
             if (defaultEfector) {
-                setSelectedEfectorId(defaultEfector.id_efector);
+                setSelectedEfectorId(defaultEfector.id);
             }
         }
     }, [efectores, selectedEfectorId]);

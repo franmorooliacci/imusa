@@ -54,7 +54,7 @@ const Navbar = ({ toggleSidebar }) => {
                         onChange={handleChange}
                     >
                         {efectores.map((e) => (
-                            <MenuItem key={e.id_efector} value={e.id_efector}>
+                            <MenuItem key={e.id} value={e.id}>
                                 {e.nombre}
                             </MenuItem>
                         ))}

@@ -20,7 +20,7 @@ const AtencionesListPage = () => {
     useEffect(() => {
         const fetchAtenciones = async () => {
             try{
-                const params = { id_efector: selectedEfectorId, estado: 0 }
+                const params = { id: selectedEfectorId, estado: 0 }
                 const response = await getAtenciones(params);
                 setAtenciones(response);
                 setLoading(false);
