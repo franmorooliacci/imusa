@@ -44,8 +44,11 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('profesional', JSON.stringify(data.profesional));
         }
         if (data.efectores) {
-            setEfectores(data.efectores);
-            localStorage.setItem('efectores', JSON.stringify(data.efectores));
+            const sortedEfectores = [...data.efectores].sort((a, b) =>
+                a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
+            );
+            setEfectores(sortedEfectores);
+            localStorage.setItem('efectores', JSON.stringify(sortedEfectores));
         }
     };
 
