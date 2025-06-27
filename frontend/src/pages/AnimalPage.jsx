@@ -8,6 +8,7 @@ import SkeletonList from '../components/SkeletonList';
 import AtencionTable from '../components/AtencionTable';
 import AnimalForm from '../components/AnimalForm';
 import BackHeader from '../components/BackHeader';
+import AlertMessage from '../components/AlertMessage';
 
 const AnimalPage = () => {
     const { especie, animalId, responsableId } = useParams();
@@ -16,7 +17,9 @@ const AnimalPage = () => {
     const [loading, setLoading] = useState(true);
     const [atenciones, setAtenciones] = useState([]);
     const visibleAtenciones = atenciones.filter(a => a.estado === 1);
-    
+    const [alertOpen, setAlertOpen] = useState(false);
+    const [alertMsg, setAlertMsg] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -59,7 +62,21 @@ const AnimalPage = () => {
     // };
 
     const handleAddAtencion = () => {
-        navigate(`/atencion/agregar/${animal.id_responsable}/${animal.id}`);
+        // Busca si el animal tiene alguna atencion en curso
+        const ongoing = atenciones.find(a => a.estado === 0);
+
+        if (ongoing) {
+            // true, muestra la alerta
+            setAlertSeverity('warning');
+            setAlertMsg(
+                `${animal.nombre} tiene una atención en curso en el efector ${ongoing.efector_nombre}. ` +
+                'Debe finalizarla antes de agregar otra.'
+            );
+            setAlertOpen(true);
+        } else {
+            // false, redirige a la pagina de atenciones
+            navigate(`/atencion/agregar/${responsableId}/${animalId}`);
+        }
     };
 
     if (loading) {
@@ -179,6 +196,13 @@ const AnimalPage = () => {
                     </Grid2>
                 </Grid2>
             )}
+
+            <AlertMessage
+                open={alertOpen}
+                handleClose={() => setAlertOpen(false)}
+                message={alertMsg}
+                severity={alertSeverity}
+            />
         </Box>
     );
 };
