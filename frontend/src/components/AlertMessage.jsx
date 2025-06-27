@@ -26,7 +26,7 @@ const AlertMessage = ({ open, handleClose, message, severity }) => {
                 {message}
             </Alert>
         </Snackbar>
-);
+    );
 }
 
 export default AlertMessage;
