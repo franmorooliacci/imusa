@@ -49,7 +49,7 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
 
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
-    const [alertSuccess, setAlertSuccess] = useState(false);
+    const [alertSeverity, setAlertSeverity] = useState('');
     const [loading, setLoading] = useState(true);
     const [razas, setRazas] = useState([]);
     const [tamaños, setTamaños] = useState([]);
@@ -96,7 +96,7 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
             if (mode === 'add') {
                 const response = await addAnimal(data);
 
-                setAlertSuccess(true);
+                setAlertSeverity('success');
                 setAlertMsg(`${data.id_especie === 1 ? 'Canino' : 'Felino'} agregado con éxito!`);
                 setAlertOpen(true);
 
@@ -106,7 +106,7 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
             } else {
                 const response = await updateAnimal(initialData.id, data);
 
-                setAlertSuccess(true);
+                setAlertSeverity('success');
                 setAlertMsg(`${data.id_especie === 1 ? 'Canino' : 'Felino'} modificado con éxito!`);
                 setAlertOpen(true);
                 setTimeout(() => {
@@ -115,19 +115,15 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
             }
         } catch (error) {
             if (mode === 'add') {
-                setAlertSuccess(false);
+                setAlertSeverity('error');
                 setAlertMsg(`No se ha podido agregar ${data.id_especie === 1 ? 'canino' : 'felino'}.`);
                 setAlertOpen(true);
             } else {
-                setAlertSuccess(false);
+                setAlertSeverity('error');
                 setAlertMsg(`No se ha podido modificar ${data.id_especie === 1 ? 'canino' : 'felino'}.`);
                 setAlertOpen(true);
             }
         }
-    };
-
-    const handleCloseAlert = () => {
-        setAlertOpen(false);
     };
 
     if (loading) {
@@ -395,9 +391,9 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
 
             <AlertMessage
                 open = {alertOpen}
-                handleClose = {handleCloseAlert}
+                handleClose = {() => setAlertOpen(false)}
                 message = {alertMsg}
-                success = {alertSuccess}
+                severity = {alertSeverity}
             />
         </LocalizationProvider>
     );

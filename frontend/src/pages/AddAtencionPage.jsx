@@ -25,7 +25,7 @@ const AddAtencionPage = () => {
     const [loading, setLoading] = useState(true);
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
-    const [alertSuccess, setAlertSuccess] = useState(false);
+    const [alertSeverity, setAlertSeverity] = useState('');
     const { profesional, selectedEfectorId } = useContext(AuthContext);
 
     const navigate = useNavigate();
@@ -68,25 +68,21 @@ const AddAtencionPage = () => {
         // }, 3000);
     }, [responsableId, animalId]);
 
-const handleChange = (e) => {
-    const { name, value } = e.target;
+    const handleChange = (e) => {
+        const { name, value } = e.target;
 
-    if (name === 'peso_kg') {
-        const isValid = /^[0-9]*[.,]?[0-9]*$/.test(value);
-        if (!isValid) return;
-    }
-
-    setFormData((prev) => ({
-        ...prev,
-        atencion: {
-            ...prev.atencion,
-            [name]: value,
+        if (name === 'peso_kg') {
+            const isValid = /^[0-9]*[.,]?[0-9]*$/.test(value);
+            if (!isValid) return;
         }
-    }));
-};
 
-    const handleCloseAlert = () => {
-        setAlertOpen(false);
+        setFormData((prev) => ({
+            ...prev,
+            atencion: {
+                ...prev.atencion,
+                [name]: value,
+            }
+        }));
     };
 
     const handleSubmit = async (event) => {
@@ -115,7 +111,7 @@ const handleChange = (e) => {
                 
             await addAtencion(newAtencion);
 
-            setAlertSuccess(true);
+            setAlertSeverity('success');
             setAlertMsg('Atención agregada con éxito!');
             setAlertOpen(true);
 
@@ -124,7 +120,7 @@ const handleChange = (e) => {
             }, 3000); // Timeout para que se muestre la alerta
 
         } catch(error) {
-            setAlertSuccess(false);
+            setAlertSeverity('error');
             setAlertMsg('No se ha podido agregar la atención.');
             setAlertOpen(true);
         }
@@ -195,9 +191,9 @@ const handleChange = (e) => {
 
             <AlertMessage 
                 open = {alertOpen}
-                handleClose = {handleCloseAlert}
+                handleClose = {() => setAlertOpen(false)}
                 message = {alertMsg}
-                success = {alertSuccess}
+                severity = {alertSeverity}
             />
         </Box>
     );

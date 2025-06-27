@@ -19,7 +19,7 @@ const AnimalPage = () => {
     const visibleAtenciones = atenciones.filter(a => a.estado === 1);
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
-    const [alertSeverity, setAlertSeverity] = useState(false);
+    const [alertSeverity, setAlertSeverity] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
