@@ -16,7 +16,7 @@ const ResponsablePage = () => {
     const [especie, setEspecie] = useState('');
     const [loading, setLoading] = useState(true);
     const [atenciones, setAtenciones] = useState([]);
-    const visibleAtenciones = atenciones.filter(a => a.estado === 1);
+    const visibleAtenciones = atenciones.filter(a => a.finalizada === 1);
     const navigate = useNavigate();
 
     useEffect(() => {

@@ -16,7 +16,7 @@ const AnimalPage = () => {
     const [editMode, setEditMode] = useState(false);
     const [loading, setLoading] = useState(true);
     const [atenciones, setAtenciones] = useState([]);
-    const visibleAtenciones = atenciones.filter(a => a.estado === 1);
+    const visibleAtenciones = atenciones.filter(a => a.finalizada === 1);
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('');
@@ -63,7 +63,7 @@ const AnimalPage = () => {
 
     const handleAddAtencion = () => {
         // Busca si el animal tiene alguna atencion en curso
-        const ongoing = atenciones.find(a => a.estado === 0);
+        const ongoing = atenciones.find(a => a.finalizada === 0);
 
         if (ongoing) {
             // true, muestra la alerta
