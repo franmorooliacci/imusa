@@ -31,7 +31,7 @@ const AddResponsablePage = () => {
     const [domicilioDone, setDomicilioDone] = useState(false);
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
-    const [alertSuccess, setAlertSuccess] = useState(false);
+    const [alertSeverity, setAlertSeverity] = useState('');
     const navigate = useNavigate();
     const canSubmit = domicilioDone && isValid;
 
@@ -106,7 +106,7 @@ const AddResponsablePage = () => {
             
             const response = await addResponsable(formattedResponsable);
 
-            setAlertSuccess(true);
+            setAlertSeverity('success');
             setAlertMsg('Responsable agregado con éxito!');
             setAlertOpen(true);
 
@@ -114,7 +114,7 @@ const AddResponsablePage = () => {
                 navigate(`/responsable/${response.id}`);
             }, 3000);
         } catch (error) {
-            setAlertSuccess(false);
+            setAlertSeverity('error');
             setAlertMsg('No se ha podido agregar al responsable.');
             setAlertOpen(true);
         }
@@ -261,7 +261,7 @@ const AddResponsablePage = () => {
                     open={alertOpen}
                     handleClose={() => setAlertOpen(false)}
                     message={alertMsg}
-                    success={alertSuccess}
+                    severity={alertSeverity}
                 />
             </Box>
         </FormProvider>

@@ -40,7 +40,7 @@ const FinishAtencionPage = () => {
     const [loading, setLoading] = useState(true);
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
-    const [alertSuccess, setAlertSuccess] = useState(false);
+    const [alertSeverity, setAlertSeverity] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -109,10 +109,6 @@ const FinishAtencionPage = () => {
         }));
     };
 
-    const handleCloseAlert = () => {
-        setAlertOpen(false);
-    };
-
     const handleSubmit = async (event) => {
         event.preventDefault();
         const now = new Date();
@@ -155,7 +151,7 @@ const FinishAtencionPage = () => {
 
             await addAtencionInsumo(insumos);
 
-            setAlertSuccess(true);
+            setAlertSeverity('success');
             setAlertMsg('Atención finalizada con éxito!');
             setAlertOpen(true);
 
@@ -164,7 +160,7 @@ const FinishAtencionPage = () => {
             }, 3000); // Timeout para que se muestre la alerta
 
         } catch(error) {
-            setAlertSuccess(false);
+            setAlertSeverity('error');
             setAlertMsg('No se ha podido finalizar la atención.');
             setAlertOpen(true);
         }
@@ -298,9 +294,9 @@ const FinishAtencionPage = () => {
 
             <AlertMessage 
                 open = {alertOpen}
-                handleClose = {handleCloseAlert}
+                handleClose = {() => setAlertOpen(false)}
                 message = {alertMsg}
-                success = {alertSuccess}
+                severity = {alertSeverity}
             />
         </Box>
     );

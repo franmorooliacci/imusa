@@ -33,7 +33,7 @@ const AnimalDetailsForm = ({ formData, onChange = () => {}, readOnly }) => {
                 <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                     <TextField
                         label='Raza'
-                        value={formData.animal.raza_nombre ?? ''}
+                        value={formData.animal.raza ?? ''}
                         slotProps={{
                             readOnly: true,
                         }}
@@ -81,7 +81,11 @@ const AnimalDetailsForm = ({ formData, onChange = () => {}, readOnly }) => {
                 <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                     <TextField
                         label='Pelaje(color)'
-                        value={formData.animal.pelaje_color ?? ''}
+                        value={
+                            Array.isArray(formData.animal.colores)
+                                ? formData.animal.colores.map(c => c.nombre).join(', ')
+                                :''
+                        }
                         slotProps={{
                             readOnly: true,
                         }}
@@ -93,13 +97,30 @@ const AnimalDetailsForm = ({ formData, onChange = () => {}, readOnly }) => {
                 <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                     <TextField
                         label='Tamaño'
-                        value={(formData.animal.raza_tamaño.charAt(0).toUpperCase() + formData.animal.raza_tamaño.slice(1)) ?? ''}
+                        value={formData.animal.tamaño ?? ''}
                         slotProps={{
                             readOnly: true,
                         }}
                         variant='outlined'
                         fullWidth
                         size='small'
+                    />
+                </Grid2>
+                <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+                    <TextField
+                        label='Peso(kg)'
+                        name='peso_kg'
+                        value={formData.atencion.peso_kg ?? ''}
+                        slotProps={{
+                            input: {
+                                readOnly: readOnly,
+                                inputMode: 'decimal'
+                            }
+                        }}
+                        variant='outlined'
+                        fullWidth
+                        size='small'
+                        onChange={onChange}
                     />
                 </Grid2>
                 <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>

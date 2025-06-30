@@ -35,11 +35,7 @@ const EditResponsable = ({ editDomicilio, setEditDomicilio, editContacto, setEdi
     const [domicilioDone, setDomicilioDone] = useState(false);
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
-    const [alertSuccess, setAlertSuccess] = useState(false);
-
-    const handleCloseAlert = () => {
-        setAlertOpen(false);
-    };
+    const [alertSeverity, setAlertSeverity] = useState('');
 
     // Formatea domicilio para agregar a la db
     const formatDomicilio = (domicilio) => {
@@ -94,7 +90,7 @@ const EditResponsable = ({ editDomicilio, setEditDomicilio, editContacto, setEdi
                 mail: data.contacto.mail
             }));
             
-            setAlertSuccess(true);
+            setAlertSeverity('success');
             setAlertMsg('Modificación realizada con éxito!');
             setAlertOpen(true);
             
@@ -102,7 +98,7 @@ const EditResponsable = ({ editDomicilio, setEditDomicilio, editContacto, setEdi
                 setEditContacto(false);
             }, 3000); // Timeout para que se muestre la alerta
         } catch(error){
-            setAlertSuccess(false);
+            setAlertSeverity('error');
             setAlertMsg('No se ha podido realizar la modificación.');
             setAlertOpen(true);
         }
@@ -122,7 +118,7 @@ const EditResponsable = ({ editDomicilio, setEditDomicilio, editContacto, setEdi
             // Actualizo el nuevo domicilio en la db
             await updateResponsable(responsable.id, { id_domicilio_actual: newDomicilio.id });
 
-            setAlertSuccess(true);
+            setAlertSeverity('success');
             setAlertMsg('Modificación realizada con éxito!');
             setAlertOpen(true);
             
@@ -131,7 +127,7 @@ const EditResponsable = ({ editDomicilio, setEditDomicilio, editContacto, setEdi
             }, 3000); // Timeout para que se muestre la alerta
 
         } catch(error){
-            setAlertSuccess(false);
+            setAlertSeverity('error');
             setAlertMsg('No se ha podido realizar la modificación.');
             setAlertOpen(true);
         }
@@ -194,9 +190,9 @@ const EditResponsable = ({ editDomicilio, setEditDomicilio, editContacto, setEdi
 
             <AlertMessage
                 open = {alertOpen}
-                handleClose = {handleCloseAlert}
+                handleClose = {() => setAlertOpen(false)}
                 message = {alertMsg}
-                success = {alertSuccess}
+                severity = {alertSeverity}
             />
         </Box>
     );

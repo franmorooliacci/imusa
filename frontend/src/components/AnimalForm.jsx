@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { TextField, Button, Box, Divider, Grid2, MenuItem, Typography, CircularProgress, Skeleton } from '@mui/material';
+import { TextField, Button, Box, Divider, Grid2, MenuItem, Typography, CircularProgress, Skeleton, FormControl, InputLabel, Select, Checkbox, ListItemText, FormHelperText } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCat, faDog } from '@fortawesome/free-solid-svg-icons';
 import { animalSchema } from '../validation/animalSchema';
-import { addAnimal, updateAnimal, getRazas } from '../services/api';
+import { addAnimal, updateAnimal, getRazas, getTamaños, getColores } from '../services/api';
 import AlertMessage from './AlertMessage';
 import SkeletonList from './SkeletonList';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 
 /**
  * Props:
@@ -19,56 +23,80 @@ import SkeletonList from './SkeletonList';
  */
 
 const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
+    const formDefaults = {
+        nombre: '', 
+        sexo: '', 
+        fecha_nacimiento: null,
+        id_tamaño: '',
+        id_raza: '',
+        fallecido: 0,
+        esterilizado: 0,
+        adoptado_imusa: 0, 
+        id_especie: '',
+        id_responsable: '',
+        ...initialData,
+        colores: initialData.colores ? initialData.colores.map(c => c.id) : ''
+    };
+    
     // React Hook Form
     const methods = useForm({
         resolver: yupResolver(animalSchema),
         mode: 'onBlur',
-        defaultValues: {
-            nombre: '', 
-            sexo: '', 
-            año_nacimiento: '',
-            pelaje_color: '',
-            id_especie: '', 
-            id_raza: '',
-            fallecido: 0,
-            id_responsable: '',
-            ...initialData
-        }
+        defaultValues: formDefaults
     });
 
     const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = methods;
 
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
-    const [alertSuccess, setAlertSuccess] = useState(false);
+    const [alertSeverity, setAlertSeverity] = useState('');
     const [loading, setLoading] = useState(true);
     const [razas, setRazas] = useState([]);
-    const currentYear = new Date().getFullYear();
+    const [tamaños, setTamaños] = useState([]);
+    const [colores, setColores] = useState([]);
 
     useEffect(() => {
-        const fetchRazas = async () => {
+        const fetchData = async () => {
             try {
-                const lista = await getRazas(initialData.id_especie);
-                setRazas(lista);
-                setLoading(false);
+                const [razasList, tamañosList, coloresList] = await Promise.all([
+                    getRazas(initialData.id_especie), 
+                    getTamaños(), 
+                    getColores()
+                ]);
+
+                setRazas(razasList);
+                setTamaños(tamañosList);
+                setColores(coloresList);
             } catch (error) {
+
+            } finally {
+                setLoading(false);
             }
         };
         
-        fetchRazas();
+        fetchData();
     }, [initialData.id_especie]);
 
     useEffect(() => {
-        if (mode === 'edit') reset({ ...initialData });
+        if (mode === 'edit') {
+            const editDefaults = {
+                ...initialData,
+                colores: initialData.colores.map(c => c.id),
+            };       
+            reset(editDefaults);
+        };
     }, [initialData, mode, reset]);
 
     const onSubmit = async (data) => {
+        const date = data.fecha_nacimiento;
+        const formattedDate = dayjs(date).format('YYYY-MM-DD');
+        data.fecha_nacimiento = formattedDate;
 
         try {
             if (mode === 'add') {
                 const response = await addAnimal(data);
 
-                setAlertSuccess(true);
+                setAlertSeverity('success');
                 setAlertMsg(`${data.id_especie === 1 ? 'Canino' : 'Felino'} agregado con éxito!`);
                 setAlertOpen(true);
 
@@ -78,7 +106,7 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
             } else {
                 const response = await updateAnimal(initialData.id, data);
 
-                setAlertSuccess(true);
+                setAlertSeverity('success');
                 setAlertMsg(`${data.id_especie === 1 ? 'Canino' : 'Felino'} modificado con éxito!`);
                 setAlertOpen(true);
                 setTimeout(() => {
@@ -87,19 +115,15 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
             }
         } catch (error) {
             if (mode === 'add') {
-                setAlertSuccess(false);
+                setAlertSeverity('error');
                 setAlertMsg(`No se ha podido agregar ${data.id_especie === 1 ? 'canino' : 'felino'}.`);
                 setAlertOpen(true);
             } else {
-                setAlertSuccess(false);
+                setAlertSeverity('error');
                 setAlertMsg(`No se ha podido modificar ${data.id_especie === 1 ? 'canino' : 'felino'}.`);
                 setAlertOpen(true);
             }
         }
-    };
-
-    const handleCloseAlert = () => {
-        setAlertOpen(false);
     };
 
     if (loading) {
@@ -110,70 +134,32 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
                 <SkeletonList length={10} random={false} />
             </Box>
         );
-    }
+    };
 
     return (
-        <Box>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
             <FormProvider {...methods}>
-            <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 2, bgcolor: 'background.paper', boxShadow: 3, borderRadius: 4 }} noValidate>
+            <Box component='form' onSubmit={handleSubmit(onSubmit)} sx={{ p: 2, bgcolor: 'background.paper', boxShadow: 3, borderRadius: 4 }} noValidate>
 
                 <Divider>
                 <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
-                    <FontAwesomeIcon icon={initialData.id_especie === 1 ? faDog : faCat} size="2x" />
-                    <Typography variant="h5">
+                    <FontAwesomeIcon icon={initialData.id_especie === 1 ? faDog : faCat} size='2x' />
+                    <Typography variant='h5'>
                         {mode === 'add' ? 'Agregar' : 'Editar'} {initialData.id_especie === 1 ? 'Canino' : 'Felino'}
                     </Typography>
                 </Box>
                 </Divider>
 
                 <Grid2 container spacing={2} sx={{ width: '100%' }}>
-                    <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
-                        <Controller
-                            name="id_especie"
-                            control={control}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    label="Especie"
-                                    value={initialData.id_especie === 1 ? 'Canino' : 'Felino'}
-                                    slotProps={{ readOnly: true }}
-                                    fullWidth
-                                />
-                            )}
-                        />
-                    </Grid2>
 
                     <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
                         <Controller
-                            name="id_raza"
+                            name='nombre'
                             control={control}
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    select
-                                    label="Raza"
-                                    error={!!errors.id_raza}
-                                    helperText={errors.id_raza?.message}
-                                    fullWidth
-                                >
-                                    {razas.map(r => (
-                                        <MenuItem key={r.id} value={r.id}>
-                                        {r.nombre}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            )}
-                        />
-                    </Grid2>
-
-                    <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
-                        <Controller
-                            name="nombre"
-                            control={control}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    label="Nombre"
+                                    label='Nombre'
                                     error={!!errors.nombre}
                                     helperText={errors.nombre?.message}
                                     fullWidth
@@ -184,19 +170,19 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
 
                     <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
                         <Controller
-                            name="sexo"
+                            name='sexo'
                             control={control}
                             render={({ field }) => (
                                 <TextField
                                     {...field}
                                     select
-                                    label="Sexo"
+                                    label='Sexo'
                                     error={!!errors.sexo}
                                     helperText={errors.sexo?.message}
                                     fullWidth
                                 >
-                                    <MenuItem value="M">Macho</MenuItem>
-                                    <MenuItem value="H">Hembra</MenuItem>
+                                    <MenuItem value='M'>Macho</MenuItem>
+                                    <MenuItem value='H'>Hembra</MenuItem>
                                 </TextField>
                             )}
                         />
@@ -204,25 +190,28 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
 
                     <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
                         <Controller
-                            name="año_nacimiento"
+                            name='fecha_nacimiento'
                             control={control}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    type="number"
-                                    label="Año de nacimiento"
-                                    error={!!errors.año_nacimiento}
-                                    helperText={errors.año_nacimiento?.message}
-                                    fullWidth
-                                    slotProps={{ max: currentYear }}
-                                    sx={{
-                                        '& input[type=number]': {
-                                        MozAppearance: 'textfield',
+                            render={({ field: { ref, value, onChange, ...restField } }) => (
+                                <DatePicker
+                                    {...restField}
+                                    label='Fecha de nacimiento'
+                                    views={['year', 'month']}
+                                    openTo='year'
+                                    inputFormat='MM/yyyy'
+                                    maxDate={dayjs()}
+                                    value={value ? dayjs(value) : null}
+                                    onChange={newValue => {
+                                        const firstOfMonth = newValue?.startOf('month') ?? null;
+                                        onChange(firstOfMonth);
+                                    }}
+                                    slotProps={{
+                                        textField: {
+                                            inputRef: ref,
+                                            error: !!errors.fecha_nacimiento,
+                                            helperText: errors.fecha_nacimiento?.message,
+                                            fullWidth: true,
                                         },
-                                        '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
-                                            WebkitAppearance: 'none',
-                                            margin: 0,
-                                        }
                                     }}
                                 />
                             )}
@@ -231,24 +220,169 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
 
                     <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
                         <Controller
-                            name="pelaje_color"
+                            name='id_especie'
                             control={control}
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    label="Pelaje (color)"
-                                    error={!!errors.pelaje_color}
-                                    helperText={errors.pelaje_color?.message}
+                                    label='Especie'
+                                    value={initialData.id_especie === 1 ? 'Canino' : 'Felino'}
+                                    slotProps={{ readOnly: true }}
                                     fullWidth
                                 />
+                            )}
+                        />
+                    </Grid2>
+
+                    <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
+                        <Controller
+                            name='id_raza'
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    select
+                                    label='Raza'
+                                    error={!!errors.id_raza}
+                                    helperText={errors.id_raza?.message}
+                                    fullWidth
+                                >
+                                    {razas.map(r => (
+                                        <MenuItem key={r.id} value={r.id}>
+                                            {r.nombre}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                            )}
+                        />
+                    </Grid2>
+
+                    <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
+                        <Controller
+                            name='id_tamaño'
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    select
+                                    label='Tamaño'
+                                    error={!!errors.id_tamaño}
+                                    helperText={errors.id_tamaño?.message}
+                                    fullWidth
+                                >
+                                    {tamaños.map(t => (
+                                        <MenuItem key={t.id} value={t.id}>
+                                            {t.nombre}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                            )}
+                        />
+                    </Grid2>
+
+                    <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
+                        <FormControl
+                            fullWidth
+                            error={!!errors.colores}
+                        >
+                            <InputLabel id='pelaje'>Pelaje (color)</InputLabel>
+                            <Controller
+                                name='colores'
+                                render={({ field }) => (
+                                    <Select
+                                        {...field}
+                                        labelId='pelaje'
+                                        label='Pelaje (colores)'
+                                        multiple
+                                        value={Array.isArray(field.value) ? field.value : []}
+                                        renderValue={(selected) =>
+                                            selected
+                                                .map(id => colores.find(c => c.id === id)?.nombre)
+                                                .filter(name => !!name)
+                                                .join(', ')
+                                        }
+                                    >
+                                        {colores.map(c => (
+                                            <MenuItem key={c.id} value={c.id}>
+                                                <Checkbox
+                                                    checked={Array.isArray(field.value) && field.value.includes(c.id)}
+                                                />
+                                                <ListItemText primary={c.nombre} />
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                )}
+                            />
+                            <FormHelperText>
+                                {errors.colores?.message}
+                            </FormHelperText>
+                        </FormControl>
+                    </Grid2>
+
+                    <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
+                        <Controller
+                            name='esterilizado'
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    select
+                                    label='Esterilizado'
+                                    error={!!errors.esterilizado}
+                                    helperText={errors.esterilizado?.message}
+                                    fullWidth
+                                >
+                                    <MenuItem value={0}>No</MenuItem>
+                                    <MenuItem value={1}>Si</MenuItem>
+                                </TextField>
+                            )}
+                        />
+                    </Grid2>
+
+                    <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
+                        <Controller
+                            name='adoptado_imusa'
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    select
+                                    label='Adoptado en IMuSA'
+                                    error={!!errors.adoptado_imusa}
+                                    helperText={errors.adoptado_imusa?.message}
+                                    fullWidth
+                                >
+                                    <MenuItem value={0}>No</MenuItem>
+                                    <MenuItem value={1}>Si</MenuItem>
+                                </TextField>
+                            )}
+                        />
+                    </Grid2>
+
+                    <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
+                        <Controller
+                            name='fallecido'
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    select
+                                    label='Fallecido'
+                                    error={!!errors.fallecido}
+                                    helperText={errors.fallecido?.message}
+                                    fullWidth
+                                >
+                                    <MenuItem value={0}>No</MenuItem>
+                                    <MenuItem value={1}>Si</MenuItem>
+                                </TextField>
                             )}
                         />
                     </Grid2>
                 </Grid2>
 
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
-                <Button variant="outlined" color="error" onClick={onCancel} disabled={isSubmitting}>Cancelar</Button>
-                <Button type="submit" variant="contained" disabled={isSubmitting}>
+                <Button variant='outlined' color='error' onClick={onCancel} disabled={isSubmitting}>Cancelar</Button>
+                <Button type='submit' variant='contained' disabled={isSubmitting}>
                     {isSubmitting ? <CircularProgress size={24}/> : mode === 'add' ? 'Agregar' : 'Guardar'}
                 </Button>
                 </Box>
@@ -257,11 +391,11 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
 
             <AlertMessage
                 open = {alertOpen}
-                handleClose = {handleCloseAlert}
+                handleClose = {() => setAlertOpen(false)}
                 message = {alertMsg}
-                success = {alertSuccess}
+                severity = {alertSeverity}
             />
-        </Box>
+        </LocalizationProvider>
     );
 }
 

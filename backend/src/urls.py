@@ -6,7 +6,8 @@ from .views import (
     ResponsableViewSet, AnimalViewSet, RazaViewSet, 
     EfectorViewSet, AtencionViewSet, InsumoViewSet, 
     DomicilioViewSet, AtencionInsumoViewSet, ProfesionalViewSet, 
-    CustomTokenObtainPairView, ExternalDataViewSet, PDFAPIView
+    CustomTokenObtainPairView, ExternalDataViewSet, PDFAPIView,
+    ColorViewSet, TamañoViewSet
 )
 
 router = DefaultRouter()
@@ -17,10 +18,11 @@ router.register('efectores', EfectorViewSet, basename='efector')
 router.register('atenciones', AtencionViewSet, basename='atencion')
 router.register('insumos', InsumoViewSet, basename='insumo')
 router.register('domicilios', DomicilioViewSet, basename='domicilio')
-router.register('atencion_insumo', AtencionInsumoViewSet,
-                basename='atencion_insumo')
+router.register('atencion_insumo', AtencionInsumoViewSet, basename='atencion_insumo')
 router.register('profesionales', ProfesionalViewSet, basename='profesional')
 router.register('external_data', ExternalDataViewSet, basename='external_data')
+router.register('colores', ColorViewSet, basename='color')
+router.register('tamaños', TamañoViewSet, basename='tamaño')
 
 urlpatterns = [
     path('', include(router.urls)),

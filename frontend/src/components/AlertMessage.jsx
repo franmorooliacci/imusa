@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert, Snackbar } from '@mui/material';
 
-const AlertMessage = ({ open, handleClose, message, success }) => {
+const AlertMessage = ({ open, handleClose, message, severity }) => {
 
     return (
         <Snackbar 
@@ -12,14 +12,21 @@ const AlertMessage = ({ open, handleClose, message, success }) => {
         >
             <Alert
                 onClose={handleClose}
-                severity={success ? 'success' : 'error' }
-                variant='filled'
-                sx={{ width: '100%' }}
+                severity={severity}
+                sx={{ 
+                    width: '100%', 
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 4,
+                    boxShadow: 3
+                }}
             >
                 {message}
             </Alert>
         </Snackbar>
-);
+    );
 }
 
 export default AlertMessage;

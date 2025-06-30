@@ -4,6 +4,8 @@ from wkhtmltopdf.views import PDFTemplateView
 from django.shortcuts import get_object_or_404
 from pathlib import Path
 from django.conf import settings
+from django.db.models import Prefetch, Value, F, CharField
+from django.db.models.functions import Concat
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
@@ -14,18 +16,33 @@ from .models import (
     Responsable, Especie, Raza, 
     Efector, Animal, Atencion, 
     Insumo, Domicilio, AtencionInsumo, 
-    Profesional
+    Profesional, Color, Tamaño
 )
 from .serializers import (
     ResponsableSerializer, AnimalSerializer, RazaSerializer, 
     EfectorSerializer, AtencionSerializer, InsumoSerializer, 
     DomicilioSerializer, AtencionInsumoSerializer, ProfesionalSerializer, 
-    CustomTokenObtainPairSerializer
+    CustomTokenObtainPairSerializer, ColorSerializer, TamañoSerializer
 )
 
 
 class ResponsableViewSet(viewsets.ModelViewSet):
-    queryset = Responsable.objects.prefetch_related('animal_set').all()
+    queryset = (
+        Responsable.objects
+            .select_related('id_domicilio_actual')
+            .prefetch_related(
+                Prefetch(
+                    'animal_set',
+                    queryset=Animal.objects.filter(id_especie=2),
+                    to_attr='felinos_cache'
+                ),
+                Prefetch(
+                    'animal_set',
+                    queryset=Animal.objects.filter(id_especie=1),
+                    to_attr='caninos_cache'
+                )
+            )
+    )
     serializer_class = ResponsableSerializer
 
     @action(detail=False, methods=['get'], url_path='buscar')
@@ -55,8 +72,12 @@ class ResponsableViewSet(viewsets.ModelViewSet):
 
 
 class AnimalViewSet(viewsets.ModelViewSet):
-    queryset = Animal.objects.select_related(
-        'id_responsable', 'id_especie', 'id_raza').all()
+    queryset = (
+        Animal.objects
+            .select_related('id_responsable')
+            .prefetch_related('colores')   
+            .all()
+    )
     serializer_class = AnimalSerializer
 
     def update(self, request, pk=None):
@@ -100,9 +121,31 @@ class EfectorViewSet(viewsets.ModelViewSet):
     serializer_class = EfectorSerializer
 
 
+class ColorViewSet(viewsets.ModelViewSet):
+    queryset = Color.objects.all()
+    serializer_class = ColorSerializer
+
+
+class TamañoViewSet(viewsets.ModelViewSet):
+    queryset = Tamaño.objects.all()
+    serializer_class = TamañoSerializer
+
+
 class AtencionViewSet(viewsets.ModelViewSet):
-    queryset = Atencion.objects.select_related(
-        'id_animal__id_especie', 'id_responsable', 'id_efector', 'id_profesional').all()
+    queryset = (
+        Atencion.objects
+            .select_related('id_efector', 'id_profesional', 'id_animal')
+            .prefetch_related('insumos')
+            .annotate(
+                profesional_full_name=Concat(
+                    F('id_profesional__nombre'),
+                    Value(' '),
+                    F('id_profesional__apellido'),
+                    output_field=CharField()
+                )
+            )
+            .all()
+    )
     serializer_class = AtencionSerializer
 
     @action(detail=False, methods=['get'], url_path='buscar')
@@ -218,7 +261,7 @@ class AtencionInsumoViewSet(viewsets.ModelViewSet):
 
 
 class ProfesionalViewSet(viewsets.ModelViewSet):
-    queryset = Profesional.objects.all()
+    queryset = Profesional.objects.prefetch_related('efectores').all()
     serializer_class = ProfesionalSerializer
 
 
@@ -354,12 +397,48 @@ class PDFAPIView(APIView):
         veterinario = atencion.id_profesional
         efector = atencion.id_efector
 
+        # Obtiene los colores del animal
+        colores = animal.colores.all()
+        colores_nombres = ', '.join(c.nombre for c in colores)
+
         # Calcula la edad
-        import datetime
-        hoy = datetime.date.today()
-        born = animal.año_nacimiento
-        edad_years = hoy.year - born - ((hoy.month, hoy.day) < (1, 1))
-        edad_str = f"{edad_years} año{'es' if edad_years != 1 else ''}"
+        birth = animal.fecha_nacimiento
+        if not birth:
+            edad = None
+        else:
+            from datetime import date
+            today  = date.today()
+            years  = today.year  - birth.year
+            months = today.month - birth.month
+            if months < 0:
+                years  -= 1
+                months += 12
+            edad = f"{years} años {months} meses"
+
+        # Arma el domicilio
+        dom = responsable.id_domicilio_actual
+        if dom:
+            parts = []
+
+            calle_altura = f"{dom.calle} {dom.altura}"
+            if dom.bis:
+                calle_altura += " bis"
+            if dom.letra:
+                calle_altura += f" {dom.letra}"
+            parts.append(calle_altura)
+
+            if dom.piso is not None:
+                parts.append(f"piso {dom.piso}")
+
+            if dom.depto:
+                parts.append(f"depto {dom.depto}")
+
+            if dom.monoblock is not None:
+                parts.append(f"monoblock {dom.monoblock}")
+
+            localidad = dom.localidad
+            domicilio_actual = ' '.join(parts) + f", {localidad}"
+
 
         # Arma el path para los archivos estaticos
         base_static = Path(settings.BASE_DIR) / 'src' / 'static'
@@ -395,10 +474,12 @@ class PDFAPIView(APIView):
             'animal'          : animal,
             'atencion'        : atencion,
             'responsable'     : responsable,
+            'domicilio_actual': domicilio_actual,
             'medicamentos'    : medicamentos,
             'veterinario'     : veterinario,
             'efector'         : efector,
-            'edad'            : edad_str,
+            'colores_nombres' : colores_nombres,
+            'edad'            : edad,
             'css_content'     : css_content,
             'logo_data_uri'   : logo_data_uri,
             'responsable_firma_uri': responsable_uri,

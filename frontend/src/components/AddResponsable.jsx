@@ -14,7 +14,6 @@ const AddResponsable = ({ responsable }) => {
     const methods = useForm({
         mode: 'onChange',
         resolver: yupResolver(responsableSchema),
-        //shouldUnregister: true,
         defaultValues: {
             mismoDomicilio: 'si',
             domicilioRenaper: {},
@@ -29,7 +28,7 @@ const AddResponsable = ({ responsable }) => {
     const [domActualDone, setDomActualDone] = useState(false);
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
-    const [alertSuccess, setAlertSuccess] = useState(false);
+    const [alertSeverity, setAlertSeverity] = useState('');
     const navigate = useNavigate();
     const canSubmit = domRenaperDone && (mismoDom === 'no' ? domActualDone : true) && isValid;
     
@@ -41,16 +40,6 @@ const AddResponsable = ({ responsable }) => {
             setDomActualDone(false);
         }
     }, [mismoDom, trigger]);
-
-    // useEffect(() => {
-    //     if (mismoDom==='no') {
-    //         trigger('domicilioActual').then(valid => setDomActualDone(valid));
-    //     } 
-    // }, [mismoDom, trigger]);
-
-    const handleCloseAlert = () => {
-        setAlertOpen(false);
-    };
 
     // Formatea responsable para agregar a la db
     const formatResponsable = () => {
@@ -137,7 +126,7 @@ const AddResponsable = ({ responsable }) => {
                 
             const response = await addResponsable(formattedResponsable);
                 
-            setAlertSuccess(true);
+            setAlertSeverity('success');
             setAlertMsg('Responsable agregado con éxito!');
             setAlertOpen(true);
         
@@ -145,7 +134,7 @@ const AddResponsable = ({ responsable }) => {
                 navigate(`/responsable/${response.id}`);
             }, 3000); // Timeout para que se muestre la alerta
         } catch (error) {
-            setAlertSuccess(false);
+            setAlertSeverity('error');
             setAlertMsg('No se ha podido agregar al responsable.');
             setAlertOpen(true);
         }
@@ -200,9 +189,9 @@ const AddResponsable = ({ responsable }) => {
 
                 <AlertMessage
                     open = {alertOpen}
-                    handleClose = {handleCloseAlert}
+                    handleClose = {() => setAlertOpen(false)}
                     message = {alertMsg}
-                    success = {alertSuccess}
+                    severity = {alertSeverity}
                 />
             </Box>
         </FormProvider>

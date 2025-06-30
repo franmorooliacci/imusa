@@ -44,8 +44,11 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('profesional', JSON.stringify(data.profesional));
         }
         if (data.efectores) {
-            setEfectores(data.efectores);
-            localStorage.setItem('efectores', JSON.stringify(data.efectores));
+            const sortedEfectores = [...data.efectores].sort((a, b) =>
+                a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
+            );
+            setEfectores(sortedEfectores);
+            localStorage.setItem('efectores', JSON.stringify(sortedEfectores));
         }
     };
 
@@ -80,7 +83,7 @@ export const AuthProvider = ({ children }) => {
         ) {
             const defaultEfector = efectores.find(e => e.unidad_movil === 0) || efectores[0];
             if (defaultEfector) {
-                setSelectedEfectorId(defaultEfector.id_efector);
+                setSelectedEfectorId(defaultEfector.id);
             }
         }
     }, [efectores, selectedEfectorId]);

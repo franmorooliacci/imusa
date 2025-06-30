@@ -13,14 +13,10 @@ const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
     const [domicilioBuffer, setDomicilioBuffer] = useState({ piso: '', depto: '', monoblock: '' });
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
-    const [alertSuccess, setAlertSuccess] = useState(false);
+    const [alertSeverity, setAlertSeverity] = useState('');
     const { setValue, getValues, trigger, formState: { errors, isSubmitted } } = useFormContext();
     const domicilioErrors = errors[name] || {};
     const [loading, setLoading] = useState(false);
-
-    const handleCloseAlert = () => {
-        setAlertOpen(false);
-    };
 
     const validate = async () => {
         setLoading(true);
@@ -30,7 +26,7 @@ const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
             setSelectedIndex('');
 
         } catch(error){
-            setAlertSuccess(false);
+            setAlertSeverity('error');
             setAlertMsg('No se ha podido validar el domicilio.');
             setAlertOpen(true);
         } finally {
@@ -206,9 +202,9 @@ const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
 
             <AlertMessage
                 open = {alertOpen}
-                handleClose = {handleCloseAlert}
+                handleClose = {() => setAlertOpen(false)}
                 message = {alertMsg}
-                success = {alertSuccess}
+                severity = {alertSeverity}
             />
         </Box>
     );

@@ -29,10 +29,10 @@
             <p><strong>Sexo:</strong> {{ animal.sexo }}</p>
           </div>
           <div class="column">
-            <p><strong>Edad:</strong> {{ edad }}</p>
-            <p><strong>Peso:</strong> {{ atencion.peso|default:"No especificado" }} kg</p>
-            <p><strong>Tamaño:</strong> {{ animal.id_raza.tamaño }}</p>
-            <p><strong>Color pelaje:</strong> {{ animal.pelaje_color|default:"No especificado" }}</p>
+            <p><strong>Edad:</strong> {{ edad|default:"No especificado" }}</p>
+            <p><strong>Peso:</strong> {{ atencion.peso_kg|default:"No especificado" }} kg</p>
+            <p><strong>Tamaño:</strong> {{ animal.id_tamaño.nombre }}</p>
+            <p><strong>Pelaje(color):</strong> {{ colores_nombres|default:"No especificado" }}</p>
           </div>
         </div>
       </div>
@@ -46,7 +46,7 @@
             <p><strong>DNI:</strong> {{ responsable.dni }}</p>
           </div>
           <div class="column">
-            <p><strong>Dirección:</strong> {{ responsable.id_domicilio_actual.full_address }}</p>
+            <p><strong>Dirección:</strong> {{ domicilio_actual|default:"No especificado" }}</p>
             <p><strong>Teléfono:</strong> {{ responsable.telefono|default:"No especificado" }}</p>
             <p><strong>Correo:</strong> {{ responsable.mail|default:"No especificado" }}</p>
           </div>
@@ -59,7 +59,7 @@
           <div class="mi-row">
             {% for mi in medicamentos %}
               <div class="column_35">
-                <p><strong>Medicamento:</strong> {{ mi.id_insumo.descripcion }}</p>
+                <p><strong>Medicamento:</strong> {{ mi.id_insumo.nombre }}</p>
               </div>
               <div class="column_35">
                 <p><strong>Cantidad:</strong> {{ mi.cant_ml }} ml</p>

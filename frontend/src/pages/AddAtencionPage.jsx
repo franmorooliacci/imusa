@@ -15,6 +15,7 @@ const AddAtencionPage = () => {
     const { responsableId, animalId } = useParams();
     const [formData, setFormData] = useState({
         atencion: {
+            peso_kg: '',
             señas_particulares: '',
             observaciones_animal: ''
         },
@@ -24,7 +25,7 @@ const AddAtencionPage = () => {
     const [loading, setLoading] = useState(true);
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
-    const [alertSuccess, setAlertSuccess] = useState(false);
+    const [alertSeverity, setAlertSeverity] = useState('');
     const { profesional, selectedEfectorId } = useContext(AuthContext);
 
     const navigate = useNavigate();
@@ -69,6 +70,12 @@ const AddAtencionPage = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        if (name === 'peso_kg') {
+            const isValid = /^[0-9]*[.,]?[0-9]*$/.test(value);
+            if (!isValid) return;
+        }
+
         setFormData((prev) => ({
             ...prev,
             atencion: {
@@ -76,10 +83,6 @@ const AddAtencionPage = () => {
                 [name]: value,
             }
         }));
-    };
-
-    const handleCloseAlert = () => {
-        setAlertOpen(false);
     };
 
     const handleSubmit = async (event) => {
@@ -94,6 +97,7 @@ const AddAtencionPage = () => {
                 id_animal: formData.animal.id,
                 id_servicio: 1,
                 id_profesional: profesional.id,
+                peso_kg: formData.atencion.peso_kg === '' ? null : parseFloat(formData.atencion.peso_kg.replace(',', '.')),
                 señas_particulares: formData.atencion.señas_particulares === '' ? null : formData.atencion.señas_particulares,
                 observaciones_animal: formData.atencion.observaciones_animal === '' ? null : formData.atencion.observaciones_animal,
                 fecha_ingreso: now.toISOString().split('T')[0],
@@ -107,7 +111,7 @@ const AddAtencionPage = () => {
                 
             await addAtencion(newAtencion);
 
-            setAlertSuccess(true);
+            setAlertSeverity('success');
             setAlertMsg('Atención agregada con éxito!');
             setAlertOpen(true);
 
@@ -116,7 +120,7 @@ const AddAtencionPage = () => {
             }, 3000); // Timeout para que se muestre la alerta
 
         } catch(error) {
-            setAlertSuccess(false);
+            setAlertSeverity('error');
             setAlertMsg('No se ha podido agregar la atención.');
             setAlertOpen(true);
         }
@@ -155,6 +159,7 @@ const AddAtencionPage = () => {
                     flexDirection: 'column',
                     mt: 2
                 }}
+                noValidate
             >
                 <Divider>
                     <Stack direction='row' alignItems='center' spacing={1} sx={{ mb: 1 }}>
@@ -186,9 +191,9 @@ const AddAtencionPage = () => {
 
             <AlertMessage 
                 open = {alertOpen}
-                handleClose = {handleCloseAlert}
+                handleClose = {() => setAlertOpen(false)}
                 message = {alertMsg}
-                success = {alertSuccess}
+                severity = {alertSeverity}
             />
         </Box>
     );
