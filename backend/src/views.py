@@ -154,7 +154,7 @@ class AtencionViewSet(viewsets.ModelViewSet):
         id_responsable = request.query_params.get('id_responsable')
         id_atencion = request.query_params.get('id_atencion')
         id_efector = request.query_params.get('id_efector')
-        estado = request.query_params.get('estado')
+        finalizada = request.query_params.get('finalizada')
 
         queryset = self.queryset
 
@@ -170,8 +170,8 @@ class AtencionViewSet(viewsets.ModelViewSet):
         if id_efector:
             queryset = queryset.filter(id_efector=id_efector)
 
-        if estado:
-            queryset = queryset.filter(estado=estado)
+        if finalizada:
+            queryset = queryset.filter(finalizada=finalizada)
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
