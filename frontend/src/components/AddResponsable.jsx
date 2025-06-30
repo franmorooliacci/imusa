@@ -5,7 +5,6 @@ import { addDomicilio, addResponsable, getDomicilio } from '../services/api';
 import AlertMessage from './AlertMessage';
 import { useNavigate } from 'react-router-dom';
 import ContactoForm from './ContactoForm';
-import FirmaForm from './FirmaForm';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import responsableSchema from '../validation/responsableSchema';
@@ -18,8 +17,7 @@ const AddResponsable = ({ responsable }) => {
             mismoDomicilio: 'si',
             domicilioRenaper: {},
             domicilioActual: {},
-            contacto: { telefono:'', mail:'' },
-            firma: ''
+            contacto: { telefono:'', mail:'' }
         }
     });
     const { handleSubmit, watch, trigger, formState: { isValid } } = methods;
@@ -58,8 +56,7 @@ const AddResponsable = ({ responsable }) => {
             id_domicilio_renaper: '',
             id_domicilio_actual: '',
             telefono: values.contacto.telefono === '' ? null : values.contacto.telefono,
-            mail: values.contacto.mail === '' ? null : values.contacto.mail,
-            firma: values.firma
+            mail: values.contacto.mail === '' ? null : values.contacto.mail
         };
     
         return formattedResponsable;
@@ -180,8 +177,6 @@ const AddResponsable = ({ responsable }) => {
                 }
 
                 <ContactoForm name = {'contacto'} />
-
-                <FirmaForm name = {'firma'} />
 
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
                     <Button type='submit' variant='contained' color='primary' disabled={!canSubmit}>Agregar</Button>
