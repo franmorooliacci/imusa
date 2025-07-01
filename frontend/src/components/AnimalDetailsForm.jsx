@@ -69,7 +69,7 @@ const AnimalDetailsForm = ({ formData, onChange = () => {}, readOnly }) => {
                 <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                     <TextField
                         label='Edad'
-                        value={(formData.animal.edad === 1 ? `${formData.animal.edad} año` : `${formData.animal.edad} años`) ?? ''}
+                        value={formData.animal.edad ?? ''}
                         slotProps={{
                             readOnly: true,
                         }}
