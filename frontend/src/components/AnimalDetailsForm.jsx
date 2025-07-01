@@ -123,39 +123,6 @@ const AnimalDetailsForm = ({ formData, onChange = () => {}, readOnly }) => {
                         onChange={onChange}
                     />
                 </Grid2>
-                <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                    <TextField
-                        label='Señas particulares'
-                        name='señas_particulares'
-                        value={formData.atencion.señas_particulares ?? ''}
-                        slotProps={{
-                            input: {
-                                readOnly: readOnly,
-                            }
-                        }}
-                        variant='outlined'
-                        fullWidth
-                        size='small'
-                        onChange={onChange}
-                    />
-                </Grid2>
-                <Grid2 size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
-                    <TextField
-                        label='Observaciones'
-                        placeholder='Observaciones del animal'
-                        name='observaciones_animal'
-                        value={formData.atencion.observaciones_animal ?? ''}
-                        slotProps={{
-                            input: {
-                                readOnly: readOnly,
-                            }
-                        }}
-                        variant='outlined'
-                        fullWidth
-                        size='small'
-                        onChange={onChange}
-                    />
-                </Grid2>
             </Grid2>
         </Box>
     );
