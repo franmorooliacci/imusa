@@ -467,7 +467,8 @@ class PDFAPIView(APIView):
                 return b64_string
             return f'data:{mime};base64,{b64_string}'
 
-        responsable_uri = make_data_uri(responsable.firma, mime='image/png')
+        firma_ingreso_uri = make_data_uri(atencion.firma_ingreso, mime='image/png')
+        firma_egreso_uri = make_data_uri(atencion.firma_egreso, mime='image/png')
         veterinario_uri = make_data_uri(veterinario.firma, mime='image/png')
 
         extra_context = {
@@ -482,7 +483,8 @@ class PDFAPIView(APIView):
             'edad'            : edad,
             'css_content'     : css_content,
             'logo_data_uri'   : logo_data_uri,
-            'responsable_firma_uri': responsable_uri,
+            'firma_ingreso_uri'    : firma_ingreso_uri,
+            'firma_egreso_uri'     : firma_egreso_uri,
             'veterinario_firma_uri': veterinario_uri
         }
 
