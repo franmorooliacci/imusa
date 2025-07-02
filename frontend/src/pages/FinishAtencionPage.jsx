@@ -1,15 +1,16 @@
-import { faAsterisk, faFileMedical, faPersonWalkingArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faAsterisk, faFileMedical } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Button, Divider, Skeleton, TextField, Typography, Stack } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { addAtencionInsumo, getAnimalById, getAtencionById, getResponsableById, updateAtencion } from '../services/api';
+import { addAtencionInsumo, getAnimalById, getAtencionById, getResponsableById, updateAnimal, updateAtencion } from '../services/api';
 import ResponsableDetailsForm from '../components/ResponsableDetailsForm';
 import AnimalDetailsForm from '../components/AnimalDetailsForm';
 import MedicamentosDetailsForm from '../components/MedicamentosDetailsForm';
 import AlertMessage from '../components/AlertMessage';
 import SkeletonList from '../components/SkeletonList';
 import BackHeader from '../components/BackHeader';
+import FirmaForm from '../components/FirmaForm';
 
 const FinishAtencionPage = () => {
     const { atencionId, responsableId, animalId } = useParams();
@@ -17,10 +18,10 @@ const FinishAtencionPage = () => {
         atencion: {},
         responsable: {},
         animal: {},
-        estado_egreso: '',
         ketamina_prequirurgico: '',
         ketamina_induccion: '',
         ketamina_quirofano: '',
+        firma_egreso: '',
         observaciones: ''
     });
     const [options, setOptions] = useState({
@@ -118,9 +119,9 @@ const FinishAtencionPage = () => {
                 ...formData.atencion,
                 fecha_egreso: now.toISOString().split('T')[0],
                 hora_egreso: now.toTimeString().slice(0, 5),
-                estado_sanitario_egreso: formData.estado_egreso === '' ? null : formData.estado_egreso,
-                observaciones_atencion: formData.observaciones === '' ? null : formData.observaciones,
-                estado: 1
+                firma_egreso: formData.firma_egreso === '' ? null : formData.firma_egreso,
+                observaciones: formData.observaciones === '' ? null : formData.observaciones,
+                finalizada: 1
             };
                 
             await updateAtencion(formData.atencion.id, finishedAtencion);
@@ -150,6 +151,8 @@ const FinishAtencionPage = () => {
             }
 
             await addAtencionInsumo(insumos);
+
+            await updateAnimal(animalId, { esterilizado: 1 });
 
             setAlertSeverity('success');
             setAlertMsg('Atención finalizada con éxito!');
@@ -224,29 +227,6 @@ const FinishAtencionPage = () => {
 
                 <AnimalDetailsForm formData = {formData} readOnly={true} />
 
-                {/* Egreso */}
-                <Box sx={{ mb: 2 }}>
-                    <Divider textAlign='left'>
-                        <Stack direction='row' alignItems='center' spacing={1} sx={{ mb: 2 }}>
-                            <FontAwesomeIcon icon={faPersonWalkingArrowRight} size='1x' sx={{ color: (theme) => theme.palette.text.primary }} />
-        
-                            <Typography variant='subtitle2'>
-                                Egreso
-                            </Typography>
-                        </Stack>
-                    </Divider>
-
-                    <TextField
-                        label='Estado sanitario'
-                        name='estado_egreso'
-                        value={formData.estado_egreso ?? ''}
-                        onChange={handleChange}
-                        variant='outlined'
-                        fullWidth
-                        size='small'
-                    />
-                </Box>
-
                 <MedicamentosDetailsForm 
                     options = {options} 
                     onOptionChange = {handleOptionChange} 
@@ -268,7 +248,6 @@ const FinishAtencionPage = () => {
         
                     <TextField
                         label='Observaciones'
-                        placeholder='Observaciones de la atención'
                         name='observaciones'
                         value={formData.observaciones ?? ''}
                         variant='outlined'
@@ -278,7 +257,16 @@ const FinishAtencionPage = () => {
                     />
                 </Box>
 
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+                <FirmaForm
+                    onChange={(base64) =>
+                        setFormData(prev => ({
+                            ...prev,
+                            firma_egreso: base64
+                        }))
+                    }
+                />
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
                     <Button 
                         variant='outlined' 
                         color='error' 
@@ -286,7 +274,7 @@ const FinishAtencionPage = () => {
                     >
                         Cancelar
                     </Button>
-                    <Button type='submit' variant='contained' color='primary'>
+                    <Button type='submit' variant='contained' color='primary' disabled={!formData.firma_egreso}>
                         Finalizar
                     </Button>
                 </Box>
