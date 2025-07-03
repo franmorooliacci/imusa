@@ -12,6 +12,8 @@ from rest_framework import viewsets, status
 from rest_framework.exceptions import NotFound, APIException
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser
+from .utils import build_atencion_context, generate_pdf_bytes
 from .models import (
     Responsable, Especie, Raza, 
     Efector, Animal, Atencion, 
@@ -379,117 +381,82 @@ class ExternalDataViewSet(viewsets.ViewSet):
             raise APIException(detail=f'External API error: {str(exc)}')
 
 
-class PDFAPIView(APIView):
-
+class InformeAPIView(APIView):
     def get(self, request, *args, **kwargs):
         id_atencion = request.GET.get('id_atencion')
         if not id_atencion:
             return Response({'error': 'id_atencion parameter is required'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        # Busca la atencion por id, 404 if not found
-        atencion = get_object_or_404(Atencion, pk=id_atencion)
-
-        # Construye los objetos
-        animal      = atencion.id_animal
-        responsable = atencion.id_responsable
-        medicamentos = AtencionInsumo.objects.filter(id_atencion=atencion)
-        veterinario = atencion.id_profesional
-        efector = atencion.id_efector
-
-        # Obtiene los colores del animal
-        colores = animal.colores.all()
-        colores_nombres = ', '.join(c.nombre for c in colores)
-
-        # Calcula la edad
-        birth = animal.fecha_nacimiento
-        if not birth:
-            edad = None
-        else:
-            from datetime import date
-            today  = date.today()
-            years  = today.year  - birth.year
-            months = today.month - birth.month
-            if months < 0:
-                years  -= 1
-                months += 12
-            edad = f"{years} años {months} meses"
-
-        # Arma el domicilio
-        dom = responsable.id_domicilio_actual
-        if dom:
-            parts = []
-
-            calle_altura = f"{dom.calle} {dom.altura}"
-            if dom.bis:
-                calle_altura += " bis"
-            if dom.letra:
-                calle_altura += f" {dom.letra}"
-            parts.append(calle_altura)
-
-            if dom.piso is not None:
-                parts.append(f"piso {dom.piso}")
-
-            if dom.depto:
-                parts.append(f"depto {dom.depto}")
-
-            if dom.monoblock is not None:
-                parts.append(f"monoblock {dom.monoblock}")
-
-            localidad = dom.localidad
-            domicilio_actual = ' '.join(parts) + f", {localidad}"
-
-
-        # Arma el path para los archivos estaticos
-        base_static = Path(settings.BASE_DIR) / 'src' / 'static'
-        css_file   = base_static / 'css'    / 'esterilizacion.css'
-        logo_file  = base_static / 'images' / 'logo.jpeg'
-
-        # Convierte css a string
-        try:
-            css_content = css_file.read_text(encoding='utf-8')
-        except FileNotFoundError:
-            return Response({'error': 'CSS file not found.'}, status=500)
-
-        # Convierte el logo de base64 a imagen
-        try:
-            logo_data = logo_file.read_bytes()
-        except FileNotFoundError:
-            return Response({'error': 'Logo file not found.'}, status=500)
-        logo_b64 = base64.b64encode(logo_data).decode('ascii')
-        logo_data_uri = f"data:image/jpeg;base64,{logo_b64}"
-
-        # Convierte las firmas de base64 a imagen
-        def make_data_uri(b64_string, mime='image/png'):
-            if not b64_string:
-                return None
-            if b64_string.startswith('data:'):
-                return b64_string
-            return f'data:{mime};base64,{b64_string}'
-
-        firma_ingreso_uri = make_data_uri(atencion.firma_ingreso, mime='image/png')
-        firma_egreso_uri = make_data_uri(atencion.firma_egreso, mime='image/png')
-        veterinario_uri = make_data_uri(veterinario.firma, mime='image/png')
-
-        extra_context = {
-            'animal'          : animal,
-            'atencion'        : atencion,
-            'responsable'     : responsable,
-            'domicilio_actual': domicilio_actual,
-            'medicamentos'    : medicamentos,
-            'veterinario'     : veterinario,
-            'efector'         : efector,
-            'colores_nombres' : colores_nombres,
-            'edad'            : edad,
-            'css_content'     : css_content,
-            'logo_data_uri'   : logo_data_uri,
-            'firma_ingreso_uri'    : firma_ingreso_uri,
-            'firma_egreso_uri'     : firma_egreso_uri,
-            'veterinario_firma_uri': veterinario_uri
-        }
-
+        ctx = build_atencion_context(int(id_atencion))
         return PDFTemplateView.as_view(
             template_name='esterilizacion.html',
-            extra_context=extra_context
+            extra_context=ctx
         )(request._request, *args, **kwargs)
 
+
+class SendInformeEmailAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            id_atencion = int(request.data.get('id_atencion'))
+        except (TypeError, ValueError):
+            return Response(
+                {'error': 'id_atencion (integer) is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            ctx       = build_atencion_context(id_atencion)
+            pdf_bytes = generate_pdf_bytes('esterilizacion.html', ctx)
+        except Exception as e:
+            return Response(
+                {'error': 'PDF generation failed', 'details': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        to_emails: list[str] = list(request.data.get('to_emails', []))
+        if not to_emails:
+            return Response(
+                {'error': 'No recipient found for this atención'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        subject = config('EMAIL_SUBJECT').format(id_atencion=id_atencion)
+
+        data = {
+            'from_email': config('EMAIL_SENDER'),
+            'subject':    subject,
+            'body':       config('EMAIL_BODY'),
+            'to_emails':  to_emails,
+        }
+        files = {
+            'attachment': (
+                f'esterilizacion-{id_atencion}.pdf',
+                pdf_bytes,
+                'application/pdf'
+            )
+        }
+
+        session = requests.Session()
+        session.trust_env = False  # ignore HTTP(S)_PROXY
+
+        try:
+            resp = session.post(
+                config('API_EMAIL'),
+                data=data,
+                files=files,
+                timeout=15
+            )
+            resp.raise_for_status()
+        except requests.RequestException as e:
+            return Response(
+                {'error': 'External mail API error', 'details': str(e)},
+                status=status.HTTP_502_BAD_GATEWAY
+            )
+
+        try:
+            payload = resp.json()
+        except ValueError:
+            payload = {'text': resp.text}
+
+        return Response(payload, status=resp.status_code)
