@@ -222,9 +222,9 @@ export const getLatitudLongitud = async (punto_x, punto_y) => {
     }
 };
 
-export const getPdf = async (id_atencion) => {
+export const getInforme = async (id_atencion) => {
     try {
-        const response = await http.get('pdf/', { params: { id_atencion }, responseType: 'blob', });
+        const response = await http.get('informes/', { params: { id_atencion }, responseType: 'blob', });
         const url  = URL.createObjectURL(response.data);    
         return url;
     } catch (error) {
