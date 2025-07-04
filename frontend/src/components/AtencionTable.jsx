@@ -1,10 +1,10 @@
-import { Box, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
+import { Box, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCat, faCircleInfo, faDog } from '@fortawesome/free-solid-svg-icons';
+import { faCat, faCircleInfo, faDog, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
-const AtencionTable = ({atenciones, animalDetails}) => {
+const AtencionTable = ({ atenciones, animalDetails, onSendEmail }) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const navigate = useNavigate();
@@ -55,7 +55,7 @@ const AtencionTable = ({atenciones, animalDetails}) => {
                         <TableCell>Efector</TableCell>
                         <TableCell>Servicio</TableCell>
                         <TableCell>Profesional</TableCell>
-                        <TableCell>Detalles</TableCell>
+                        <TableCell>Acciones</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -76,21 +76,39 @@ const AtencionTable = ({atenciones, animalDetails}) => {
                             <TableCell>{atencion.efector_nombre}</TableCell>
                             <TableCell>{'Esterilización'}</TableCell>
                             <TableCell>{atencion.profesional_nombre}</TableCell>
-                            <TableCell>
-                                <IconButton 
-                                    variant="outlined" 
-                                    color="primary" 
-                                    onClick={() => navigate(`/atencion/${atencion.id}`)}
-                                    sx={{
-                                        '&:hover': {
-                                            backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                                            transform: 'scale(1.1)',
-                                            transition: 'transform 0.2s'
-                                        }
-                                    }}
-                                >
-                                    <FontAwesomeIcon icon={faCircleInfo} size='1x' />
-                                </IconButton>
+                            <TableCell sx={{ display: 'flex', flexDirection: 'row' }}>
+                                <Tooltip title='Ver detalles' arrow>
+                                    <IconButton 
+                                        variant='outlined' 
+                                        color='primary' 
+                                        onClick={() => navigate(`/atencion/${atencion.id}`)}
+                                        sx={{
+                                            '&:hover': {
+                                                backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                                                transform: 'scale(1.1)',
+                                                transition: 'transform 0.2s'
+                                            }
+                                        }}
+                                    >
+                                        <FontAwesomeIcon icon={faCircleInfo} size='1x' />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title='Enviar informe por mail' arrow>
+                                    <IconButton
+                                        variant='outlined' 
+                                        color='success' 
+                                        onClick={() => onSendEmail(atencion.id)}
+                                        sx={{
+                                            '&:hover': {
+                                                backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                                                transform: 'scale(1.1)',
+                                                transition: 'transform 0.2s'
+                                            }
+                                        }}
+                                    >
+                                        <FontAwesomeIcon icon={faPaperPlane} size='1x' />
+                                    </IconButton>
+                                </Tooltip>
                             </TableCell>
                         </TableRow>
                     ))}
