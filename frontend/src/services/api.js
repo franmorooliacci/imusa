@@ -232,6 +232,15 @@ export const getInforme = async (id_atencion) => {
     }
 };
 
+export const sendInformeEmail = async (params) => {
+    try {
+        const response = await http.post('informes/email/', params);    
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const getTamaños = async () => {
     try {
         const response = await http.get('tamaños/');
