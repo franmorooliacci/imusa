@@ -1,9 +1,9 @@
 import { faAsterisk, faFileMedical } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Button, Divider, Skeleton, TextField, Typography, Stack } from '@mui/material';
+import { Box, Button, Divider, Skeleton, TextField, Typography, Stack, FormControlLabel, Checkbox, FormControl, FormHelperText } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { addAtencionInsumo, getAnimalById, getAtencionById, getResponsableById, updateAnimal, updateAtencion } from '../services/api';
+import { addAtencionInsumo, getAnimalById, getAtencionById, getResponsableById, sendInformeEmail, updateAnimal, updateAtencion } from '../services/api';
 import ResponsableDetailsForm from '../components/ResponsableDetailsForm';
 import AnimalDetailsForm from '../components/AnimalDetailsForm';
 import MedicamentosDetailsForm from '../components/MedicamentosDetailsForm';
@@ -22,7 +22,8 @@ const FinishAtencionPage = () => {
         ketamina_induccion: '',
         ketamina_quirofano: '',
         firma_egreso: '',
-        observaciones: ''
+        observaciones: '',
+        sendEmail: false
     });
     const [options, setOptions] = useState({
         acepromacina: {selected: false, value: '', id: 1},
@@ -43,6 +44,10 @@ const FinishAtencionPage = () => {
     const [alertMsg, setAlertMsg] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('');
     const navigate = useNavigate();
+
+    const isValidEmail = (email) => typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const email = formData.responsable.mail;
+    const emailValid = isValidEmail(email);
 
     useEffect(() => {
         const fetchAtencion = async () => {
@@ -153,6 +158,9 @@ const FinishAtencionPage = () => {
             await addAtencionInsumo(insumos);
 
             await updateAnimal(animalId, { esterilizado: 1 });
+
+            if(formData.sendEmail)
+                await sendInformeEmail({ id_atencion: finishedAtencion.id, to_emails: [email] });
 
             setAlertSeverity('success');
             setAlertMsg('Atención finalizada con éxito!');
@@ -265,6 +273,31 @@ const FinishAtencionPage = () => {
                         }))
                     }
                 />
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                name='sendEmail'
+                                checked={formData.sendEmail}
+                                onChange={(e) =>
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        sendEmail: e.target.checked
+                                    }))
+                                }
+                                disabled={!emailValid}
+                            />
+                        }
+                        label={
+                            !emailValid
+                                ? 'Correo inválido – no se puede enviar el informe'
+                                : formData.sendEmail
+                                    ? `Enviar a ${email}`
+                                    : 'Enviar informe por correo'
+                        }
+                    />
+                </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
                     <Button 
