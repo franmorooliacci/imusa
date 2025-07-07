@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Divider, Grid2, TextField, Typography, Stack } from '@mui/material';
 import React from 'react';
 
-const AnimalDetailsForm = ({ formData, onChange = () => {}, readOnly }) => {
+const AnimalDetailsForm = ({ formData }) => {
 
     return (
         <Box sx={{ mb: 2 }}>
@@ -104,23 +104,6 @@ const AnimalDetailsForm = ({ formData, onChange = () => {}, readOnly }) => {
                         variant='outlined'
                         fullWidth
                         size='small'
-                    />
-                </Grid2>
-                <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                    <TextField
-                        label='Peso(kg)'
-                        name='peso_kg'
-                        value={formData.atencion.peso_kg ?? ''}
-                        slotProps={{
-                            input: {
-                                readOnly: readOnly,
-                                inputMode: 'decimal'
-                            }
-                        }}
-                        variant='outlined'
-                        fullWidth
-                        size='small'
-                        onChange={onChange}
                     />
                 </Grid2>
             </Grid2>

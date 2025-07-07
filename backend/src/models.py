@@ -208,7 +208,6 @@ class Atencion(models.Model):
         Servicio, models.DO_NOTHING, db_column='id_servicio')
     id_profesional = models.ForeignKey(
         Profesional, models.DO_NOTHING, db_column='id_profesional')
-    peso_kg = models.FloatField(blank=True, null=True)
     fecha_ingreso = models.DateField(blank=True, null=True)
     hora_ingreso = models.TimeField(blank=True, null=True)
     firma_ingreso = models.TextField(null=True)

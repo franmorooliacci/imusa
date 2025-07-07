@@ -1615,7 +1615,6 @@ CREATE TABLE atencion (
     id_animal INT NOT NULL,
     id_servicio INT NOT NULL,
     id_profesional INT NOT NULL,
-    peso_kg FLOAT NULL,
     fecha_ingreso DATE NULL,
     hora_ingreso TIME NULL,
     firma_ingreso TEXT NULL,

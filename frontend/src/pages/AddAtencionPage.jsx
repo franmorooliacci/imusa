@@ -16,7 +16,6 @@ const AddAtencionPage = () => {
     const { responsableId, animalId } = useParams();
     const [formData, setFormData] = useState({
         atencion: {
-            peso_kg: '',
             firma_ingreso: ''
         },
         responsable: {},
@@ -68,23 +67,6 @@ const AddAtencionPage = () => {
         // }, 3000);
     }, [responsableId, animalId]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-
-        if (name === 'peso_kg') {
-            const isValid = /^[0-9]*[.,]?[0-9]*$/.test(value);
-            if (!isValid) return;
-        }
-
-        setFormData((prev) => ({
-            ...prev,
-            atencion: {
-                ...prev.atencion,
-                [name]: value,
-            }
-        }));
-    };
-
     const handleSubmit = async (event) => {
         event.preventDefault();
         const now = new Date();
@@ -97,7 +79,6 @@ const AddAtencionPage = () => {
                 id_animal: formData.animal.id,
                 id_servicio: 1,
                 id_profesional: profesional.id,
-                peso_kg: formData.atencion.peso_kg === '' ? null : parseFloat(formData.atencion.peso_kg.replace(',', '.')),
                 fecha_ingreso: now.toISOString().split('T')[0],
                 hora_ingreso: now.toTimeString().slice(0, 5),
                 firma_ingreso: formData.atencion.firma_ingreso === '' ? null : formData.atencion.firma_ingreso,
@@ -168,7 +149,7 @@ const AddAtencionPage = () => {
 
                 <ResponsableDetailsForm formData = {formData} />
 
-                <AnimalDetailsForm formData = {formData} onChange = {handleChange} readOnly={false} />
+                <AnimalDetailsForm formData = {formData} />
 
                 <FirmaForm
                     onChange={(base64) =>
