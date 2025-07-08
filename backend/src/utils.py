@@ -5,10 +5,11 @@ from pathlib import Path
 from datetime import date
 from django.conf import settings
 from django.template.loader import render_to_string
+from typing import Any, cast
 from .models import Atencion, AtencionInsumo
 
 
-def build_atencion_context(id_atencion: int) -> dict:
+def build_atencion_context(id_atencion: int) -> dict[str, Any]:
     atencion = (
         Atencion.objects
             .select_related(
@@ -28,10 +29,11 @@ def build_atencion_context(id_atencion: int) -> dict:
     efector     = atencion.id_efector
 
     # colores
-    colores_nombres = ', '.join(c.nombre for c in animal.colores.all())
+    colores: list[str] = [c.nombre for c in animal.colores.all()]
+    colores_nombres: str = ', '.join(colores)
 
     # edad
-    birth = animal.fecha_nacimiento
+    birth: date | None = animal.fecha_nacimiento
     if birth:
         today  = date.today()
         years  = today.year  - birth.year
@@ -39,15 +41,15 @@ def build_atencion_context(id_atencion: int) -> dict:
         if months < 0:
             years  -= 1
             months += 12
-        edad = f"{years} años {months} meses"
+        edad: str | None = f"{years} años {months} meses"
     else:
-        edad = None
+        edad= None
 
     # domicilio
     dom = responsable.id_domicilio_actual
-    domicilio_actual = None
+    domicilio_actual: str | None = None
     if dom:
-        parts = []
+        parts: list[str] = []
         calle_altura = f"{dom.calle} {dom.altura}"
         if dom.bis:
             calle_altura += " bis"
@@ -67,18 +69,18 @@ def build_atencion_context(id_atencion: int) -> dict:
     css_path    = base_static / 'css'    / 'esterilizacion.css'
     logo_path   = base_static / 'images' / 'logo.jpeg'
 
-    css_content = css_path.read_text(encoding='utf-8')
-    logo_b64    = base64.b64encode(logo_path.read_bytes()).decode('ascii')
-    logo_data_uri = f"data:image/jpeg;base64,{logo_b64}"
+    css_content: str = css_path.read_text(encoding='utf-8')
+    logo_b64: str    = base64.b64encode(logo_path.read_bytes()).decode('ascii')
+    logo_data_uri: str = f"data:image/jpeg;base64,{logo_b64}"
 
-    def make_data_uri(b64_string, mime='image/png'):
+    def make_data_uri(b64_string: str | None, mime: str ='image/png') -> str | None:
         if not b64_string:
             return None
         if b64_string.startswith('data:'):
             return b64_string
         return f'data:{mime};base64,{b64_string}'
 
-    ctx = {
+    ctx: dict[str, Any] = {
         'animal'                : animal,
         'atencion'              : atencion,
         'responsable'           : responsable,
@@ -90,15 +92,15 @@ def build_atencion_context(id_atencion: int) -> dict:
         'edad'                  : edad,
         'css_content'           : css_content,
         'logo_data_uri'         : logo_data_uri,
-        'firma_ingreso_uri'     : make_data_uri(atencion.firma_ingreso),
-        'firma_egreso_uri'      : make_data_uri(atencion.firma_egreso),
-        'veterinario_firma_uri' : make_data_uri(veterinario.firma),
+        'firma_ingreso_uri'     : make_data_uri(cast(str | None, atencion.firma_ingreso)),
+        'firma_egreso_uri'      : make_data_uri(cast(str | None, atencion.firma_egreso)),
+        'veterinario_firma_uri' : make_data_uri(cast(str | None, veterinario.firma)),
     }
 
     return ctx
 
 
-def generate_pdf_bytes(template_name: str, context: dict) -> bytes:
+def generate_pdf_bytes(template_name: str, context: dict[str, Any]) -> bytes:
     html = render_to_string(template_name, context)
 
     with tempfile.NamedTemporaryFile(suffix='.pdf') as pdf_tmp:

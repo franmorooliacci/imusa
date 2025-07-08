@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Any, cast
+from django.contrib.auth.models import AbstractUser
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (
@@ -8,32 +11,32 @@ from .models import (
 )
 
 
-class RazaSerializer(serializers.ModelSerializer):
+class RazaSerializer(serializers.ModelSerializer[Raza]):
     class Meta:
         model = Raza
         fields = '__all__'
 
 
-class ColorSerializer(serializers.ModelSerializer):
+class ColorSerializer(serializers.ModelSerializer[Color]):
     class Meta:
         model = Color
         fields = '__all__'
 
 
-class TamañoSerializer(serializers.ModelSerializer):
+class TamañoSerializer(serializers.ModelSerializer[Tamaño]):
     class Meta:
         model = Tamaño
         fields = '__all__'
 
 
-class AnimalSerializer(serializers.ModelSerializer):
+class AnimalSerializer(serializers.ModelSerializer[Animal]):
     colores = serializers.PrimaryKeyRelatedField(
         queryset=Color.objects.all(),
         many=True
     )
-    raza   = serializers.CharField(source='id_raza.nombre', read_only=True, required=False)
-    tamaño = serializers.CharField(source='id_tamaño.nombre', read_only=True)
-    edad   = serializers.SerializerMethodField()
+    raza: serializers.CharField = serializers.CharField(source='id_raza.nombre', read_only=True, required=False)
+    tamaño: serializers.CharField = serializers.CharField(source='id_tamaño.nombre', read_only=True)
+    edad: serializers.SerializerMethodField = serializers.SerializerMethodField()
 
     class Meta:
         model  = Animal
@@ -45,13 +48,13 @@ class AnimalSerializer(serializers.ModelSerializer):
             'raza', 'tamaño', 'edad',
         ]
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict[str, Any]) -> Animal:
         colores = validated_data.pop('colores', [])
         animal = super().create(validated_data)
         animal.colores.set(colores)
         return animal
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Animal, validated_data: dict[str, Any]) -> Animal:
         colores = validated_data.pop('colores', None)
         animal = super().update(instance, validated_data)
         if colores is not None:
@@ -60,12 +63,12 @@ class AnimalSerializer(serializers.ModelSerializer):
 
     # POST/PUT/PATCH -> colores: [ids]
     # GET            -> colores: [{id, nombre}]
-    def to_representation(self, instance):
+    def to_representation(self, instance: Animal) -> dict[str, Any]:
         data = super().to_representation(instance)
         data['colores'] = ColorSerializer(instance.colores.all(), many=True).data
         return data
 
-    def get_edad(self, obj):
+    def get_edad(self, obj: Animal) -> str | None:
         birth = obj.fecha_nacimiento
         if not birth:
             return None
@@ -79,23 +82,23 @@ class AnimalSerializer(serializers.ModelSerializer):
         return f"{years} años {months} meses"
 
 
-class DomicilioSerializer(serializers.ModelSerializer):
+class DomicilioSerializer(serializers.ModelSerializer[Domicilio]):
     class Meta:
         model = Domicilio
         fields = '__all__'
 
 
-class ResponsableSerializer(serializers.ModelSerializer):
-    felinos = AnimalSerializer(source='felinos_cache', many=True, read_only=True)
-    caninos = AnimalSerializer(source='caninos_cache', many=True, read_only=True)
-    domicilio_actual = DomicilioSerializer(source='id_domicilio_actual', read_only=True, required=False)
-    edad = serializers.SerializerMethodField()
+class ResponsableSerializer(serializers.ModelSerializer[Responsable]):
+    felinos: AnimalSerializer = AnimalSerializer(source='felinos_cache', many=True, read_only=True)
+    caninos: AnimalSerializer = AnimalSerializer(source='caninos_cache', many=True, read_only=True)
+    domicilio_actual: DomicilioSerializer = DomicilioSerializer(source='id_domicilio_actual', read_only=True, required=False)
+    edad: serializers.SerializerMethodField = serializers.SerializerMethodField()
 
     class Meta:
         model = Responsable
         fields = '__all__'
 
-    def get_edad(self, obj):
+    def get_edad(self, obj: Responsable) -> int | None:
         from datetime import date
         if obj.fecha_nacimiento:
             today = date.today()
@@ -106,37 +109,37 @@ class ResponsableSerializer(serializers.ModelSerializer):
         return None
 
 
-class EfectorSerializer(serializers.ModelSerializer):
+class EfectorSerializer(serializers.ModelSerializer[Efector]):
     class Meta:
         model = Efector
         fields = ['id', 'nombre', 'unidad_movil']
 
 
-class InsumoSerializer(serializers.ModelSerializer):
+class InsumoSerializer(serializers.ModelSerializer[Insumo]):
     class Meta:
         model = Insumo
         fields = '__all__'
 
 
-class AtencionSerializer(serializers.ModelSerializer):
-    efector_nombre     = serializers.CharField(source='id_efector.nombre', read_only=True)
-    profesional_nombre = serializers.CharField(source='profesional_full_name', read_only=True)
-    animal = AnimalSerializer(source='id_animal', read_only=True, required=False)
-    insumos = InsumoSerializer(many=True, read_only=True)
+class AtencionSerializer(serializers.ModelSerializer[Atencion]):
+    efector_nombre: serializers.CharField = serializers.CharField(source='id_efector.nombre', read_only=True)
+    profesional_nombre: serializers.CharField  = serializers.CharField(source='profesional_full_name', read_only=True)
+    animal: AnimalSerializer = AnimalSerializer(source='id_animal', read_only=True, required=False)
+    insumos: InsumoSerializer = InsumoSerializer(many=True, read_only=True)
 
     class Meta:
         model = Atencion
         fields = '__all__'
 
 
-class AtencionInsumoSerializer(serializers.ModelSerializer):
+class AtencionInsumoSerializer(serializers.ModelSerializer[AtencionInsumo]):
     class Meta:
         model = AtencionInsumo
         fields = '__all__'
 
 
-class ProfesionalSerializer(serializers.ModelSerializer):
-    efectores = EfectorSerializer(many=True, read_only=True)
+class ProfesionalSerializer(serializers.ModelSerializer[Profesional]):
+    efectores: EfectorSerializer = EfectorSerializer(many=True, read_only=True)
 
     class Meta:
         model = Profesional
@@ -145,13 +148,13 @@ class ProfesionalSerializer(serializers.ModelSerializer):
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
-        data = super().validate(attrs)
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        data: dict[str, Any] = super().validate(attrs)
 
-        user = self.user
+        user = cast(AbstractUser, self.user)
         data['username'] = user.username
 
-        profesional = getattr(user, 'profesional', None)
+        profesional: Profesional | None = getattr(user, 'profesional', None)
         data['profesional'] = (
             ProfesionalSerializer(profesional, context=self.context).data
             if profesional else None

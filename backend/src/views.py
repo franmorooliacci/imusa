@@ -1,18 +1,18 @@
-import requests, base64
+import requests
 from decouple import config
 from wkhtmltopdf.views import PDFTemplateView
-from django.shortcuts import get_object_or_404
-from pathlib import Path
-from django.conf import settings
 from django.db.models import Prefetch, Value, F, CharField
 from django.db.models.functions import Concat
+from django.http import HttpResponseBase
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.exceptions import NotFound, APIException
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser
+from rest_framework.request import Request
+from rest_framework.serializers import BaseSerializer, ListSerializer
+from typing import Any, cast
 from .utils import build_atencion_context, generate_pdf_bytes
 from .models import (
     Responsable, Especie, Raza, 
@@ -48,12 +48,12 @@ class ResponsableViewSet(viewsets.ModelViewSet):
     serializer_class = ResponsableSerializer
 
     @action(detail=False, methods=['get'], url_path='buscar')
-    def search(self, request):
+    def search(self, request: Request) -> Response:
 
-        dni = request.query_params.get('dni')
-        sexo = request.query_params.get('sexo')
+        dni: str | None = request.query_params.get('dni')
+        sexo: str | None = request.query_params.get('sexo')
 
-        queryset = self.queryset
+        queryset = self.get_queryset()
 
         if dni and sexo:
             queryset = queryset.filter(dni=dni, sexo=sexo)
@@ -82,7 +82,7 @@ class AnimalViewSet(viewsets.ModelViewSet):
     )
     serializer_class = AnimalSerializer
 
-    def update(self, request, pk=None):
+    def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         animal = self.get_object()
         serializer = self.get_serializer(
             animal, data=request.data, partial=True)
@@ -90,19 +90,21 @@ class AnimalViewSet(viewsets.ModelViewSet):
         self.perform_update(serializer)
         return Response(serializer.data)
 
-    def destroy(self, request, pk=None):
+    def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         animal = self.get_object()
         animal.delete()
         return Response(status=204)
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: BaseSerializer[Any]) -> None:
+        animal_serializer = cast(AnimalSerializer, serializer)
+
         responsable = Responsable.objects.get(
             id=self.request.data['id_responsable'])
         especie = Especie.objects.get(
             id=self.request.data['id_especie'])
         raza = Raza.objects.get(id=self.request.data['id_raza'])
 
-        serializer.save(id_responsable=responsable,
+        animal_serializer.save(id_responsable=responsable,
                         id_especie=especie, id_raza=raza)
 
 
@@ -111,8 +113,8 @@ class RazaViewSet(viewsets.ModelViewSet):
     serializer_class = RazaSerializer
     lookup_field = 'id_especie'
 
-    def retrieve(self, request, *args, **kwargs):
-        id_especie = kwargs.get('id_especie')
+    def retrieve(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        id_especie: str | None = kwargs.get('id_especie')
         razas = Raza.objects.filter(id_especie=id_especie)
         serializer = self.get_serializer(razas, many=True)
         return Response(serializer.data)
@@ -151,14 +153,14 @@ class AtencionViewSet(viewsets.ModelViewSet):
     serializer_class = AtencionSerializer
 
     @action(detail=False, methods=['get'], url_path='buscar')
-    def search(self, request):
-        id_animal = request.query_params.get('id_animal')
-        id_responsable = request.query_params.get('id_responsable')
-        id_atencion = request.query_params.get('id_atencion')
-        id_efector = request.query_params.get('id_efector')
-        finalizada = request.query_params.get('finalizada')
+    def search(self, request: Request) -> Response:
+        id_animal: str | None = request.query_params.get('id_animal')
+        id_responsable: str | None = request.query_params.get('id_responsable')
+        id_atencion: str | None = request.query_params.get('id_atencion')
+        id_efector: str | None = request.query_params.get('id_efector')
+        finalizada: str | None = request.query_params.get('finalizada')
 
-        queryset = self.queryset
+        queryset = self.get_queryset()
 
         if id_animal:
             queryset = queryset.filter(id_animal=id_animal)
@@ -188,21 +190,22 @@ class DomicilioViewSet(viewsets.ModelViewSet):
     queryset = Domicilio.objects.all()
     serializer_class = DomicilioSerializer
 
-    def perform_create(self, serializer):
-        serializer.save()
+    def perform_create(self, serializer: BaseSerializer[Any]) -> None:
+        domicilio_serializer = cast(DomicilioSerializer, serializer)
+        domicilio_serializer.save()
 
     @action(detail=False, methods=['get'], url_path='buscar')
-    def search(self, request):
-        calle = request.query_params.get('calle')
-        altura = request.query_params.get('altura')
-        localidad = request.query_params.get('localidad')
-        bis = request.query_params.get('bis')
-        letra = request.query_params.get('letra')
-        piso = request.query_params.get('piso')
-        depto = request.query_params.get('depto')
-        monoblock = request.query_params.get('monoblock')
+    def search(self, request: Request) -> Response:
+        calle: str | None = request.query_params.get('calle')
+        altura: str | None = request.query_params.get('altura')
+        localidad: str | None = request.query_params.get('localidad')
+        bis: str | None = request.query_params.get('bis')
+        letra: str | None = request.query_params.get('letra')
+        piso: str | None = request.query_params.get('piso')
+        depto: str | None = request.query_params.get('depto')
+        monoblock: str | None = request.query_params.get('monoblock')
 
-        filters = {}
+        filters: dict[str, Any] = {}
         if calle:
             filters['calle__icontains'] = calle
         if altura:
@@ -226,7 +229,7 @@ class DomicilioViewSet(viewsets.ModelViewSet):
             raise NotFound(
                 'El domicilio no está registrado en la base de datos.')
 
-        result = queryset.first()
+        result: Domicilio = cast(Domicilio, queryset.first())
         serializer = DomicilioSerializer(result)
         return Response(serializer.data)
 
@@ -235,25 +238,26 @@ class AtencionInsumoViewSet(viewsets.ModelViewSet):
     queryset = AtencionInsumo.objects.all()
     serializer_class = AtencionInsumoSerializer
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         if isinstance(request.data, list):
             serializer = self.get_serializer(data=request.data, many=True)
             serializer.is_valid(raise_exception=True)
-            self.perform_bulk_create(serializer)
+            list_serializer = cast(ListSerializer[Any], serializer)
+            self.perform_bulk_create(list_serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return super().create(request, *args, **kwargs)
 
-    def perform_bulk_create(self, serializer):
+    def perform_bulk_create(self, serializer: ListSerializer[Any]) -> None:
         AtencionInsumo.objects.bulk_create([
             AtencionInsumo(**item) for item in serializer.validated_data
         ])
 
     @action(detail=False, methods=['get'], url_path='buscar')
-    def search(self, request):
-        id_atencion = request.query_params.get('id_atencion')
+    def search(self, request: Request) -> Response:
+        id_atencion: str | None = request.query_params.get('id_atencion')
 
-        queryset = self.queryset
+        queryset = self.get_queryset()
 
         if id_atencion:
             queryset = queryset.filter(id_atencion=id_atencion)
@@ -274,8 +278,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 class ExternalDataViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['get'], url_path='features')
-    def features(self, request):
-        domicilio = request.query_params.get('domicilio')
+    def features(self, request: Request) -> Response:
+        domicilio: str | None = request.query_params.get('domicilio')
 
         if not domicilio:
             return Response(
@@ -286,8 +290,12 @@ class ExternalDataViewSet(viewsets.ViewSet):
         url = f"{config('API_GEO1')}{domicilio}"
 
         try:
-            response = requests.get(url, timeout=10, proxies={
-                                    'http': None, 'https': None}, verify=False)
+            response = requests.get(
+                url, 
+                timeout=10, 
+                proxies={'http': None, 'https': None}, # type: ignore[arg-type]
+                verify=False
+            )
             if response.status_code == 404:
                 raise NotFound()
             response.raise_for_status()
@@ -300,11 +308,11 @@ class ExternalDataViewSet(viewsets.ViewSet):
             raise APIException(detail=f'External API error: {str(exc)}')
 
     @action(detail=False, methods=['get'], url_path='direccion')
-    def direccion(self, request):
-        codigo_calle = request.query_params.get('codigoCalle')
-        altura = request.query_params.get('altura')
-        bis = request.query_params.get('bis')
-        letra = request.query_params.get('letra')
+    def direccion(self, request: Request) -> Response:
+        codigo_calle: str | None = request.query_params.get('codigoCalle')
+        altura: str | None = request.query_params.get('altura')
+        bis: str | None = request.query_params.get('bis')
+        letra: str | None = request.query_params.get('letra')
 
         if not (codigo_calle and altura and bis):
             return Response(
@@ -318,8 +326,12 @@ class ExternalDataViewSet(viewsets.ViewSet):
         )
 
         try:
-            response = requests.get(url, timeout=10, proxies={
-                                    'http': None, 'https': None}, verify=False)
+            response = requests.get(
+                url, 
+                timeout=10, 
+                proxies={'http': None, 'https': None}, # type: ignore[arg-type]
+                verify=False
+            )
             if response.status_code == 404:
                 raise NotFound()
             response.raise_for_status()
@@ -330,9 +342,9 @@ class ExternalDataViewSet(viewsets.ViewSet):
             raise APIException(detail=f'External API error: {str(exc)}')
 
     @action(detail=False, methods=['get'], url_path='latitud-longitud')
-    def latitud_longitud(self, request):
-        punto_x = request.query_params.get('punto_x')
-        punto_y = request.query_params.get('punto_y')
+    def latitud_longitud(self, request: Request) -> Response:
+        punto_x: str | None = request.query_params.get('punto_x')
+        punto_y: str | None = request.query_params.get('punto_y')
 
         if not (punto_x and punto_y):
             return Response(
@@ -343,8 +355,12 @@ class ExternalDataViewSet(viewsets.ViewSet):
         url = f"{config('API_GEO3')}{punto_x}/{punto_y}/"
 
         try:
-            response = requests.get(url, timeout=10, proxies={
-                                    'http': None, 'https': None}, verify=False)
+            response = requests.get(
+                url, 
+                timeout=10, 
+                proxies={'http': None, 'https': None}, # type: ignore[arg-type] 
+                verify=False
+            )
             if response.status_code == 404:
                 raise NotFound()
             response.raise_for_status()
@@ -355,9 +371,9 @@ class ExternalDataViewSet(viewsets.ViewSet):
             raise APIException(detail=f'External API error: {str(exc)}')
 
     @action(detail=False, methods=['get'], url_path='ciudadano')
-    def ciudadano(self, request):
-        dni = request.query_params.get('dni')
-        sexo = request.query_params.get('sexo')
+    def ciudadano(self, request: Request) -> Response:
+        dni: str | None = request.query_params.get('dni')
+        sexo: str | None = request.query_params.get('sexo')
 
         if not (dni and sexo):
             return Response(
@@ -382,8 +398,8 @@ class ExternalDataViewSet(viewsets.ViewSet):
 
 
 class InformeAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        id_atencion = request.GET.get('id_atencion')
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> HttpResponseBase:
+        id_atencion: str | None = request.GET.get('id_atencion')
         if not id_atencion:
             return Response({'error': 'id_atencion parameter is required'},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -396,9 +412,9 @@ class InformeAPIView(APIView):
 
 
 class SendInformeEmailAPIView(APIView):
-    def post(self, request, *args, **kwargs):
+    def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         try:
-            id_atencion = int(request.data.get('id_atencion'))
+            id_atencion: int = cast(int,request.data.get('id_atencion'))
         except (TypeError, ValueError):
             return Response(
                 {'error': 'id_atencion (integer) is required'},
@@ -407,7 +423,7 @@ class SendInformeEmailAPIView(APIView):
 
         try:
             ctx       = build_atencion_context(id_atencion)
-            pdf_bytes = generate_pdf_bytes('esterilizacion.html', ctx)
+            pdf_bytes: bytes = generate_pdf_bytes('esterilizacion.html', ctx)
         except Exception as e:
             return Response(
                 {'error': 'PDF generation failed', 'details': str(e)},
@@ -421,9 +437,9 @@ class SendInformeEmailAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        subject = config('EMAIL_SUBJECT').format(id_atencion=id_atencion)
+        subject: str = cast(str, config('EMAIL_SUBJECT')).format(id_atencion=id_atencion)
 
-        data = {
+        data: dict[str, Any] = {
             'from_email': config('EMAIL_SENDER'),
             'subject':    subject,
             'body':       config('EMAIL_BODY'),
@@ -442,7 +458,7 @@ class SendInformeEmailAPIView(APIView):
 
         try:
             resp = session.post(
-                config('API_EMAIL'),
+                cast(str, config('API_EMAIL')),
                 data=data,
                 files=files,
                 timeout=15
@@ -455,7 +471,7 @@ class SendInformeEmailAPIView(APIView):
             )
 
         try:
-            payload = resp.json()
+            payload: dict[str, Any] = resp.json()
         except ValueError:
             payload = {'text': resp.text}
 
