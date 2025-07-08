@@ -1,6 +1,6 @@
 import { faAsterisk, faFileMedical } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Button, Divider, Skeleton, TextField, Typography, Stack, FormControlLabel, Checkbox, FormControl, FormHelperText } from '@mui/material';
+import { Box, Button, Divider, Skeleton, TextField, Typography, Stack, FormControlLabel, Checkbox } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { addAtencionInsumo, getAnimalById, getAtencionById, getResponsableById, sendInformeEmail, updateAnimal, updateAtencion } from '../services/api';
