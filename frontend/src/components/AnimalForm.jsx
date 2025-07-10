@@ -64,7 +64,11 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
                     getColores()
                 ]);
 
-                setRazas(razasList);
+                const razasOrdenadas = razasList.sort((a, b) =>
+                    a.nombre.localeCompare(b.nombre, 'es')
+                );
+
+                setRazas(razasOrdenadas);
                 setTamaños(tamañosList);
                 setColores(coloresList);
             } catch (error) {
