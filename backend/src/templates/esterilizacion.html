@@ -7,26 +7,25 @@
   </style>
 </head>
 
+{% load custom_filters %}
+
 <body>
   <div class="container">
     {% if atencion %}
       <!-- Datos de la mascota y responsable -->
       <div class="superior">
-        <img src="{{ logo_data_uri }}" height="70" style="width:100%" />
-        <h4>PROGRAMA DE ESTERILIZACIÓN</h4>
+        <img src="{{ logo_data_uri }}" height="90" style="width:100%" />
+        <h2>PROGRAMA DE ESTERILIZACIÓN</h2>
       </div>
 
       <div class="cuadro" id="datos_animal">
         <h3>Datos del Animal</h3>
-        {% if animal_rescatado %}
-          <h4>Animal rescatado por IMUSA</h4>
-        {% endif %}
         <div class="mi-row">
           <div class="column">
             <p><strong>Nombre:</strong> {{ animal.nombre|default:"No especificado" }}</p>
             <p><strong>Especie:</strong> {{ animal.id_especie.nombre }}</p>
             <p><strong>Raza:</strong> {{ animal.id_raza.nombre }}</p>
-            <p><strong>Sexo:</strong> {{ animal.sexo }}</p>
+            <p><strong>Sexo:</strong> {% if animal.sexo == "M" %}Macho {% else %} Hembra{%endif %}</p>
           </div>
           <div class="column">
             <p><strong>Edad:</strong> {{ edad|default:"No especificado" }}</p>
@@ -34,6 +33,11 @@
             <p><strong>Pelaje(color):</strong> {{ colores_nombres|default:"No especificado" }}</p>
           </div>
         </div>
+        {% if animal.adoptado_imusa %}
+        <div class="rescatado">
+          <h4>Animal rescatado por IMUSA</h4>
+        </div>
+        {% endif %}
       </div>
 
       <div class="cuadro" id="datos_responsable">
@@ -55,16 +59,31 @@
       {% if medicamentos %}
         <div class="cuadro" id="medicamento">
           <h3>Medicamentos Suministrados</h3>
-          <div class="mi-row">
-            {% for mi in medicamentos %}
-              <div class="column_35">
-                <p><strong>Medicamento:</strong> {{ mi.id_insumo.nombre }}</p>
+          {% for mi in medicamentos %}
+            {% if forloop.counter0|divisibleby:2 %}
+              <div class="mi-row">
+                <div class="column_30">
+                  <p><strong>{{ mi.nombre }}</strong></p>
+                </div>
+                <div class="column_20">
+                  <p>{{ mi.cantidad }} ml</p>
+                </div>
+                {% if not forloop.last %}
+                  {% with siguiente=medicamentos|index:forloop.counter %}
+                    <div class="column_30">
+                      <p><strong>{{ siguiente.nombre }}</strong></p>
+                    </div>
+                    <div class="column_20">
+                      <p>{{ siguiente.cantidad }} ml</p>
+                    </div>
+                  {% endwith %}
+                {% else %}
+                  <div class="column_30"></div>
+                  <div class="column_20"></div>
+                {% endif %}
               </div>
-              <div class="column_35">
-                <p><strong>Cantidad:</strong> {{ mi.cant_ml }} ml</p>
-              </div>
-            {% endfor %}
-          </div>
+            {% endif %}
+          {% endfor %}
         </div>
       {% endif %}
 
@@ -79,11 +98,18 @@
             <p><strong>Efector:</strong> {{ efector.nombre }}</p>
           </div>
           <div class="column">
-            <img src="{{ veterinario_firma_uri }}" style="max-width:200px" />
+            <img src="{{ veterinario_firma_uri }}" style="max-width:150px" />
           </div>
         </div>
       </div>
-
+    {% if estado_sanitario %}
+          <div class="cuadro" id="egreso">
+            <h3>Estado sanitario egreso</h3>
+            <div class="mi-row">
+              <p>{{estado_sanitario }}</p>
+            </div>
+          </div>
+    {% endif %}
       <div class="cuadro" id="autorizacion">
         <h3>Autorización</h3>
         <div class="mi-row">
@@ -93,7 +119,7 @@
           </p>
           <div class="column">
             {% if firma_ingreso_uri %}
-              <img src="{{ firma_ingreso_uri }}" style="max-width:300px" />
+              <img src="{{ firma_ingreso_uri }}" style="max-width:150px" />
             {% endif %}
             <p><strong>Ingreso</strong></p>
             <p>
@@ -103,7 +129,7 @@
           </div>
           <div class="column">
             {% if firma_egreso_uri %}
-              <img src="{{ firma_egreso_uri }}" style="max-width:300px" />
+              <img src="{{ firma_egreso_uri }}" style="max-width:150px" />
             {% endif %}
             <p><strong>Egreso</strong></p>
             <p>
