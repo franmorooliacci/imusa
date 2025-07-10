@@ -16,11 +16,7 @@ const responsableSchema = yup.object({
     otherwise: (schema) => schema.strip()
   }),  
 
-  contacto: contactoSchema.required(),
-
-  firma: yup
-    .string()
-    .required('Campo obligatorio')
+  contacto: contactoSchema.required()
 });
 
 export default responsableSchema;

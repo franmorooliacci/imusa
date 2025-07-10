@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Divider, Grid2, TextField, Typography, Stack } from '@mui/material';
 import React from 'react';
 
-const AnimalDetailsForm = ({ formData, onChange = () => {}, readOnly }) => {
+const AnimalDetailsForm = ({ formData }) => {
 
     return (
         <Box sx={{ mb: 2 }}>
@@ -69,7 +69,7 @@ const AnimalDetailsForm = ({ formData, onChange = () => {}, readOnly }) => {
                 <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                     <TextField
                         label='Edad'
-                        value={(formData.animal.edad === 1 ? `${formData.animal.edad} año` : `${formData.animal.edad} años`) ?? ''}
+                        value={formData.animal.edad ?? ''}
                         slotProps={{
                             readOnly: true,
                         }}
@@ -104,56 +104,6 @@ const AnimalDetailsForm = ({ formData, onChange = () => {}, readOnly }) => {
                         variant='outlined'
                         fullWidth
                         size='small'
-                    />
-                </Grid2>
-                <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                    <TextField
-                        label='Peso(kg)'
-                        name='peso_kg'
-                        value={formData.atencion.peso_kg ?? ''}
-                        slotProps={{
-                            input: {
-                                readOnly: readOnly,
-                                inputMode: 'decimal'
-                            }
-                        }}
-                        variant='outlined'
-                        fullWidth
-                        size='small'
-                        onChange={onChange}
-                    />
-                </Grid2>
-                <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                    <TextField
-                        label='Señas particulares'
-                        name='señas_particulares'
-                        value={formData.atencion.señas_particulares ?? ''}
-                        slotProps={{
-                            input: {
-                                readOnly: readOnly,
-                            }
-                        }}
-                        variant='outlined'
-                        fullWidth
-                        size='small'
-                        onChange={onChange}
-                    />
-                </Grid2>
-                <Grid2 size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
-                    <TextField
-                        label='Observaciones'
-                        placeholder='Observaciones del animal'
-                        name='observaciones_animal'
-                        value={formData.atencion.observaciones_animal ?? ''}
-                        slotProps={{
-                            input: {
-                                readOnly: readOnly,
-                            }
-                        }}
-                        variant='outlined'
-                        fullWidth
-                        size='small'
-                        onChange={onChange}
                     />
                 </Grid2>
             </Grid2>

@@ -37,7 +37,6 @@ const SearchResponsable = ({ setResponsable, setIsLoading, setSearched, setIsInD
             domicilio_actual: '',
             telefono: '',
             mail: '',
-            firma: '',
             fallecido: ''
         });
         setIsLoading(true);
@@ -75,7 +74,6 @@ const SearchResponsable = ({ setResponsable, setIsLoading, setSearched, setIsInD
                     domicilio_actual: response.domicilio,
                     telefono: '',
                     mail: '',
-                    firma: '',
                     fallecido: response.fechaFallecido
                 });
                 setRenaperFound(true);

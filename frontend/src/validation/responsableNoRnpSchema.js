@@ -32,12 +32,7 @@ const responsableNoRnpSchema = yup.object({
     domicilioActual: domicilioSchema
         .required('Debe completar domicilio actual'),
 
-    contacto: contactoSchema
-        .required(),
-
-    firma: yup
-      .string()
-      .required('Campo obligatorio'),
+    contacto: contactoSchema.required()
 });
 
 export default responsableNoRnpSchema;

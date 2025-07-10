@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getResponsableById, getAtenciones } from '../services/api';
+import { getResponsableById, getAtenciones, sendInformeEmail } from '../services/api';
 import { Box, Button, Divider, Grid2, Skeleton, Stack, Typography } from '@mui/material';
 import AnimalTable from '../components/AnimalTable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,6 +8,7 @@ import { faCat, faDog, faStethoscope, faUser } from '@fortawesome/free-solid-svg
 import SkeletonList from '../components/SkeletonList';
 import AtencionTable from '../components/AtencionTable';
 import AnimalForm from '../components/AnimalForm';
+import AlertMessage from '../components/AlertMessage';
 
 const ResponsablePage = () => {
     const { id } = useParams();
@@ -16,8 +17,11 @@ const ResponsablePage = () => {
     const [especie, setEspecie] = useState('');
     const [loading, setLoading] = useState(true);
     const [atenciones, setAtenciones] = useState([]);
-    const visibleAtenciones = atenciones.filter(a => a.estado === 1);
+    const visibleAtenciones = atenciones.filter(a => a.finalizada === 1);
     const navigate = useNavigate();
+    const [alertOpen, setAlertOpen] = useState(false);
+    const [alertMsg, setAlertMsg] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
 
     useEffect(() => {
         const fetchResponsable = async () => {
@@ -54,6 +58,27 @@ const ResponsablePage = () => {
         return `${day}/${month}/${year}`;
     };
 
+    const handleSendInformeEmail = async (id_atencion) => {
+        if (!responsable.mail) {
+            setAlertSeverity('warning');
+            setAlertMsg(`La persona no tiene asociada una dirección de correo.`);
+            setAlertOpen(true);
+            return;
+        }
+        
+        try {
+            await sendInformeEmail({ id_atencion: id_atencion, to_emails: [responsable.mail] });
+
+            setAlertSeverity('success');
+            setAlertMsg('Se ha enviado el informe con éxito!');
+            setAlertOpen(true);
+        } catch (error) {
+            setAlertSeverity('error');
+            setAlertMsg('No se ha podido enviar el informe.');
+            setAlertOpen(true);
+        }
+    };
+
     if (loading) {
         return (
             <Box>
@@ -84,7 +109,7 @@ const ResponsablePage = () => {
                 </Grid2>    
             </Box>
         );
-    }
+    };
 
     return (
         <Box>
@@ -237,11 +262,18 @@ const ResponsablePage = () => {
 
                             <Divider sx={{ mt: 2, mb: 2 }} />
 
-                            <AtencionTable atenciones={visibleAtenciones} animalDetails={true} />
+                            <AtencionTable atenciones={visibleAtenciones} animalDetails={true} onSendEmail={handleSendInformeEmail} />
                         </Grid2>
                     }
                 </Grid2>
             )}
+
+            <AlertMessage
+                open = {alertOpen}
+                handleClose = {() => setAlertOpen(false)}
+                message = {alertMsg}
+                severity = {alertSeverity}
+            />
         </Box>
     );
 }

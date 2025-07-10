@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import ContactoForm from '../components/ContactoForm';
 import DomicilioForm from '../components/DomicilioForm';
-import FirmaForm from '../components/FirmaForm';
 import AlertMessage from '../components/AlertMessage';
 import { addDomicilio, addResponsable, getDomicilio } from '../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -23,8 +22,7 @@ const AddResponsablePage = () => {
             sexo: '',
             fecha_nacimiento: '',
             domicilioActual: {},
-            contacto: { telefono: '', mail: '' },
-            firma: ''
+            contacto: { telefono: '', mail: '' }
         }
     });
     const { handleSubmit, control, formState: { isValid } } = methods;
@@ -49,8 +47,7 @@ const AddResponsablePage = () => {
             id_domicilio_renaper: '',
             id_domicilio_actual: '',
             telefono: data.contacto.telefono === '' ? null : data.contacto.telefono,
-            mail: data.contacto.mail === '' ? null : data.contacto.mail,
-            firma: data.firma
+            mail: data.contacto.mail === '' ? null : data.contacto.mail
         };
     
         return formattedResponsable;
@@ -248,8 +245,6 @@ const AddResponsablePage = () => {
                 />
 
                 <ContactoForm name="contacto" />
-                
-                <FirmaForm name="firma" />
 
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
                     <Button type="submit" variant="contained" color="primary" disabled={!canSubmit}>

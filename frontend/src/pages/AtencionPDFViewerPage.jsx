@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getAtencionById, getPdf } from '../services/api';
+import { getAtencionById, getInforme } from '../services/api';
 import { Box, CircularProgress, Grid2 } from '@mui/material';
 import BackHeader from '../components/BackHeader';
 
@@ -16,7 +16,7 @@ const AtencionPDFViewerPage = () => {
                 const atencion = await getAtencionById(id);
                 setAtencion(atencion);
 
-                const url = await getPdf(id);
+                const url = await getInforme(id);
                 setUrl(url);
             } catch(error) {
 

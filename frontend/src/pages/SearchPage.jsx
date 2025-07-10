@@ -18,7 +18,6 @@ const SearchPage = () => {
         domicilio_actual: '',
         telefono: '',
         mail: '',
-        firma: '',
         fallecido: ''
     });
     // Indica si se realizó una busqueda

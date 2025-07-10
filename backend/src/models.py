@@ -44,7 +44,6 @@ class Responsable(models.Model):
         Domicilio, models.DO_NOTHING, db_column='id_domicilio_actual', related_name='domicilio_actual')
     telefono = models.CharField(max_length=15, blank=True, null=True)
     mail = models.CharField(max_length=255, blank=True, null=True)
-    firma = models.TextField(null=True)
 
     class Meta:
         managed = False
@@ -209,20 +208,15 @@ class Atencion(models.Model):
         Servicio, models.DO_NOTHING, db_column='id_servicio')
     id_profesional = models.ForeignKey(
         Profesional, models.DO_NOTHING, db_column='id_profesional')
-    peso_kg = models.FloatField(blank=True, null=True)
-    señas_particulares = models.CharField(
-        max_length=255, blank=True, null=True)
-    observaciones_animal = models.CharField(
-        max_length=255, blank=True, null=True)
     fecha_ingreso = models.DateField(blank=True, null=True)
     hora_ingreso = models.TimeField(blank=True, null=True)
+    firma_ingreso = models.TextField(null=True)
     fecha_egreso = models.DateField(blank=True, null=True)
     hora_egreso = models.TimeField(blank=True, null=True)
-    estado_sanitario_egreso = models.CharField(
+    firma_egreso = models.TextField(null=True)
+    observaciones = models.CharField(
         max_length=255, blank=True, null=True)
-    observaciones_atencion = models.CharField(
-        max_length=255, blank=True, null=True)
-    estado = models.IntegerField()
+    finalizada = models.IntegerField()
     insumos = models.ManyToManyField(Insumo, through='AtencionInsumo')
 
     class Meta:

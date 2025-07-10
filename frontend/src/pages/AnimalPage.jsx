@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getAnimalById, getAtenciones } from '../services/api';
+import { getAnimalById, getAtenciones, getResponsableById, sendInformeEmail } from '../services/api';
 import { Typography, Button, Box, Divider, Grid2, Skeleton, Stack } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCat, faDog, faStethoscope } from '@fortawesome/free-solid-svg-icons';
@@ -16,7 +16,7 @@ const AnimalPage = () => {
     const [editMode, setEditMode] = useState(false);
     const [loading, setLoading] = useState(true);
     const [atenciones, setAtenciones] = useState([]);
-    const visibleAtenciones = atenciones.filter(a => a.estado === 1);
+    const visibleAtenciones = atenciones.filter(a => a.finalizada === 1);
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('');
@@ -63,7 +63,7 @@ const AnimalPage = () => {
 
     const handleAddAtencion = () => {
         // Busca si el animal tiene alguna atencion en curso
-        const ongoing = atenciones.find(a => a.estado === 0);
+        const ongoing = atenciones.find(a => a.finalizada === 0);
 
         if (ongoing) {
             // true, muestra la alerta
@@ -76,6 +76,30 @@ const AnimalPage = () => {
         } else {
             // false, redirige a la pagina de atenciones
             navigate(`/atencion/agregar/${responsableId}/${animalId}`);
+        }
+    };
+
+    const handleSendInformeEmail = async (id_atencion) => {
+        try {
+            const response = await getResponsableById(responsableId);
+            const email = response.mail;
+
+            if (!email) {
+                setAlertSeverity('warning');
+                setAlertMsg(`La persona responsable no tiene asociada una dirección de correo.`);
+                setAlertOpen(true);
+                return;
+            }
+
+            await sendInformeEmail({ id_atencion: id_atencion, to_emails: [email] });
+
+            setAlertSeverity('success');
+            setAlertMsg('Se ha enviado el informe con éxito!');
+            setAlertOpen(true);
+        } catch (error) {
+            setAlertSeverity('error');
+            setAlertMsg('No se ha podido enviar el informe.');
+            setAlertOpen(true);
         }
     };
 
@@ -190,7 +214,7 @@ const AnimalPage = () => {
                         {visibleAtenciones.length > 0 &&
                             <Box>
                                 <Divider sx={{ mt: 2, mb: 2 }} />
-                                <AtencionTable atenciones={visibleAtenciones} animalDetails={false} />
+                                <AtencionTable atenciones={visibleAtenciones} animalDetails={false} onSendEmail={handleSendInformeEmail} />
                             </Box>
                         }
                     </Grid2>
