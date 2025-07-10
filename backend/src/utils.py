@@ -27,6 +27,38 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
     medicamentos = AtencionInsumo.objects.filter(id_atencion=atencion)
     veterinario = atencion.id_profesional
     efector     = atencion.id_efector
+    #estado_sanitario = atencion.estado_sanitario_egreso
+
+    # Acomodo medicamentos
+    medicamentos_queryset = AtencionInsumo.objects.filter(id_atencion=atencion)
+    medicamentos = []
+    ketamina_partes = []
+
+    for med in medicamentos_queryset:
+        if med.id_insumo.nombre == "Ketamina":
+            if med.cant_ml_prequirurgico:
+                ketamina_partes.append({
+                    'nombre': 'Ketamina (Prequirúrgico)',
+                    'cantidad': med.cant_ml_prequirurgico
+                })
+            if med.cant_ml_induccion:
+                ketamina_partes.append({
+                    'nombre': 'Ketamina (Inducción)',
+                    'cantidad': med.cant_ml_induccion
+                })
+            if med.cant_ml_quirofano:
+                ketamina_partes.append({
+                    'nombre': 'Ketamina (Quirófano)',
+                    'cantidad': med.cant_ml_quirofano
+                })
+        else:
+            medicamentos.append({
+                'nombre': med.id_insumo.nombre,
+                'cantidad': med.cant_ml
+            })
+
+    # Unificamos todo en una sola lista
+    medicamentos_completos = medicamentos + ketamina_partes
 
     # colores
     colores: list[str] = [c.nombre for c in animal.colores.all()]
@@ -85,7 +117,8 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
         'atencion'              : atencion,
         'responsable'           : responsable,
         'domicilio_actual'      : domicilio_actual,
-        'medicamentos'          : medicamentos,
+        'medicamentos'          : medicamentos_completos,
+        #'estado_sanitario'      : estado_sanitario,
         'veterinario'           : veterinario,
         'efector'               : efector,
         'colores_nombres'       : colores_nombres,
