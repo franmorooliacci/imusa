@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Grid2, List, ListItemButton, ListItemText, TextField } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Grid2, List, ListItemButton, ListItemText, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { getDireccion, getFeatures, getLatitudLongitud } from '../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -101,7 +101,7 @@ const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
 
     return (
         <Box>
-            <Grid2 container spacing={2} sx={{ mt: 1, mb: 1, gap: 2, display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+            <Grid2 container spacing={2} sx={{ mt: 1, gap: 2, display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
                 <Grid2>
                     <TextField
                         label='Domicilio'
@@ -128,8 +128,14 @@ const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
             </Grid2>
 
             {features.length > 0 &&
-                <Grid2 container spacing={1} sx={{ mt: 1, mb: 1, display: 'flex', flexDirection: 'column' }}>
+                <Grid2 container spacing={1} sx={{ mb: 1, display: 'flex', flexDirection: 'column' }}>
                     <Grid2 container sx={{ justifyContent: 'center', width: { xs: '100%', sm: '50%' }, mx: 'auto' }}>
+                        {selectedIndex === '' && (
+                            <Alert severity='info' sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                                Seleccione una opción.  
+                            </Alert>
+                        )}
+
                         <List sx={{ width: '100%' }}>
                             {features.map((feature, index) => {
                                 const { nombreCalle, altura, letra, bis } = feature.properties;
