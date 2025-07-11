@@ -1,10 +1,15 @@
 import { Alert, Box, Button, CircularProgress, Grid2, List, ListItemButton, ListItemText, TextField } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { getDireccion, getFeatures, getLatitudLongitud } from '../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import AlertMessage from './AlertMessage';
 import { useFormContext } from 'react-hook-form';
+import MapView from './MapView';
+import proj4 from 'proj4';
+
+// Define EPSG:22185 and WGS84
+proj4.defs("EPSG:22185", "+proj=tmerc +lat_0=-90 +lon_0=-60 +k=1 +x_0=5500000 +y_0=0 +ellps=GRS80 +units=m +no_defs");
 
 const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
     const [toValidate, setToValidate] = useState(domicilioRenaper);
@@ -17,6 +22,17 @@ const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
     const { setValue, getValues, trigger, formState: { errors, isSubmitted } } = useFormContext();
     const domicilioErrors = errors[name] || {};
     const [loading, setLoading] = useState(false);
+
+    const convertCoordinates = (x, y) => {
+        const [lon, lat] = proj4('EPSG:22185', 'EPSG:4326', [x, y]);
+        return { lat, lon };
+    };
+
+    const mapCoordinates = useMemo(() => {
+        if (selectedIndex === '' || features.length === 0) return null;
+        const [xRaw, yRaw] = features[selectedIndex].geometry.coordinates;
+        return convertCoordinates(xRaw, yRaw);
+    }, [selectedIndex, features]);
 
     const validate = async () => {
         setLoading(true);
@@ -130,10 +146,12 @@ const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
             {features.length > 0 &&
                 <Grid2 container spacing={1} sx={{ mb: 1, display: 'flex', flexDirection: 'column' }}>
                     <Grid2 container sx={{ justifyContent: 'center', width: { xs: '100%', sm: '50%' }, mx: 'auto' }}>
-                        {selectedIndex === '' && (
+                        {selectedIndex === '' ? (
                             <Alert severity='info' sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                                 Seleccione una opción.  
                             </Alert>
+                        ) : (
+                            <MapView x={mapCoordinates.lon} y={mapCoordinates.lat} />
                         )}
 
                         <List sx={{ width: '100%' }}>
