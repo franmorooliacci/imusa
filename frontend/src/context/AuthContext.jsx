@@ -14,8 +14,8 @@ export const AuthProvider = ({ children }) => {
     const [username, setUsername] = useState(() => {
         return localStorage.getItem('username') || null;
     });
-    const [profesional, setProfesional] = useState(() => {
-        const p = localStorage.getItem('profesional');
+    const [personal, setPersonal] = useState(() => {
+        const p = localStorage.getItem('personal');
         return p ? JSON.parse(p) : null;
     });
     const [efectores, setEfectores] = useState(() => {
@@ -39,12 +39,12 @@ export const AuthProvider = ({ children }) => {
             setUsername(data.username);
             localStorage.setItem('username', data.username);
         }
-        if (data.profesional) {
-            setProfesional(data.profesional);
-            localStorage.setItem('profesional', JSON.stringify(data.profesional));
+        if (data.personal) {
+            setPersonal(data.personal);
+            localStorage.setItem('personal', JSON.stringify(data.personal));
         }
-        if (data.efectores) {
-            const sortedEfectores = [...data.efectores].sort((a, b) =>
+        if (data.personal.efectores) {
+            const sortedEfectores = [...data.personal.efectores].sort((a, b) =>
                 a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
             );
             setEfectores(sortedEfectores);
@@ -57,12 +57,12 @@ export const AuthProvider = ({ children }) => {
         setAuthTokens(null);
         tokensRef.current = null;
         setUsername(null);
-        setProfesional(null);
+        setPersonal(null);
         setEfectores([]);
         setSelectedEfectorId(null);
         localStorage.removeItem('tokens');
         localStorage.removeItem('username');
-        localStorage.removeItem('profesional');
+        localStorage.removeItem('personal');
         localStorage.removeItem('efectores');
         localStorage.removeItem('selectedEfectorId');
     };
@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
             value={{
                 authTokens,
                 username,
-                profesional,
+                personal: personal,
                 efectores,
                 initializeAuth,
                 logout,

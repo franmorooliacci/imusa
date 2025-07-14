@@ -75,7 +75,7 @@ const AtencionTable = ({ atenciones, animalDetails, onSendEmail }) => {
                             <TableCell>{formatTime(atencion.hora_ingreso)}</TableCell>
                             <TableCell>{atencion.efector_nombre}</TableCell>
                             <TableCell>{'Esterilización'}</TableCell>
-                            <TableCell>{atencion.profesional_nombre}</TableCell>
+                            <TableCell>{atencion.personal_nombre}</TableCell>
                             <TableCell sx={{ display: 'flex', flexDirection: 'row' }}>
                                 <Tooltip title='Ver detalles' arrow>
                                     <IconButton 
