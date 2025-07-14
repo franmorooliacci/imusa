@@ -15,7 +15,7 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
             .select_related(
                 'id_animal',
                 'id_responsable__id_domicilio_actual',
-                'id_profesional',
+                'id_personal__persona',
                 'id_efector',
             )
             .prefetch_related('id_animal__colores')
@@ -25,7 +25,8 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
     animal      = atencion.id_animal
     responsable = atencion.id_responsable
     medicamentos = AtencionInsumo.objects.filter(id_atencion=atencion)
-    veterinario = atencion.id_profesional
+    personal = atencion.id_personal
+    veterinario = personal.persona
     efector     = atencion.id_efector
     #estado_sanitario = atencion.estado_sanitario_egreso
 
@@ -119,6 +120,7 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
         'domicilio_actual'      : domicilio_actual,
         'medicamentos'          : medicamentos_completos,
         #'estado_sanitario'      : estado_sanitario,
+        'personal'              : personal,
         'veterinario'           : veterinario,
         'efector'               : efector,
         'colores_nombres'       : colores_nombres,
@@ -127,7 +129,7 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
         'logo_data_uri'         : logo_data_uri,
         'firma_ingreso_uri'     : make_data_uri(cast(str | None, atencion.firma_ingreso)),
         'firma_egreso_uri'      : make_data_uri(cast(str | None, atencion.firma_egreso)),
-        'veterinario_firma_uri' : make_data_uri(cast(str | None, veterinario.firma)),
+        'veterinario_firma_uri' : make_data_uri(cast(str | None, personal.firma)),
     }
 
     return ctx

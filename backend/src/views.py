@@ -15,22 +15,22 @@ from rest_framework.serializers import BaseSerializer, ListSerializer
 from typing import Any, cast
 from .utils import build_atencion_context, generate_pdf_bytes
 from .models import (
-    Responsable, Especie, Raza, 
+    Persona, Especie, Raza, 
     Efector, Animal, Atencion, 
     Insumo, Domicilio, AtencionInsumo, 
-    Profesional, Color, Tamaño
+    Personal, Color, Tamaño
 )
 from .serializers import (
-    ResponsableSerializer, AnimalSerializer, RazaSerializer, 
+    PersonaSerializer, AnimalSerializer, RazaSerializer, 
     EfectorSerializer, AtencionSerializer, InsumoSerializer, 
-    DomicilioSerializer, AtencionInsumoSerializer, ProfesionalSerializer, 
+    DomicilioSerializer, AtencionInsumoSerializer, PersonalSerializer, 
     CustomTokenObtainPairSerializer, ColorSerializer, TamañoSerializer
 )
 
 
-class ResponsableViewSet(viewsets.ModelViewSet):
+class PersonaViewSet(viewsets.ModelViewSet):
     queryset = (
-        Responsable.objects
+        Persona.objects
             .select_related('id_domicilio_actual')
             .prefetch_related(
                 Prefetch(
@@ -45,7 +45,7 @@ class ResponsableViewSet(viewsets.ModelViewSet):
                 )
             )
     )
-    serializer_class = ResponsableSerializer
+    serializer_class = PersonaSerializer
 
     @action(detail=False, methods=['get'], url_path='buscar')
     def search(self, request: Request) -> Response:
@@ -98,7 +98,7 @@ class AnimalViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer: BaseSerializer[Any]) -> None:
         animal_serializer = cast(AnimalSerializer, serializer)
 
-        responsable = Responsable.objects.get(
+        responsable = Persona.objects.get(
             id=self.request.data['id_responsable'])
         especie = Especie.objects.get(
             id=self.request.data['id_especie'])
@@ -138,13 +138,13 @@ class TamañoViewSet(viewsets.ModelViewSet):
 class AtencionViewSet(viewsets.ModelViewSet):
     queryset = (
         Atencion.objects
-            .select_related('id_efector', 'id_profesional', 'id_animal')
+            .select_related('id_efector', 'id_personal__id_persona', 'id_animal')
             .prefetch_related('insumos')
             .annotate(
-                profesional_full_name=Concat(
-                    F('id_profesional__nombre'),
+                personal_full_name=Concat(
+                    F('id_personal__id_persona__nombre'),
                     Value(' '),
-                    F('id_profesional__apellido'),
+                    F('id_personal__id_persona__apellido'),
                     output_field=CharField()
                 )
             )
@@ -266,9 +266,9 @@ class AtencionInsumoViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ProfesionalViewSet(viewsets.ModelViewSet):
-    queryset = Profesional.objects.prefetch_related('efectores').all()
-    serializer_class = ProfesionalSerializer
+class PersonalViewSet(viewsets.ModelViewSet):
+    queryset = Personal.objects.prefetch_related('efectores').all()
+    serializer_class = PersonalSerializer
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):

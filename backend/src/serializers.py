@@ -4,9 +4,9 @@ from django.contrib.auth.models import AbstractUser
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (
-    Responsable, Animal, Raza,
+    Persona, Animal, Raza,
     Efector, Insumo, Atencion, 
-    Domicilio, AtencionInsumo, Profesional, 
+    Domicilio, AtencionInsumo, Personal, 
     Color, Tamaño
 )
 
@@ -88,17 +88,17 @@ class DomicilioSerializer(serializers.ModelSerializer[Domicilio]):
         fields = '__all__'
 
 
-class ResponsableSerializer(serializers.ModelSerializer[Responsable]):
+class PersonaSerializer(serializers.ModelSerializer[Persona]):
     felinos: AnimalSerializer = AnimalSerializer(source='felinos_cache', many=True, read_only=True)
     caninos: AnimalSerializer = AnimalSerializer(source='caninos_cache', many=True, read_only=True)
     domicilio_actual: DomicilioSerializer = DomicilioSerializer(source='id_domicilio_actual', read_only=True, required=False)
     edad: serializers.SerializerMethodField = serializers.SerializerMethodField()
 
     class Meta:
-        model = Responsable
+        model = Persona
         fields = '__all__'
 
-    def get_edad(self, obj: Responsable) -> int | None:
+    def get_edad(self, obj: Persona) -> int | None:
         from datetime import date
         if obj.fecha_nacimiento:
             today = date.today()
@@ -123,7 +123,7 @@ class InsumoSerializer(serializers.ModelSerializer[Insumo]):
 
 class AtencionSerializer(serializers.ModelSerializer[Atencion]):
     efector_nombre: serializers.CharField = serializers.CharField(source='id_efector.nombre', read_only=True)
-    profesional_nombre: serializers.CharField  = serializers.CharField(source='profesional_full_name', read_only=True)
+    personal_nombre: serializers.CharField  = serializers.CharField(source='personal_full_name', read_only=True)
     animal: AnimalSerializer = AnimalSerializer(source='id_animal', read_only=True, required=False)
     insumos: InsumoSerializer = InsumoSerializer(many=True, read_only=True)
 
@@ -138,11 +138,11 @@ class AtencionInsumoSerializer(serializers.ModelSerializer[AtencionInsumo]):
         fields = '__all__'
 
 
-class ProfesionalSerializer(serializers.ModelSerializer[Profesional]):
+class PersonalSerializer(serializers.ModelSerializer[Personal]):
     efectores: EfectorSerializer = EfectorSerializer(many=True, read_only=True)
 
     class Meta:
-        model = Profesional
+        model = Personal
         fields = '__all__'
 
 
@@ -154,15 +154,15 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         user = cast(AbstractUser, self.user)
         data['username'] = user.username
 
-        profesional: Profesional | None = getattr(user, 'profesional', None)
-        data['profesional'] = (
-            ProfesionalSerializer(profesional, context=self.context).data
-            if profesional else None
+        personal: Personal | None = getattr(user, 'personal', None)
+        data['personal'] = (
+            PersonalSerializer(personal, context=self.context).data
+            if personal else None
         )
 
-        if profesional:
-            efectores_qs = profesional.efectores.filter(
-                profesionalefector__estado=1
+        if personal:
+            efectores_qs = personal.efectores.filter(
+                personalefector__estado=1
             )
             data['efectores'] = EfectorSerializer(
                 efectores_qs,
