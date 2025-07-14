@@ -1466,7 +1466,7 @@ CREATE TABLE domicilio (
     radio_censal VARCHAR(255) NULL
 );
 
-CREATE TABLE responsable (
+CREATE TABLE persona (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     apellido VARCHAR(255) NOT NULL,
@@ -1555,7 +1555,7 @@ CREATE TABLE color (
 );
 
 INSERT INTO color (nombre) 
-VALUES ('Blanco'), ('Negro'), ('Gris'), ('Marrón'), ('Naranja'), ('Crema');
+VALUES ('Blanco'), ('Negro'), ('Gris'), ('Marrón'), ('Naranja'), ('Crema'), ('Atigrado');
 
 CREATE TABLE tamaño (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -1580,7 +1580,7 @@ CREATE TABLE animal (
     FOREIGN KEY (id_tamaño) REFERENCES tamaño (id),
     FOREIGN KEY (id_especie) REFERENCES especie (id),
     FOREIGN KEY (id_raza) REFERENCES raza (id),
-    FOREIGN KEY (id_responsable) REFERENCES responsable (id)
+    FOREIGN KEY (id_responsable) REFERENCES persona (id)
 );
 
 CREATE TABLE animal_color (
@@ -1591,20 +1591,25 @@ CREATE TABLE animal_color (
     FOREIGN KEY (id_color) REFERENCES color (id)
 );
 
-CREATE TABLE profesional (
+CREATE TABLE tipo_personal (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL
+);
+
+INSERT INTO tipo_personal (nombre)
+VALUES ('Médico Veterinario'), ('Administrativo');
+
+CREATE TABLE personal (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_persona INT NOT NULL,
     user_id INT NULL,
-    nombre VARCHAR(255) NOT NULL,
-    apellido VARCHAR(255) NOT NULL,
-    dni INT NOT NULL,
-    sexo CHAR(1) NULL,
-    fecha_nacimiento DATE NULL,
-    telefono VARCHAR(15) NULL,
-    mail VARCHAR(255) NULL,
     matricula VARCHAR(15) NOT NULL,
     legajo INT NOT NULL,
     estado TINYINT (1) NOT NULL,
-    firma TEXT NULL
+    firma TEXT NULL,
+    id_tipo_personal INT NOT NULL,
+    FOREIGN KEY (id_persona) REFERENCES persona (id),
+    FOREIGN KEY (id_tipo_personal) REFERENCES tipo_personal (id)
 );
 
 CREATE TABLE atencion (
@@ -1614,7 +1619,7 @@ CREATE TABLE atencion (
     id_domicilio_responsable INT NULL,
     id_animal INT NOT NULL,
     id_servicio INT NOT NULL,
-    id_profesional INT NOT NULL,
+    id_personal INT NOT NULL,
     fecha_ingreso DATE NULL,
     hora_ingreso TIME NULL,
     firma_ingreso TEXT NULL,
@@ -1624,11 +1629,11 @@ CREATE TABLE atencion (
     observaciones VARCHAR(255) NULL,
     finalizada TINYINT (1) NOT NULL,
     FOREIGN KEY (id_efector) REFERENCES efector (id),
-    FOREIGN KEY (id_responsable) REFERENCES responsable (id),
+    FOREIGN KEY (id_responsable) REFERENCES persona (id),
     FOREIGN KEY (id_domicilio_responsable) REFERENCES domicilio (id),
     FOREIGN KEY (id_animal) REFERENCES animal (id),
     FOREIGN KEY (id_servicio) REFERENCES servicio (id),
-    FOREIGN KEY (id_profesional) REFERENCES profesional (id)
+    FOREIGN KEY (id_personal) REFERENCES personal (id)
 );
 
 CREATE TABLE atencion_insumo (
@@ -1643,11 +1648,11 @@ CREATE TABLE atencion_insumo (
     FOREIGN KEY (id_insumo) REFERENCES insumo (id)
 );
 
-CREATE TABLE profesional_efector (
+CREATE TABLE personal_efector (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    id_profesional INT NOT NULL,
+    id_personal INT NOT NULL,
     id_efector INT NOT NULL,
     estado TINYINT (1) NOT NULL,
-    FOREIGN KEY (id_profesional) REFERENCES profesional (id),
+    FOREIGN KEY (id_personal) REFERENCES personal (id),
     FOREIGN KEY (id_efector) REFERENCES efector (id)
 );
