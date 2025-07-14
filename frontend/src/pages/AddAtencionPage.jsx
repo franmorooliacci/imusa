@@ -27,7 +27,7 @@ const AddAtencionPage = () => {
     const [submitting, setSubmitting] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('');
-    const { profesional, selectedEfectorId } = useContext(AuthContext);
+    const { personal, selectedEfectorId } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
@@ -83,7 +83,7 @@ const AddAtencionPage = () => {
                 id_domicilio_responsable: formData.responsable.id_domicilio_actual,
                 id_animal: formData.animal.id,
                 id_servicio: 1,
-                id_profesional: profesional.id,
+                id_personal: personal.id,
                 fecha_ingreso: now.toISOString().split('T')[0],
                 hora_ingreso: now.toTimeString().slice(0, 5),
                 firma_ingreso: formData.atencion.firma_ingreso === '' ? null : formData.atencion.firma_ingreso,

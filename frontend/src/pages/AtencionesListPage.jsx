@@ -133,7 +133,7 @@ const AtencionesListPage = () => {
                                         <Typography variant='body2' component='span' color='text.secondary'>
                                             {`${formatDate(atencion.fecha_ingreso)}` +
                                             ` - ${formatTime(atencion.hora_ingreso)}` + 
-                                            ` - ${atencion.profesional_nombre}`}
+                                            ` - ${atencion.personal_nombre}`}
                                         </Typography>
                                     </>
                                 }
