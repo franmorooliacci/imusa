@@ -15,7 +15,7 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
             .select_related(
                 'id_animal',
                 'id_responsable__id_domicilio_actual',
-                'id_personal__persona',
+                'id_personal__id_persona',
                 'id_efector',
             )
             .prefetch_related('id_animal__colores')
@@ -26,7 +26,7 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
     responsable = atencion.id_responsable
     medicamentos = AtencionInsumo.objects.filter(id_atencion=atencion)
     personal = atencion.id_personal
-    veterinario = personal.persona
+    veterinario = personal.id_persona
     efector     = atencion.id_efector
     #estado_sanitario = atencion.estado_sanitario_egreso
 
