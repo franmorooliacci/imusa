@@ -2,7 +2,7 @@ import http from './axiosClient';
 
 export const getResponsable = async (dni, sexo) => {
     try {
-        const response = await http.get(`responsables/buscar/?dni=${dni}&sexo=${sexo}`);
+        const response = await http.get(`personas/buscar/?dni=${dni}&sexo=${sexo}`);
         return response.data;
     } catch (error) {
         throw error;
@@ -11,7 +11,7 @@ export const getResponsable = async (dni, sexo) => {
 
 export const addResponsable = async (newResponsable) => {
     try {
-        const response = await http.post(`responsables/`, newResponsable);
+        const response = await http.post(`personas/`, newResponsable);
         return response.data;
     } catch (error) {
         throw error;
@@ -20,7 +20,7 @@ export const addResponsable = async (newResponsable) => {
 
 export const getResponsableById = async (id) => {
     try {
-        const response = await http.get(`responsables/${id}/`);
+        const response = await http.get(`personas/${id}/`);
         return response.data;
     } catch (error) {
         throw error;
@@ -29,7 +29,7 @@ export const getResponsableById = async (id) => {
 
 export const updateResponsable = async (id, data) => {
     try {
-        const response = await http.patch(`responsables/${id}/`, data);
+        const response = await http.patch(`personas/${id}/`, data);
         return response.data;
     } catch (error) {
         throw error;
@@ -126,9 +126,9 @@ export const getInsumosByIdAtencion = async (id_atencion) => {
     }
 };
 
-export const getProfesionalById = async (id) => {
+export const getPersonalById = async (id) => {
     try {
-        const response = await http.get(`profesionales/${id}/`);
+        const response = await http.get(`personal/${id}/`);
         return response.data;
     } catch (error) {
         throw error;
