@@ -31,7 +31,7 @@ class Domicilio(models.Model):
         db_table = 'domicilio'
 
 
-class Responsable(models.Model):
+class Persona(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=255)
     apellido = models.CharField(max_length=255)
@@ -47,7 +47,7 @@ class Responsable(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'responsable'
+        db_table = 'persona'
 
 
 class Especie(models.Model):
@@ -94,7 +94,7 @@ class Animal(models.Model):
     sexo = models.CharField(max_length=1)
     fecha_nacimiento = models.DateField(blank=True, null=True)
     id_tamaño = models.ForeignKey(Tamaño, models.DO_NOTHING, db_column='id_tamaño')
-    id_responsable = models.ForeignKey(Responsable, models.DO_NOTHING, db_column='id_responsable', blank=True, null=True)
+    id_responsable = models.ForeignKey(Persona, models.DO_NOTHING, db_column='id_responsable', blank=True, null=True)
     id_especie = models.ForeignKey(Especie, models.DO_NOTHING, db_column='id_especie')
     id_raza = models.ForeignKey('Raza', models.DO_NOTHING, db_column='id_raza')
     fallecido = models.IntegerField()
@@ -149,38 +149,42 @@ class Servicio(models.Model):
         db_table = 'servicio'
 
 
-class Profesional(models.Model):
+class TipoPersonal(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=255)
-    apellido = models.CharField(max_length=255)
-    dni = models.IntegerField()
-    sexo = models.CharField(max_length=1, null=True)
-    fecha_nacimiento = models.DateField(blank=True, null=True)
-    telefono = models.CharField(max_length=15, blank=True, null=True)
-    mail = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tipo_personal'
+
+
+class Personal(models.Model):
+    id = models.AutoField(primary_key=True)
+    id_persona = models.ForeignKey(Persona, models.DO_NOTHING, db_column='id_persona')
     matricula = models.CharField(max_length=15)
     firma = models.TextField(null=True)
     legajo = models.IntegerField()
     estado = models.IntegerField()
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, null=True)
-    efectores = models.ManyToManyField(Efector, through='ProfesionalEfector')
+    efectores = models.ManyToManyField(Efector, through='PersonalEfector')
+    id_tipo_personal = models.ForeignKey(TipoPersonal, models.DO_NOTHING, db_column='id_tipo_personal')
 
     class Meta:
         managed = False
-        db_table = 'profesional'
+        db_table = 'personal'
 
 
-class ProfesionalEfector(models.Model):
+class PersonalEfector(models.Model):
     id = models.AutoField(primary_key=True)
-    id_profesional = models.ForeignKey(
-        Profesional, models.DO_NOTHING, db_column='id_profesional')
+    id_personal = models.ForeignKey(
+        Personal, models.DO_NOTHING, db_column='id_personal')
     id_efector = models.ForeignKey(
         Efector, models.DO_NOTHING, db_column='id_efector')
     estado = models.IntegerField()
 
     class Meta:
         managed = False
-        db_table = 'profesional_efector'
+        db_table = 'personal_efector'
 
 
 class Insumo(models.Model):
@@ -199,15 +203,15 @@ class Atencion(models.Model):
     id_efector = models.ForeignKey(
         Efector, models.DO_NOTHING, db_column='id_efector')
     id_responsable = models.ForeignKey(
-        Responsable, models.DO_NOTHING, db_column='id_responsable')
+        Persona, models.DO_NOTHING, db_column='id_responsable')
     id_domicilio_responsable = models.ForeignKey(
         Domicilio, models.DO_NOTHING, db_column='id_domicilio_responsable', blank=True, null=True)
     id_animal = models.ForeignKey(
         Animal, models.DO_NOTHING, db_column='id_animal')
     id_servicio = models.ForeignKey(
         Servicio, models.DO_NOTHING, db_column='id_servicio')
-    id_profesional = models.ForeignKey(
-        Profesional, models.DO_NOTHING, db_column='id_profesional')
+    id_personal = models.ForeignKey(
+        Personal, models.DO_NOTHING, db_column='id_personal')
     fecha_ingreso = models.DateField(blank=True, null=True)
     hora_ingreso = models.TimeField(blank=True, null=True)
     firma_ingreso = models.TextField(null=True)
