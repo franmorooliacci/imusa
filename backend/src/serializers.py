@@ -139,6 +139,7 @@ class AtencionInsumoSerializer(serializers.ModelSerializer[AtencionInsumo]):
 
 
 class PersonalSerializer(serializers.ModelSerializer[Personal]):
+    persona: PersonaSerializer = PersonaSerializer(source='id_persona', read_only=True, required=False)
     efectores: EfectorSerializer = EfectorSerializer(many=True, read_only=True)
 
     class Meta:
@@ -159,18 +160,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             PersonalSerializer(personal, context=self.context).data
             if personal else None
         )
-
-        if personal:
-            efectores_qs = personal.efectores.filter(
-                personalefector__estado=1
-            )
-            data['efectores'] = EfectorSerializer(
-                efectores_qs,
-                many=True,
-                context=self.context
-            ).data
-        else:
-            data['efectores'] = []
 
         return data
 
