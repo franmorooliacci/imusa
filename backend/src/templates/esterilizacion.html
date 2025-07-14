@@ -98,7 +98,7 @@
             <p><strong>Efector:</strong> {{ efector.nombre }}</p>
           </div>
           <div class="column">
-            <img src="{{ veterinario_firma_uri }}" style="max-width:150px" />
+            <img src="{{ veterinario_firma_uri }}" class="firma-img" />
           </div>
         </div>
       </div>
@@ -119,7 +119,7 @@
           </p>
           <div class="column">
             {% if firma_ingreso_uri %}
-              <img src="{{ firma_ingreso_uri }}" style="max-width:150px" />
+              <img src="{{ firma_ingreso_uri }}" class="firma-img" />
             {% endif %}
             <p><strong>Ingreso</strong></p>
             <p>
@@ -129,7 +129,7 @@
           </div>
           <div class="column">
             {% if firma_egreso_uri %}
-              <img src="{{ firma_egreso_uri }}" style="max-width:150px" />
+              <img src="{{ firma_egreso_uri }}" class="firma-img" />
             {% endif %}
             <p><strong>Egreso</strong></p>
             <p>
