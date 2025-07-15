@@ -5,6 +5,7 @@ from django.conf import settings
 class Domicilio(models.Model):
     id = models.AutoField(primary_key=True)
     calle = models.CharField(max_length=255)
+    codigo_calle = models.IntegerField(blank=True, null=True)
     altura = models.IntegerField()
     bis = models.IntegerField()
     letra = models.CharField(max_length=1, blank=True, null=True)
@@ -17,12 +18,9 @@ class Domicilio(models.Model):
     seccional_policial = models.CharField(
         max_length=255, blank=True, null=True)
     localidad = models.CharField(max_length=255)
+    lineas_tup = models.CharField(max_length=500, blank=True, null=True)
     coordenada_x = models.CharField(max_length=255, blank=True, null=True)
     coordenada_y = models.CharField(max_length=255, blank=True, null=True)
-    punto_x = models.CharField(max_length=255, blank=True, null=True)
-    punto_y = models.CharField(max_length=255, blank=True, null=True)
-    latitud = models.CharField(max_length=255, blank=True, null=True)
-    longitud = models.CharField(max_length=255, blank=True, null=True)
     fraccion_censal = models.CharField(max_length=255, blank=True, null=True)
     radio_censal = models.CharField(max_length=255, blank=True, null=True)
 
@@ -117,22 +115,20 @@ class AnimalColor(models.Model):
         db_table = 'animal_color'
 
 
+class TipoEfector(models.Model):
+    id     = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=255)
+
+    class Meta:
+        db_table  = 'tipo_efector'
+        managed   = False
+
+
 class Efector(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=255)
-    domicilio = models.CharField(max_length=255)
-    latitud = models.CharField(max_length=255, blank=True, null=True)
-    longitud = models.CharField(max_length=255, blank=True, null=True)
-    coordenadas = models.CharField(max_length=255, blank=True, null=True)
-    distrito = models.CharField(max_length=255, blank=True, null=True)
-    vecinal = models.CharField(max_length=255, blank=True, null=True)
-    punto_x = models.CharField(max_length=255, blank=True, null=True)
-    punto_y = models.CharField(max_length=255, blank=True, null=True)
-    lineas_tup = models.CharField(max_length=500, blank=True, null=True)
-    barrio = models.CharField(max_length=255, blank=True, null=True)
-    fraccion_censal = models.CharField(max_length=255, blank=True, null=True)
-    radio_censal = models.CharField(max_length=255, blank=True, null=True)
-    tipo_efector = models.CharField(max_length=255, blank=True, null=True)
+    id_domicilio = models.ForeignKey(Domicilio, models.DO_NOTHING, db_column='id_domicilio')
+    id_tipo_efector = models.ForeignKey(TipoEfector, models.DO_NOTHING, db_column='id_tipo_efector')
     unidad_movil = models.IntegerField()
 
     class Meta:
