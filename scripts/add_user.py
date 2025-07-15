@@ -22,13 +22,6 @@ user = User.objects.create_user(
     last_name='Doe'
 )
 
-domicilio = Domicilio.objects.create(
-    calle = 'Calle Falsa',
-    altura = '123',
-    bis = False,
-    localidad = 'Rosario'
-)
-
 persona = Persona.objects.create(
     nombre = 'John',
     apellido = 'Doe',
@@ -38,7 +31,7 @@ persona = Persona.objects.create(
     telefono = '3413372340',
     mail = 'jdoe@example.com',
     id_domicilio_renaper = None,
-    id_domicilio_actual  = domicilio,
+    id_domicilio_actual  = Domicilio.objects.get(id=44)
 )
 
 personal = Personal.objects.create(
