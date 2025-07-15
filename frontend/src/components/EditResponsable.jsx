@@ -42,6 +42,7 @@ const EditResponsable = ({ editDomicilio, setEditDomicilio, editContacto, setEdi
     
         const formattedDomicilio = {
             ...domicilio,
+            codigo_calle: domicilio.codigo_calle === '' ? null : domicilio.codigo_calle,
             bis: domicilio.bis ? 1 : 0,
             letra: domicilio.letra === '' ? null : domicilio.letra,
             piso: domicilio.piso === '' ? null : domicilio.piso,
@@ -53,12 +54,9 @@ const EditResponsable = ({ editDomicilio, setEditDomicilio, editContacto, setEdi
             seccional_policial: domicilio.seccional_policial === '' ? null : domicilio.seccional_policial,
             coordenada_x: domicilio.coordenada_x === '' ? null : domicilio.coordenada_x,
             coordenada_y: domicilio.coordenada_y === '' ? null : domicilio.coordenada_y,
-            punto_x: domicilio.punto_x === '' ? null : domicilio.punto_x,
-            punto_y: domicilio.punto_y === '' ? null : domicilio.punto_y,
-            latitud: domicilio.latitud === '' ? null : domicilio.latitud,
-            longitud: domicilio.longitud === '' ? null : domicilio.longitud,
             fraccion_censal: domicilio.fraccion_censal === '' ? null : domicilio.fraccion_censal,
-            radio_censal: domicilio.radio_censal === '' ? null : domicilio.radio_censal
+            radio_censal: domicilio.radio_censal === '' ? null : domicilio.radio_censal,
+            lineas_tup: domicilio.lineas_tup === '' ? null : domicilio.lineas_tup
         };
     
         return formattedDomicilio;
