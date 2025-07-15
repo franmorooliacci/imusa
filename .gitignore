@@ -1,8 +1,13 @@
 .vscode/
 venv/
-backend/core/__pycache__/
-backend/src/__pycache__/
-backend/src/migrations/__pycache__/
+
 backend/.env
-frontend/.env
 backend/staticfiles
+**/__pycache__/
+
+frontend/.env
+frontend/node_modules
+frontend/build
+frontend/eslint.config.cjs
+
+test.http
