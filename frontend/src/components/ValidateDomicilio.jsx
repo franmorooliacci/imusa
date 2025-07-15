@@ -61,6 +61,7 @@ const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
             ...domicilioBuffer,
             coordenada_x: features[selectedIndex].geometry.coordinates[0],
             coordenada_y: features[selectedIndex].geometry.coordinates[1],
+            codigo_calle: features[selectedIndex].properties.codigoCalle
         };
 
         // Llamo a la segunda api
@@ -82,24 +83,11 @@ const ValidateDomicilio = ({ name, setDone, domicilioRenaper }) => {
             distrito: response2.divsAdmins[0].valor,
             seccional_policial: response2.divsAdmins[3].valor,
             localidad: response2.localidad,
-            punto_x: response2.puntoX,
-            punto_y: response2.puntoY,
+            lineas_tup: response2.lineasTup.join(','),
             fraccion_censal: response2.divsAdmins[4].valor,
             radio_censal: response2.divsAdmins[5].valor        
         });
-
-        // Llamo a la tercer api
-        const response3 = await getLatitudLongitud(domicilioData.punto_x, domicilioData.punto_y);
-
-        // Guardo los datos de la tercer api
-        Object.assign(domicilioData, {
-            latitud: response3.latitud,
-            longitud: response3.longitud
-        });
-
-        //console.log(domicilioData);
-
-        //setDomicilio(domicilioData);
+        
         const previous = getValues(name) || {};
         setValue(name, { ...previous, ...domicilioData }, { shouldValidate: true });
     };
