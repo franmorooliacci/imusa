@@ -294,7 +294,7 @@ class ExternalDataViewSet(viewsets.ViewSet):
                 url, 
                 timeout=10, 
                 proxies={'http': None, 'https': None}, # type: ignore[arg-type]
-                verify=False
+                verify=True
             )
             if response.status_code == 404:
                 raise NotFound()
@@ -330,7 +330,7 @@ class ExternalDataViewSet(viewsets.ViewSet):
                 url, 
                 timeout=10, 
                 proxies={'http': None, 'https': None}, # type: ignore[arg-type]
-                verify=False
+                verify=True
             )
             if response.status_code == 404:
                 raise NotFound()
@@ -359,7 +359,7 @@ class ExternalDataViewSet(viewsets.ViewSet):
                 url, 
                 timeout=10, 
                 proxies={'http': None, 'https': None}, # type: ignore[arg-type] 
-                verify=False
+                verify=True
             )
             if response.status_code == 404:
                 raise NotFound()
