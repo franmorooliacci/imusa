@@ -343,8 +343,8 @@ VALUES
     (1, 'Terranova'),
     (1, 'Leonberger'),
     (1, 'Mastín Tibetiano'),
-    (1, 'Mestizo'),
-    (2, 'Mestizo');
+    (1, 'Indefinida'),
+    (2, 'Indefinida');
 
 CREATE TABLE color (
     id INT AUTO_INCREMENT PRIMARY KEY,
