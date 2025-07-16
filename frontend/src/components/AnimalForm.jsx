@@ -330,65 +330,69 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
                         </FormControl>
                     </Grid2>
 
-                    <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
-                        <Controller
-                            name='esterilizado'
-                            control={control}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    select
-                                    label='Esterilizado'
-                                    error={!!errors.esterilizado}
-                                    helperText={errors.esterilizado?.message}
-                                    fullWidth
-                                >
-                                    <MenuItem value={0}>No</MenuItem>
-                                    <MenuItem value={1}>Si</MenuItem>
-                                </TextField>
-                            )}
-                        />
-                    </Grid2>
+                    {mode === 'add' && (
+                        <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
+                            <Controller
+                                name='esterilizado'
+                                control={control}
+                                render={({ field }) => (
+                                    <TextField
+                                        {...field}
+                                        select
+                                        label='Esterilizado'
+                                        error={!!errors.esterilizado}
+                                        helperText={errors.esterilizado?.message}
+                                        fullWidth
+                                    >
+                                        <MenuItem value={0}>No</MenuItem>
+                                        <MenuItem value={1}>Si</MenuItem>
+                                    </TextField>
+                                )}
+                            />
+                        </Grid2>
+                    )}
+                    
+                    {/*
+                        <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
+                            <Controller
+                                name='adoptado_imusa'
+                                control={control}
+                                render={({ field }) => (
+                                    <TextField
+                                        {...field}
+                                        select
+                                        label='Adoptado en IMuSA'
+                                        error={!!errors.adoptado_imusa}
+                                        helperText={errors.adoptado_imusa?.message}
+                                        fullWidth
+                                    >
+                                        <MenuItem value={0}>No</MenuItem>
+                                        <MenuItem value={1}>Si</MenuItem>
+                                    </TextField>
+                                )}
+                            />
+                        </Grid2>
 
-                    <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
-                        <Controller
-                            name='adoptado_imusa'
-                            control={control}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    select
-                                    label='Adoptado en IMuSA'
-                                    error={!!errors.adoptado_imusa}
-                                    helperText={errors.adoptado_imusa?.message}
-                                    fullWidth
-                                >
-                                    <MenuItem value={0}>No</MenuItem>
-                                    <MenuItem value={1}>Si</MenuItem>
-                                </TextField>
-                            )}
-                        />
-                    </Grid2>
-
-                    <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
-                        <Controller
-                            name='fallecido'
-                            control={control}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    select
-                                    label='Fallecido'
-                                    error={!!errors.fallecido}
-                                    helperText={errors.fallecido?.message}
-                                    fullWidth
-                                >
-                                    <MenuItem value={0}>No</MenuItem>
-                                    <MenuItem value={1}>Si</MenuItem>
-                                </TextField>
-                            )}
-                        />
-                    </Grid2>
+                        <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
+                            <Controller
+                                name='fallecido'
+                                control={control}
+                                render={({ field }) => (
+                                    <TextField
+                                        {...field}
+                                        select
+                                        label='Fallecido'
+                                        error={!!errors.fallecido}
+                                        helperText={errors.fallecido?.message}
+                                        fullWidth
+                                    >
+                                        <MenuItem value={0}>No</MenuItem>
+                                        <MenuItem value={1}>Si</MenuItem>
+                                    </TextField>
+                                )}
+                            />
+                        </Grid2>
+                    */}
                 </Grid2>
 
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
