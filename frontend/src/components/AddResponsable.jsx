@@ -8,6 +8,7 @@ import ContactoForm from './ContactoForm';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import responsableSchema from '../validation/responsableSchema';
+import { CircularProgress } from '@mui/material';
 
 const AddResponsable = ({ responsable }) => {
     const methods = useForm({
@@ -27,6 +28,7 @@ const AddResponsable = ({ responsable }) => {
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('');
+    const [submitting, setSubmitting] = useState(false);
     const navigate = useNavigate();
     const canSubmit = domRenaperDone && (mismoDom === 'no' ? domActualDone : true) && isValid;
     
@@ -106,6 +108,10 @@ const AddResponsable = ({ responsable }) => {
     };
 
     const onSubmit = async (data) => {
+
+        if (submitting) return;
+        setSubmitting(true);
+        
         try {
             const formattedResponsable = formatResponsable();
             const formattedDomRNP = formatDomicilio(data.domicilioRenaper);
@@ -134,6 +140,7 @@ const AddResponsable = ({ responsable }) => {
             setAlertSeverity('error');
             setAlertMsg('No se ha podido agregar al responsable.');
             setAlertOpen(true);
+            setSubmitting(false);
         }
     };
     
@@ -179,7 +186,8 @@ const AddResponsable = ({ responsable }) => {
                 <ContactoForm name = {'contacto'} />
 
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                    <Button type='submit' variant='contained' color='primary' disabled={!canSubmit}>Agregar</Button>
+                    <Button type='submit' variant='contained' color='primary' disabled={!canSubmit || submitting}> 
+                        { submitting ? <CircularProgress size={24}  /> : 'Agregar'}</Button>
                 </Box>
 
                 <AlertMessage

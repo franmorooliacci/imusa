@@ -11,6 +11,8 @@ import AlertMessage from '../components/AlertMessage';
 import SkeletonList from '../components/SkeletonList';
 import BackHeader from '../components/BackHeader';
 import FirmaForm from '../components/FirmaForm';
+import { CircularProgress } from '@mui/material';
+
 
 const FinishAtencionPage = () => {
     const { atencionId, responsableId, animalId } = useParams();
@@ -41,6 +43,7 @@ const FinishAtencionPage = () => {
     });
     const [loading, setLoading] = useState(true);
     const [alertOpen, setAlertOpen] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('');
     const navigate = useNavigate();
@@ -117,6 +120,9 @@ const FinishAtencionPage = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        if (submitting) return;
+        setSubmitting(true);
+
         const now = new Date();
 
         try{ 
@@ -174,6 +180,7 @@ const FinishAtencionPage = () => {
             setAlertSeverity('error');
             setAlertMsg('No se ha podido finalizar la atención.');
             setAlertOpen(true);
+            setSubmitting(false);
         }
 
     };
@@ -307,9 +314,14 @@ const FinishAtencionPage = () => {
                     >
                         Cancelar
                     </Button>
-                    <Button type='submit' variant='contained' color='primary' disabled={!formData.firma_egreso}>
-                        Finalizar
-                    </Button>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            disabled={!formData.firma_egreso || submitting}
+                        >
+                         { submitting ? <CircularProgress size={24}  /> : 'Finalizar'}
+                        </Button>
                 </Box>
             </Box>
 

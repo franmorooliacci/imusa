@@ -54,6 +54,7 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
     const [razas, setRazas] = useState([]);
     const [tamaños, setTamaños] = useState([]);
     const [colores, setColores] = useState([]);
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -92,6 +93,10 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
     }, [initialData, mode, reset]);
 
     const onSubmit = async (data) => {
+
+        if (submitting) return;
+        setSubmitting(true);
+
         const date = data.fecha_nacimiento;
         const formattedDate = dayjs(date).format('YYYY-MM-DD');
         data.fecha_nacimiento = formattedDate;
@@ -112,9 +117,9 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
 
                 setAlertSeverity('success');
                 setAlertMsg(`${data.id_especie === 1 ? 'Canino' : 'Felino'} modificado con éxito!`);
-                setAlertOpen(true);
+                setAlertOpen(true);                
                 setTimeout(() => {
-                    onSuccess(response);
+                    onSuccess(`/responsable/${data.id_responsable}/${data.id_especie === 1 ? 'canino' : 'felino'}/${response.id}`);
                 }, 3000);
             }
         } catch (error) {
@@ -122,12 +127,14 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
                 setAlertSeverity('error');
                 setAlertMsg(`No se ha podido agregar ${data.id_especie === 1 ? 'canino' : 'felino'}.`);
                 setAlertOpen(true);
+                setSubmitting(false);
             } else {
                 setAlertSeverity('error');
                 setAlertMsg(`No se ha podido modificar ${data.id_especie === 1 ? 'canino' : 'felino'}.`);
                 setAlertOpen(true);
+                setSubmitting(false);
             }
-        }
+        } 
     };
 
     if (loading) {
@@ -385,9 +392,9 @@ const AnimalForm = ({ mode, initialData = {}, onSuccess, onCancel }) => {
                 </Grid2>
 
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
-                <Button variant='outlined' color='error' onClick={onCancel} disabled={isSubmitting}>Cancelar</Button>
-                <Button type='submit' variant='contained' disabled={isSubmitting}>
-                    {isSubmitting ? <CircularProgress size={24}/> : mode === 'add' ? 'Agregar' : 'Guardar'}
+                <Button variant='outlined' color='error' onClick={onCancel} disabled={ submitting}>Cancelar</Button>
+                <Button type='submit' variant='contained' disabled={ submitting}>
+                    { submitting ? <CircularProgress size={24}/> : mode === 'add' ? 'Agregar' : 'Guardar'}
                 </Button>
                 </Box>
             </Box>
