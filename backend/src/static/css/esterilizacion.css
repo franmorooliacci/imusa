@@ -112,3 +112,8 @@
     width: 50%;
 } 
 
+.firma-img {
+    width: 180px;
+    height: 115px;
+    object-fit: contain;
+}
