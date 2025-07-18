@@ -10,6 +10,7 @@ import AlertMessage from '../components/AlertMessage';
 import { addDomicilio, addResponsable, getDomicilio } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import responsableNoRnpSchema from '../validation/responsableNoRnpSchema';
+import { CircularProgress } from '@mui/material';
 
 const AddResponsablePage = () => {
     const methods = useForm({
@@ -32,6 +33,7 @@ const AddResponsablePage = () => {
     const [alertSeverity, setAlertSeverity] = useState('');
     const navigate = useNavigate();
     const canSubmit = domicilioDone && isValid;
+    const [submitting, setSubmitting] = useState(false);
 
     const formatResponsable = (data) => {
 
@@ -94,6 +96,10 @@ const AddResponsablePage = () => {
     };
 
     const onSubmit = async (data) => {
+
+        if (submitting) return;
+        setSubmitting(true);
+
         try {
             const formattedResponsable = formatResponsable(data);
             const formattedDomicilio = formatDomicilio(data.domicilioActual);
@@ -114,6 +120,7 @@ const AddResponsablePage = () => {
             setAlertSeverity('error');
             setAlertMsg('No se ha podido agregar al responsable.');
             setAlertOpen(true);
+            setSubmitting(false);
         }
     };
 
@@ -247,9 +254,8 @@ const AddResponsablePage = () => {
                 <ContactoForm name="contacto" />
 
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                    <Button type="submit" variant="contained" color="primary" disabled={!canSubmit}>
-                        Agregar
-                    </Button>
+                    <Button type='submit' variant='contained' color='primary' disabled={!canSubmit || submitting}> 
+                        { submitting ? <CircularProgress size={24}  /> : 'Agregar'}</Button>
                 </Box>
 
                 <AlertMessage

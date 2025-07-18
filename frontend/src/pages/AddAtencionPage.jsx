@@ -4,6 +4,7 @@ import { Box, Button, Divider, Skeleton, Stack, Typography } from '@mui/material
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { addAtencion, getAnimalById, getResponsableById } from '../services/api';
+import { CircularProgress } from '@mui/material';
 import ResponsableDetailsForm from '../components/ResponsableDetailsForm';
 import AnimalDetailsForm from '../components/AnimalDetailsForm';
 import AlertMessage from '../components/AlertMessage';
@@ -23,6 +24,7 @@ const AddAtencionPage = () => {
     });
     const [loading, setLoading] = useState(true);
     const [alertOpen, setAlertOpen] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('');
     const { personal, selectedEfectorId } = useContext(AuthContext);
@@ -69,6 +71,9 @@ const AddAtencionPage = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        if (submitting) return;
+        setSubmitting(true);
+
         const now = new Date();
 
         try{ 
@@ -99,6 +104,7 @@ const AddAtencionPage = () => {
             setAlertSeverity('error');
             setAlertMsg('No se ha podido agregar la atención.');
             setAlertOpen(true);
+            setSubmitting(false);
         }
 
     };
@@ -171,9 +177,14 @@ const AddAtencionPage = () => {
                     >
                         Cancelar
                     </Button>
-                    <Button type='submit' variant='contained' color='primary' disabled={!formData.atencion.firma_ingreso}>
-                        Agregar
-                    </Button>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            disabled={!formData.atencion.firma_ingreso || submitting}
+                        >
+                         { submitting ? <CircularProgress size={24}  /> : 'Finalizar'}
+                        </Button>
                 </Box>
             </Box>
 
