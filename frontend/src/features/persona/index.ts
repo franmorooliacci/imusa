@@ -1,0 +1,1 @@
+export { default as SearchPersona } from './components/SearchPersona';
