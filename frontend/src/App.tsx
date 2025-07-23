@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import RedirectOnLogout from './components/RedirectOnLogout';
-import AppRoutes from './routes/AppRoutes';
+import RedirectOnLogout from '@common/components/RedirectOnLogout';
+import AppRoutes from '@common/routes/AppRoutes';
 
 const App = () => {
     return (
