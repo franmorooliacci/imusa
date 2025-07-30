@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
-import { Persona, PersonaDTO } from '@common/types';
-import AlertMessage from '@common/components/AlertMessage';
-import { createEmptyPersona, createEmptyPersonaDTO } from '@features/persona/utils';
+import type { AlertSeverity } from '@common/types';
+import { AlertMessage } from '@common/components';
+import { createEmptyPersona, createEmptyPersonaDTO } from '../utils';
+import type { Persona, PersonaDTO } from '../types';
 import SearchPersonaResult from './SearchPersonaResult';
 import SearchPersonaForm from './SearchPersonaForm';
 import AddPersona from './AddPersona';
@@ -30,7 +31,7 @@ const SearchPersona = () => {
     const [noRNP, setNoRNP] = useState<boolean>(false);
     const [alertOpen, setAlertOpen] = useState<boolean>(false);
     const [alertMsg, setAlertMsg] = useState<string>('');
-    const [alertSeverity, setAlertSeverity] = useState<string>('');
+    const [alertSeverity, setAlertSeverity] = useState<AlertSeverity>('info');
 
     return (
         <Box sx={{ maxWidth: '800px', margin: '0 auto' }}>
