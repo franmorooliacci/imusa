@@ -4,10 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { useForm, Controller, Resolver, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Setter, Persona, PersonaDTO } from '@common/types';
-import { createEmptyPersona, createEmptyPersonaDTO } from '@features/persona/utils';
-import { getCiudadano, getPersona } from '@features/persona/services/persona-api';
-import { search, SearchFormInputs } from '@features/persona/schemas';
+import type { Setter } from '@common/types';
+import { createEmptyPersona, createEmptyPersonaDTO } from '../utils';
+import { getCiudadano, getPersona } from '../api';
+import { search, SearchFormInputs } from '../schemas';
+import { Persona, PersonaDTO } from '../types';
 
 type Props = {
     setNewPersona: Setter<PersonaDTO>;
