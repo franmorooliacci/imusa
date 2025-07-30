@@ -3,7 +3,9 @@ import { Alert, Box, Button, CircularProgress, Divider, Grid2, Stack, Typography
 import { faAddressCard, faLocationDot, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
-import { Setter, Persona, PersonaDTO } from '@common/types';
+import type { Setter } from '@common/types';
+import type { Persona, PersonaDTO } from '../types';
+import { domicilioToString } from '../utils';
 
 type Props = {
     searched: boolean;
@@ -111,19 +113,7 @@ const SearchPersonaResult = (props: Props) => {
                                             <strong>
                                                 Dirección:
                                             </strong>
-                                            {` ${existingPersona.domicilio_actual?.calle} ${existingPersona.domicilio_actual?.altura}
-                                                ${existingPersona.domicilio_actual?.bis === 0 ? '' : ' BIS'}
-                                                ${existingPersona.domicilio_actual?.letra ? ` ${existingPersona.domicilio_actual?.letra}` : ''}
-                                                ${existingPersona.domicilio_actual?.piso ? ` ${existingPersona.domicilio_actual?.piso}` : ''}
-                                                ${existingPersona.domicilio_actual?.depto ? ` ${existingPersona.domicilio_actual?.depto}` : ''}
-                                                ${existingPersona.domicilio_actual?.monoblock ? ` ${existingPersona.domicilio_actual?.monoblock}` : ''}`
-                                            }
-                                        </Typography>
-                                        <Typography variant='body2'>
-                                            <strong>
-                                                Localidad:
-                                            </strong>
-                                            {` ${existingPersona.domicilio_actual?.localidad}`}
+                                            {` ${domicilioToString(existingPersona.domicilio_actual)}`}
                                         </Typography>
                                     </Stack>
                                 </Grid2>
@@ -154,7 +144,7 @@ const SearchPersonaResult = (props: Props) => {
                                     <Stack spacing={0.5} sx={{ mt: 1 }}>
                                         <Typography variant='body2'>
                                             <strong>
-                                                Mail:
+                                                Correo:
                                             </strong>
                                             {` ${existingPersona.mail || ' - '}`}
                                         </Typography>
