@@ -1,6 +1,6 @@
 import http from './axiosClient';
 
-export const getResponsable = async (dni, sexo) => {
+export const getPersona = async (dni, sexo) => {
     try {
         const response = await http.get(`personas/buscar/?dni=${dni}&sexo=${sexo}`);
         return response.data;
@@ -9,7 +9,7 @@ export const getResponsable = async (dni, sexo) => {
     }
 };
 
-export const addResponsable = async (newResponsable) => {
+export const addPersona = async (newResponsable) => {
     try {
         const response = await http.post(`personas/`, newResponsable);
         return response.data;
@@ -18,7 +18,7 @@ export const addResponsable = async (newResponsable) => {
     }
 };
 
-export const getResponsableById = async (id) => {
+export const getPersonaById = async (id) => {
     try {
         const response = await http.get(`personas/${id}/`);
         return response.data;
@@ -27,7 +27,7 @@ export const getResponsableById = async (id) => {
     }
 };
 
-export const updateResponsable = async (id, data) => {
+export const updatePersona = async (id, data) => {
     try {
         const response = await http.patch(`personas/${id}/`, data);
         return response.data;
@@ -72,54 +72,135 @@ export const getRazas = async (id_especie) => {
     }
 };
 
-export const addAtencion = async (newAtencion) => {
+export const addCirugia = async (newCirugia) => {
     try {
-        const response = await http.post(`atenciones/`, newAtencion);
+        const response = await http.post(`cirugias/`, newCirugia);
         return response.data;
     } catch (error) {
         throw error;
     }
 };
 
-export const addAtencionInsumo = async (insumos) => {
+export const addCirugiaInsumo = async (insumos) => {
     try {
-        const response = await http.post(`atencion_insumo/`, insumos);
+        const response = await http.post(`cirugia_insumo/`, insumos);
         return response.data;
     } catch (error) {
         throw error;
     }
 };
 
-export const getAtenciones = async (params) => {
+export const getCirugias = async (params) => {
     try {
-        const response = await http.get(`atenciones/buscar/`, { params });
+        const response = await http.get(`cirugias/buscar/`, { params });
         return response.data;
     } catch (error) {
         throw error;
     }
 };
 
-export const getAtencionById = async (id) => {
+export const getCirugiaById = async (id) => {
     try {
-        const response = await http.get(`atenciones/${id}/`);
+        const response = await http.get(`cirugias/${id}/`);
         return response.data;
     } catch (error) {
         throw error;
     }
 };
 
-export const updateAtencion = async (id, data) => {
+export const updateCirugia = async (id, data) => {
     try {
-        const response = await http.patch(`atenciones/${id}/`, data);
+        const response = await http.patch(`cirugias/${id}/`, data);
         return response.data;
     } catch (error) {
         throw error;
     }
 };
 
-export const getInsumosByIdAtencion = async (id_atencion) => {
+export const getInsumosByIdCirugia = async (id_cirugia) => {
     try {
-        const response = await http.get(`atencion_insumo/buscar`, { params: { id_atencion } });
+        const response = await http.get(`cirugia_insumo/buscar`, { params: { id_cirugia } });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const addConsulta = async (newConsulta) => {
+    try {
+        const response = await http.post(`consulta/`, newConsulta);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const addConsultaInsumo = async (insumos) => {
+    try {
+        const response = await http.post(`consulta_insumo/`, insumos);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const addConsultaMotivoConsulta = async (motivos) => {
+    try {
+        const response = await http.post(`consulta_motivo_consulta/`, motivos);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getConsultas = async (params) => {
+    try {
+        const response = await http.get(`consultas/buscar/`, { params });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getConsultaById = async (id) => {
+    try {
+        const response = await http.get(`consultas/${id}/`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getMotivoConsultaById = async () => {
+    try {
+        await http.get('motivos_consulta/'); 
+        return response.data;
+    } catch (error){
+        throw error;
+    };
+}
+
+export const getMotivoByIdConsulta = async (id_consulta) => {
+    try {
+        const response = await http.get(`consulta_motivo_consulta/buscar`, { params: { id_consulta } });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateConsulta = async (id, data) => {
+    try {
+        const response = await http.patch(`consultas/${id}/`, data);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getInsumosByIdConsulta = async (id_consulta) => {
+    try {
+        const response = await http.get(`consulta_insumo/buscar`, { params: { id_consulta } });
         return response.data;
     } catch (error) {
         throw error;
@@ -222,9 +303,9 @@ export const getLatitudLongitud = async (punto_x, punto_y) => {
     }
 };
 
-export const getInforme = async (id_atencion) => {
+export const getInforme = async (id_cirugia) => {
     try {
-        const response = await http.get('informes/', { params: { id_atencion }, responseType: 'blob', });
+        const response = await http.get('informes/', { params: { id_cirugia }, responseType: 'blob', });
         const url  = URL.createObjectURL(response.data);    
         return url;
     } catch (error) {
@@ -258,3 +339,41 @@ export const getColores = async () => {
         throw error;
     }
 };
+
+export const getTiposCirugia = async () => {
+    try {
+        const response = await http.get('tipos_cirugia/'); 
+        return response.data;
+    } catch (error){
+        throw error;
+    };
+};
+
+export const getEstadosEgreso = async () => {
+    try {
+        const response = await http.get('estados_egreso/'); 
+        return response.data;
+    } catch (error){
+        throw error;
+    };
+}
+
+
+export const getAtenciones = async () => {
+    try {
+        const response = await http.get('atenciones/'); 
+        return response.data;
+    } catch (error){
+        throw error;
+    };
+}
+
+
+export const getPersonal = async () => {
+    try {
+        const response = await http.get('pesonal/');
+        return response.data;
+    } catch (error){
+        throw error;
+    };
+}

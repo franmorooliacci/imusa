@@ -7,12 +7,12 @@ import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import ContactoForm from '../components/ContactoForm';
 import DomicilioForm from '../components/DomicilioForm';
 import AlertMessage from '../components/AlertMessage';
-import { addDomicilio, addResponsable, getDomicilio } from '../services/api';
+import { addDomicilio, addPersona, getDomicilio } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import responsableNoRnpSchema from '../validation/responsableNoRnpSchema';
 import { CircularProgress } from '@mui/material';
 
-const AddResponsablePage = () => {
+const addPersonaPage = () => {
     const methods = useForm({
         mode: 'onChange',
         resolver: yupResolver(responsableNoRnpSchema),
@@ -107,7 +107,7 @@ const AddResponsablePage = () => {
             const domicilio = await domicilioExists(formattedDomicilio);
             formattedResponsable.id_domicilio_actual = domicilio.id;
             
-            const response = await addResponsable(formattedResponsable);
+            const response = await addPersona(formattedResponsable);
 
             setAlertSeverity('success');
             setAlertMsg('Responsable agregado con éxito!');
@@ -269,4 +269,4 @@ const AddResponsablePage = () => {
     );
 };
 
-export default AddResponsablePage;
+export default addPersonaPage;

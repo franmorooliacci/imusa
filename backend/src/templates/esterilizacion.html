@@ -11,7 +11,7 @@
 
 <body>
   <div class="container">
-    {% if atencion %}
+    {% if cirugia %}
       <!-- Datos de la mascota y responsable -->
       <div class="superior">
         <img src="{{ logo_data_uri }}" height="90" style="width:100%" />
@@ -123,8 +123,8 @@
             {% endif %}
             <p><strong>Ingreso</strong></p>
             <p>
-              <strong>Fecha:</strong> {{ atencion.fecha_ingreso|date:"d/m/Y" }}
-              <strong>Hora:</strong> {{ atencion.hora_ingreso|time:"H:i" }}
+              <strong>Fecha:</strong> {{ cirugia.fecha|date:"d/m/Y" }}
+              <strong>Hora:</strong> {{ cirugia.hora_ingreso|time:"H:i" }}
             </p>
           </div>
           <div class="column">
@@ -133,8 +133,8 @@
             {% endif %}
             <p><strong>Egreso</strong></p>
             <p>
-              <strong>Fecha:</strong> {{ atencion.fecha_egreso|date:"d/m/Y" }}
-              <strong>Hora:</strong> {{ atencion.hora_egreso|time:"H:i" }}
+              <strong>Fecha:</strong> {{ cirugia.fecha|date:"d/m/Y" }}
+              <strong>Hora:</strong> {{ cirugia.hora_egreso|time:"H:i" }}
             </p>
           </div>
         </div>

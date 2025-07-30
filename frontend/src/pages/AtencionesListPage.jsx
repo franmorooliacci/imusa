@@ -1,7 +1,7 @@
 import { alpha, Box, CircularProgress, Grid2, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import AuthContext from '../context/AuthContext';
-import { getAtenciones } from '../services/api';
+import { getCirugias, getConsultas, getAtenciones } from '../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCat, faDog, faFileMedical } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,7 @@ const AtencionesListPage = () => {
     const [loading, setLoading] = useState(true);
     const { selectedEfectorId } = useContext(AuthContext);
     const sortedAtenciones = atenciones.sort((a, b) => {
-        const dateDiff = new Date(a.fecha_ingreso) - new Date(b.fecha_ingreso);
+        const dateDiff = new Date(a.fecha) - new Date(b.fecha);
         if (dateDiff !== 0) return dateDiff;
         return a.hora_ingreso.localeCompare(b.hora_ingreso);
     });
@@ -20,16 +20,27 @@ const AtencionesListPage = () => {
     useEffect(() => {
         const fetchAtenciones = async () => {
             try{
-                const params = { id: selectedEfectorId, finalizada: 0 }
-                const response = await getAtenciones(params);
-                setAtenciones(response);
+                const params = { id: selectedEfectorId, finalizada: 0 };
+                const [cirugiasRaw, consultasRaw] = await Promise.all([
+                getCirugias(params),
+                getConsultas(params),
+                ]);
+
+                const cirugias = cirugiasRaw.map(c => ({ ...c, servicio: 'cirugia' }));
+                const consultas = consultasRaw.map(c => ({ ...c, servicio: 'consulta' }));
+                //const data = await getAtenciones(params);
+                const data = [...consultas, ...cirugias];
+                setAtenciones(data);
                 setLoading(false);
+                console.log(loading)
             } catch(error){
+                console.log(error)
 
             }
         };
 
         fetchAtenciones();
+        console.log("2")
     }, [selectedEfectorId]);
 
     const formatDate = (date) => {
@@ -102,7 +113,9 @@ const AtencionesListPage = () => {
                         sx={{ bgcolor: 'background.paper', boxShadow: 3, borderRadius: 4, overflow: 'hidden' }}
                     >
                         <ListItemButton 
-                            onClick={() => navigate(`/atencion/finalizar/${atencion.id}/${atencion.id_responsable}/${atencion.id_animal}`)} 
+                            onClick={() => atencion.servicio === 'cirugia' ? 
+                                navigate(`/cirugia/finalizar/${atencion.id}/${atencion.id_responsable}/${atencion.id_animal}`) :
+                                navigate(`/consulta/finalizar/${atencion.id}/${atencion.id_responsable}/${atencion.id_animal}`) } 
                             sx={
                                 (theme) => ({
                                     '&:hover': {
@@ -131,7 +144,7 @@ const AtencionesListPage = () => {
                                         </Typography>
                                         <br />
                                         <Typography variant='body2' component='span' color='text.secondary'>
-                                            {`${formatDate(atencion.fecha_ingreso)}` +
+                                            {`${formatDate(atencion.fecha)}` +
                                             ` - ${formatTime(atencion.hora_ingreso)}` + 
                                             ` - ${atencion.personal_nombre}`}
                                         </Typography>

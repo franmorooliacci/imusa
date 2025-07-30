@@ -10,9 +10,9 @@ import AtencionTable from '../components/AtencionTable';
 import AnimalForm from '../components/AnimalForm';
 import AlertMessage from '../components/AlertMessage';
 
-const ResponsablePage = () => {
+const UsuarioPage = () => {
     const { id } = useParams();
-    const [responsable, setResponsable] = useState(null);
+    const [persona, setPersona] = useState(null);
     const [addingAnimal, setAddingAnimal] = useState(false);
     const [especie, setEspecie] = useState('');
     const [loading, setLoading] = useState(true);
@@ -24,35 +24,18 @@ const ResponsablePage = () => {
     const [alertSeverity, setAlertSeverity] = useState('');
 
     useEffect(() => {
-        const fetchResponsable = async () => {
+        const fetchPersona = async () => {
             try {
                 const data = await getPersonaById(id);
-                setResponsable(data);
+                setPersona(data);
             } catch (error) {
-                console.error('Error fetching responsable details:', error);
+                console.error('Error fetching usuario details:', error);
             }
         };
 
-        const fetchAtenciones = async () => {
-            try {
-                const params = {id_responsable: id};
-                const [cirugiasRaw, consultasRaw] = await Promise.all([
-                getCirugias(params),
-                getConsultas(params),
-                ]);
-
-                const cirugias = cirugiasRaw.map(c => ({ ...c, servicio: 'cirugia' }));
-                const consultas = consultasRaw.map(c => ({ ...c, servicio: 'consulta' }));
-                const data = [...consultas, ...cirugias];
-                setAtenciones(data);
-
-            } catch (error) {
-            }
-        }
-
 
         const fetchData = async () => {
-            await Promise.all([fetchResponsable(), fetchAtenciones()]);
+            await Promise.all([fetchPersona()]);
             setLoading(false);
         };
     

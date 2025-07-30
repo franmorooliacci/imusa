@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Button, Divider, Skeleton, TextField, Typography, Stack, FormControlLabel, Checkbox } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { addAtencionInsumo, getAnimalById, getAtencionById, getResponsableById, sendInformeEmail, updateAnimal, updateAtencion } from '../services/api';
+import { addCirugiaInsumo, getAnimalById, getCirugiaById, getPersonaById, sendInformeEmail, updateAnimal, updateCirugia, getEstadosEgreso } from '../services/api';
 import ResponsableDetailsForm from '../components/ResponsableDetailsForm';
 import AnimalDetailsForm from '../components/AnimalDetailsForm';
 import MedicamentosDetailsForm from '../components/MedicamentosDetailsForm';
@@ -11,13 +11,13 @@ import AlertMessage from '../components/AlertMessage';
 import SkeletonList from '../components/SkeletonList';
 import BackHeader from '../components/BackHeader';
 import FirmaForm from '../components/FirmaForm';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, Select, MenuItem } from '@mui/material';
 
 
-const FinishAtencionPage = () => {
-    const { atencionId, responsableId, animalId } = useParams();
+const FinishCirugiaPage = () => {
+    const { cirugiaId, responsableId, animalId } = useParams();
     const [formData, setFormData] = useState({
-        atencion: {},
+        cirugia: {},
         responsable: {},
         animal: {},
         ketamina_prequirurgico: '',
@@ -25,6 +25,7 @@ const FinishAtencionPage = () => {
         ketamina_quirofano: '',
         firma_egreso: '',
         observaciones: '',
+        id_estado_egreso: '',
         sendEmail: false
     });
     const [options, setOptions] = useState({
@@ -46,6 +47,8 @@ const FinishAtencionPage = () => {
     const [submitting, setSubmitting] = useState(false);
     const [alertMsg, setAlertMsg] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('');
+    const [estadosEgreso, setEstadosEgreso] = useState([]); 
+    
     const navigate = useNavigate();
 
     const isValidEmail = (email) => typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -53,12 +56,12 @@ const FinishAtencionPage = () => {
     const emailValid = isValidEmail(email);
 
     useEffect(() => {
-        const fetchAtencion = async () => {
+        const fetchCirugia = async () => {
             try{
-                const response = await getAtencionById(atencionId);
+                const response = await getCirugiaById(cirugiaId);
                 setFormData(prev => ({
                     ...prev,
-                    atencion: response
+                    cirugia: response
                 }));
 
             } catch(error){
@@ -68,7 +71,7 @@ const FinishAtencionPage = () => {
 
         const fetchResponsable = async () => {
             try{
-                const response = await getResponsableById(responsableId);
+                const response = await getPersonaById(responsableId);
                 setFormData(prev => ({
                     ...prev,
                     responsable: response
@@ -93,7 +96,7 @@ const FinishAtencionPage = () => {
         };
 
         const fetchData = async () => {
-            await Promise.all([fetchAtencion(), fetchResponsable(), fetchAnimal()]);
+            await Promise.all([fetchCirugia(), fetchResponsable(), fetchAnimal()]);
             setLoading(false);
         };
 
@@ -101,7 +104,21 @@ const FinishAtencionPage = () => {
         // setTimeout(() => {
         //     fetchData();
         // }, 3000);
-    }, [atencionId, responsableId, animalId]);
+    }, [cirugiaId, responsableId, animalId]);
+
+    useEffect(() => {
+        const fetchEstados = async () => {
+            try {
+                const estados = await getEstadosEgreso();
+                setEstadosEgreso(estados);
+
+            } catch (error) {
+
+            }
+        };
+
+        fetchEstados();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -126,21 +143,21 @@ const FinishAtencionPage = () => {
         const now = new Date();
 
         try{ 
-            const finishedAtencion = {
-                ...formData.atencion,
-                fecha_egreso: now.toISOString().split('T')[0],
+            const finishedCirugia = {
+                ...formData.cirugia,
                 hora_egreso: now.toTimeString().slice(0, 5),
                 firma_egreso: formData.firma_egreso === '' ? null : formData.firma_egreso,
                 observaciones: formData.observaciones === '' ? null : formData.observaciones,
+                id_estado_egreso: formData.id_estado_egreso,
                 finalizada: 1
             };
                 
-            await updateAtencion(formData.atencion.id, finishedAtencion);
+            await updateCirugia(formData.cirugia.id, finishedCirugia);
 
             const insumos = Object.entries(options)
                 .filter(([_, insumo]) => insumo.selected && Number(insumo.value) > 0)
                 .map(([_, insumo]) => ({
-                    id_atencion: formData.atencion.id,
+                    id_cirugia: formData.cirugia.id,
                     id_insumo: insumo.id,
                     cant_ml: Number(insumo.value)
                 }))
@@ -152,7 +169,7 @@ const FinishAtencionPage = () => {
 
             if(keta_induccion > 0 || keta_prequirurgico > 0 || keta_quirofano > 0){
                 insumos.push({
-                    id_atencion: formData.atencion.id,
+                    id_cirugia: formData.cirugia.id,
                     id_insumo: 13,
                     cant_ml: keta_induccion + keta_prequirurgico + keta_quirofano,
                     cant_ml_prequirurgico: keta_prequirurgico === 0 ? null : keta_prequirurgico,
@@ -160,13 +177,12 @@ const FinishAtencionPage = () => {
                     cant_ml_quirofano: keta_quirofano === 0 ? null : keta_quirofano
                 });
             }
-
-            await addAtencionInsumo(insumos);
+            await addCirugiaInsumo(insumos);
 
             await updateAnimal(animalId, { esterilizado: 1 });
 
             if(formData.sendEmail)
-                await sendInformeEmail({ id_atencion: finishedAtencion.id, to_emails: [email] });
+                await sendInformeEmail({ id_cirugia: finishedCirugia.id, to_emails: [email] });
 
             setAlertSeverity('success');
             setAlertMsg('Atención finalizada con éxito!');
@@ -272,6 +288,39 @@ const FinishAtencionPage = () => {
                     />
                 </Box>
 
+                                <Box sx={{ mb: 2 }}>
+                    <Divider textAlign='left'>
+                        <Stack direction='row' alignItems='center' spacing={1} sx={{ mb: 2 }}>
+                            <FontAwesomeIcon icon={faAsterisk} size='1x' sx={{ color: (theme) => theme.palette.text.primary }} />
+        
+                            <Typography variant='subtitle2'>
+                                Estado Egreso
+                            </Typography>
+                        </Stack>
+                    </Divider>
+                    <Select
+                        labelId="estado-egreso-label"
+                        id="estado-egreso"
+                        value={formData.cirugia?.id_estado_egreso || ''}
+                        label="Estado egreso"
+                        onChange={(e) =>
+                            setFormData(prev => ({
+                                ...prev,
+                                cirugia: {
+                                    ...prev.cirugia,
+                                    id_estado_egreso: e.target.value
+                                }
+                            }))
+                        }
+                    >
+                        {estadosEgreso.map((tipo) => (
+                            <MenuItem key={tipo.id} value={tipo.id}>
+                                {tipo.nombre}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </Box>
+
                 <FirmaForm
                     onChange={(base64) =>
                         setFormData(prev => ({
@@ -314,11 +363,12 @@ const FinishAtencionPage = () => {
                     >
                         Cancelar
                     </Button>
+                    
                         <Button
                             type="submit"
                             variant="contained"
                             color="primary"
-                            disabled={!formData.firma_egreso || submitting}
+                            disabled={!formData.firma_egreso || !formData.cirugia.id_estado_egreso || submitting}
                         >
                          { submitting ? <CircularProgress size={24}  /> : 'Finalizar'}
                         </Button>
@@ -333,6 +383,7 @@ const FinishAtencionPage = () => {
             />
         </Box>
     );
+
 };
 
-export default FinishAtencionPage;
+export default FinishCirugiaPage;

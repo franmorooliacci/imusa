@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Button, Divider, Skeleton, Stack, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { addAtencion, getAnimalById, getResponsableById } from '../services/api';
+import { addCirugia, getAnimalById, getPersonaById, getTiposCirugia } from '../services/api';
 import { CircularProgress } from '@mui/material';
 import ResponsableDetailsForm from '../components/ResponsableDetailsForm';
 import AnimalDetailsForm from '../components/AnimalDetailsForm';
@@ -12,12 +12,15 @@ import SkeletonList from '../components/SkeletonList';
 import AuthContext from '../context/AuthContext';
 import BackHeader from '../components/BackHeader';
 import FirmaForm from '../components/FirmaForm';
+import { MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import SearchPage from './SearchPage';
 
-const AddAtencionPage = () => {
+const AddCirugiaPage = () => {
     const { responsableId, animalId } = useParams();
     const [formData, setFormData] = useState({
-        atencion: {
-            firma_ingreso: ''
+        cirugia: {
+            firma_ingreso: '',
+            id_tipo_cirugia: '',
         },
         responsable: {},
         animal: {}
@@ -28,13 +31,16 @@ const AddAtencionPage = () => {
     const [alertMsg, setAlertMsg] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('');
     const { personal, selectedEfectorId } = useContext(AuthContext);
+    const [tipoAtencion, setTipoAtencion] = useState(''); // 🔥 NUEVO: por defecto es cirugía
+    const [tiposCirugia, setTiposCirugia] = useState([]); 
+    const [changeResp, setChangeResp] = useState(false)
 
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchResponsable = async () => {
             try{
-                const response = await getResponsableById(responsableId);
+                const response = await getPersonaById(responsableId);
                 setFormData(prev => ({
                     ...prev,
                     responsable: response
@@ -69,6 +75,21 @@ const AddAtencionPage = () => {
         // }, 3000);
     }, [responsableId, animalId]);
 
+
+    useEffect(() => {
+        const fetchTipos = async () => {
+            try {
+                const tipos = await getTiposCirugia();
+                setTiposCirugia(tipos);
+            } catch (error) {
+
+            }
+        };
+
+        fetchTipos();
+    }, []);
+
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (submitting) return;
@@ -77,20 +98,21 @@ const AddAtencionPage = () => {
         const now = new Date();
 
         try{ 
-            const newAtencion = {
+            const newCirugia = {
                 id_efector: selectedEfectorId,
                 id_responsable: formData.responsable.id,
+                id_responsable_atencion: formData.responsable.id,
                 id_domicilio_responsable: formData.responsable.id_domicilio_actual,
                 id_animal: formData.animal.id,
-                id_servicio: 1,
                 id_personal: personal.id,
-                fecha_ingreso: now.toISOString().split('T')[0],
+                fecha: now.toISOString().split('T')[0],
                 hora_ingreso: now.toTimeString().slice(0, 5),
-                firma_ingreso: formData.atencion.firma_ingreso === '' ? null : formData.atencion.firma_ingreso,
+                firma_ingreso: formData.cirugia.firma_ingreso === '' ? null : formData.cirugia.firma_ingreso,
+                id_tipo_cirugia: formData.cirugia.id_tipo_cirugia,
                 finalizada: 0
             };
-                
-            await addAtencion(newAtencion);
+            console.log(newCirugia)
+            await addCirugia(newCirugia);
 
             setAlertSeverity('success');
             setAlertMsg('Atención agregada con éxito!');
@@ -126,6 +148,12 @@ const AddAtencionPage = () => {
     };
 
     return (
+        changeResp ? (
+            <SearchPage
+            Transfer = {{}}
+            cirugia = {formData}
+            /> ) : (
+    
         <Box>
             <BackHeader navigateTo = {`/responsable/${responsableId}/${formData.animal.id_especie === 1 ? 'canino' : 'felino'}/${animalId}`} />
             
@@ -153,21 +181,60 @@ const AddAtencionPage = () => {
                     </Stack>
                 </Divider>
 
+ 
                 <ResponsableDetailsForm formData = {formData} />
 
+               <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                        onClick={() => setChangeResp(true)}
+                        >
+                            Cambiar responsable
+                </Button>
                 <AnimalDetailsForm formData = {formData} />
+                
 
-                <FirmaForm
-                    onChange={(base64) =>
-                        setFormData(prev => ({
-                            ...prev,
-                            atencion: {
-                                ...prev.atencion,
-                                firma_ingreso: base64
-                            }
-                        }))
+
+    <>
+        <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel id="tipo-cirugia-label">Tipo de cirugía</InputLabel>
+            <Select
+                labelId="tipo-cirugia-label"
+                id="tipo-cirugia"
+                value={formData.cirugia?.id_tipo_cirugia || ''}
+                label="Tipo de cirugía"
+                onChange={(e) =>
+                    setFormData(prev => ({
+                        ...prev,
+                        cirugia: {
+                            ...prev.cirugia,
+                            id_tipo_cirugia: e.target.value
+                        }
+                    }))
+                }
+            >
+                {tiposCirugia.map((tipo) => (
+                    <MenuItem key={tipo.id} value={tipo.id}>
+                        {tipo.nombre}
+                    </MenuItem>
+                ))}
+            </Select>
+        </FormControl>
+
+        <FirmaForm
+            onChange={(base64) =>
+                setFormData(prev => ({
+                    ...prev,
+                    cirugia: {
+                        ...prev.cirugia,
+                        firma_ingreso: base64
                     }
-                />
+                }))
+            }
+        />
+    </>
+
 
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
                     <Button 
@@ -181,7 +248,7 @@ const AddAtencionPage = () => {
                             type="submit"
                             variant="contained"
                             color="primary"
-                            disabled={!formData.atencion.firma_ingreso || submitting}
+                            disabled={!formData.cirugia.firma_ingreso|| !formData.cirugia.id_tipo_cirugia || submitting}
                         >
                          { submitting ? <CircularProgress size={24}  /> : 'Finalizar'}
                         </Button>
@@ -195,7 +262,10 @@ const AddAtencionPage = () => {
                 severity = {alertSeverity}
             />
         </Box>
-    );
-};
+    )
+);
 
-export default AddAtencionPage;
+}
+
+
+export default AddCirugiaPage;

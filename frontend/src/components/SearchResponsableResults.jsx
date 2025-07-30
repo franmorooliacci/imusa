@@ -3,11 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Alert, Box, Button, CircularProgress, Divider, Grid2, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { updateAnimal } from '../services/api';
 
 const SearchResultsTable = ({ searched, responsable, isLoading, isInDb, 
-    addingResponsable, setAddingResponsable, editDomicilio, setEditDomicilio, editContacto, setEditContacto, renaperFound }) => {
+    addingResponsable, setAddingResponsable, editDomicilio, setEditDomicilio, editContacto, setEditContacto, renaperFound, Transfer ={}}) => {
     const navigate = useNavigate();
-
     return (
         <Box sx={{ mt: 2 }}>
             {searched && (
@@ -33,16 +33,35 @@ const SearchResultsTable = ({ searched, responsable, isLoading, isInDb,
                             </Grid2>
 
                             {(!editDomicilio && !editContacto) &&
-                                <Grid2>
+                             <Grid2>
+                                {Object.keys(Transfer).length === 0 ? (
                                     <Button 
-                                        size='small' 
-                                        variant='contained' 
-                                        color='primary' 
+                                        size="small" 
+                                        variant="contained" 
+                                        color="primary" 
                                         onClick={() => navigate(`/responsable/${responsable.id}`)}
                                     >
                                         Continuar
                                     </Button>
-                                </Grid2>
+                                ) : (
+                                    <Button 
+                                        size="small" 
+                                        variant="contained" 
+                                        color="primary" 
+                                        onClick={() => {
+                                            const finalData = {
+                                                ...Transfer,
+                                                id_responsable: responsable.id
+                                            };
+                                            updateAnimal(finalData.Transfer.id, finalData);
+                                            navigate(`/responsable/${responsable.id}`);
+                                        }}
+                                    >
+                                        Transferir
+                                    </Button>
+                                )}
+                            </Grid2>
+
                             }       
                         </Grid2>
 

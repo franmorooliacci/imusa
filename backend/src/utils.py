@@ -6,12 +6,12 @@ from datetime import date
 from django.conf import settings
 from django.template.loader import render_to_string
 from typing import Any, cast
-from .models import Atencion, AtencionInsumo
+from .models import Cirugia, CirugiaInsumo
 
 
-def build_atencion_context(id_atencion: int) -> dict[str, Any]:
-    atencion = (
-        Atencion.objects
+def build_cirugia_context(id_cirugia: int) -> dict[str, Any]:
+    cirugia = (
+        Cirugia.objects
             .select_related(
                 'id_animal',
                 'id_responsable__id_domicilio_actual',
@@ -19,19 +19,19 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
                 'id_efector',
             )
             .prefetch_related('id_animal__colores')
-            .get(pk=id_atencion)
+            .get(pk=id_cirugia)
     )
 
-    animal      = atencion.id_animal
-    responsable = atencion.id_responsable
-    medicamentos = AtencionInsumo.objects.filter(id_atencion=atencion)
-    personal = atencion.id_personal
+    animal      = cirugia.id_animal
+    responsable = cirugia.id_responsable
+    medicamentos = CirugiaInsumo.objects.filter(id_cirugia=cirugia)
+    personal = cirugia.id_personal
     veterinario = personal.id_persona
-    efector     = atencion.id_efector
-    #estado_sanitario = atencion.estado_sanitario_egreso
+    efector     = cirugia.id_efector
+    #estado_sanitario = cirugia.estado_sanitario_egreso
 
     # Acomodo medicamentos
-    medicamentos_queryset = AtencionInsumo.objects.filter(id_atencion=atencion)
+    medicamentos_queryset = CirugiaInsumo.objects.filter(id_cirugia=cirugia)
     medicamentos = []
     ketamina_partes = []
 
@@ -115,7 +115,7 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
 
     ctx: dict[str, Any] = {
         'animal'                : animal,
-        'atencion'              : atencion,
+        'cirugia'              : cirugia,
         'responsable'           : responsable,
         'domicilio_actual'      : domicilio_actual,
         'medicamentos'          : medicamentos_completos,
@@ -127,8 +127,8 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
         'edad'                  : edad,
         'css_content'           : css_content,
         'logo_data_uri'         : logo_data_uri,
-        'firma_ingreso_uri'     : make_data_uri(cast(str | None, atencion.firma_ingreso)),
-        'firma_egreso_uri'      : make_data_uri(cast(str | None, atencion.firma_egreso)),
+        'firma_ingreso_uri'     : make_data_uri(cast(str | None, cirugia.firma_ingreso)),
+        'firma_egreso_uri'      : make_data_uri(cast(str | None, cirugia.firma_egreso)),
         'veterinario_firma_uri' : make_data_uri(cast(str | None, personal.firma)),
     }
 
@@ -146,3 +146,5 @@ def generate_pdf_bytes(template_name: str, context: dict[str, Any]) -> bytes:
         )
         pdf_tmp.seek(0)
         return pdf_tmp.read()
+
+

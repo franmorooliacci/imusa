@@ -1,7 +1,7 @@
 import { Box, Button, Divider, FormControlLabel, Grid2, Radio, RadioGroup, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import DomicilioForm from './DomicilioForm';
-import { addDomicilio, addResponsable, getDomicilio } from '../services/api';
+import { addDomicilio, addPersona, getDomicilio, updateAnimal } from '../services/api';
 import AlertMessage from './AlertMessage';
 import { useNavigate } from 'react-router-dom';
 import ContactoForm from './ContactoForm';
@@ -10,7 +10,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import responsableSchema from '../validation/responsableSchema';
 import { CircularProgress } from '@mui/material';
 
-const AddResponsable = ({ responsable }) => {
+
+const addPersona = ({ responsable, Transfer = {}, cirugia = {}}) => {
     const methods = useForm({
         mode: 'onChange',
         resolver: yupResolver(responsableSchema),
@@ -125,15 +126,39 @@ const AddResponsable = ({ responsable }) => {
                 formattedResponsable.id_domicilio_actual = formattedResponsable.id_domicilio_renaper;
             }
                 
-            const response = await addResponsable(formattedResponsable);
-                
-            setAlertSeverity('success');
-            setAlertMsg('Responsable agregado con éxito!');
-            setAlertOpen(true);
-        
-            setTimeout(() => {
-                navigate(`/responsable/${response.id}`);
-            }, 3000); // Timeout para que se muestre la alerta
+            const response = await addPersona(formattedResponsable);
+            
+            if (Object.keys(Transfer).length !== 0){
+                const finalData = {
+                    ...Transfer,
+                    id_responsable: response.id
+                };
+                updateAnimal(finalData.Transfer.id, finalData)
+                setAlertSeverity('success');
+                setAlertMsg('Responsable agregado y animal transferido con éxito!');
+                setAlertOpen(true);
+                setTimeout(() => {
+                    navigate(`/responsable/${response.id}`);
+                }, 3000); // Timeout para que se muestre la alerta
+            }
+
+            if (Object.keys(cirugia).length !== 0){
+                setAlertSeverity('success');
+                setAlertMsg('Responsable agregado con éxito!');
+                setAlertOpen(true);
+                setTimeout(() => {
+                    navigate(`/cirugia/agregar/${cirugia.id_responsable}/${cirugia.id_animal}`);
+                }, 3000); // Timeout para que se muestre la alerta
+            }
+            
+            else{
+                setAlertSeverity('success');
+                setAlertMsg('Responsable agregado con éxito!');
+                setAlertOpen(true);
+                setTimeout(() => {
+                    navigate(`/responsable/${response.id}`);
+                }, 3000); // Timeout para que se muestre la alerta
+            }
         } catch (error) {
             setAlertSeverity('error');
             setAlertMsg('No se ha podido agregar al responsable.');
@@ -185,7 +210,7 @@ const AddResponsable = ({ responsable }) => {
 
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
                     <Button type='submit' variant='contained' color='primary' disabled={!canSubmit || submitting}> 
-                        { submitting ? <CircularProgress size={24}  /> : 'Agregar'}</Button>
+                        { submitting ? <CircularProgress size={24}  /> :(Object.keys(Transfer).length === 0 ? 'Agregar' : 'Agregar y Transferir')}</Button>
                 </Box>
 
                 <AlertMessage
@@ -199,4 +224,4 @@ const AddResponsable = ({ responsable }) => {
     );
 };
 
-export default AddResponsable;
+export default addPersona;

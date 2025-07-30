@@ -15,7 +15,7 @@ export const animalSchema = yup.object({
 
     id_tamaño: yup
         .string()
-        .required('Seleccione el tamaño'),
+        .required('Seleccione el '),
 
     id_raza: yup
         .string()

@@ -5,9 +5,11 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (
     Persona, Animal, Raza,
-    Efector, Insumo, Atencion, 
-    Domicilio, AtencionInsumo, Personal, 
-    Color, Tamaño
+    Efector, Insumo, Cirugia, 
+    Domicilio, CirugiaInsumo, Personal, 
+    Color, Tamaño, TipoCirugia, EstadoEgreso,
+    Consulta, ConsultaInsumo, MotivoConsulta,
+    ConsultaMotivoConsulta
 )
 
 
@@ -121,20 +123,63 @@ class InsumoSerializer(serializers.ModelSerializer[Insumo]):
         fields = '__all__'
 
 
-class AtencionSerializer(serializers.ModelSerializer[Atencion]):
+class TipoCirugiaSerializer(serializers.ModelSerializer[TipoCirugia]):
+    class Meta:
+        model = TipoCirugia
+        fields = '__all__'
+
+
+class CirugiaSerializer(serializers.ModelSerializer[Cirugia]):
     efector_nombre: serializers.CharField = serializers.CharField(source='id_efector.nombre', read_only=True)
     personal_nombre: serializers.CharField  = serializers.CharField(source='personal_full_name', read_only=True)
     animal: AnimalSerializer = AnimalSerializer(source='id_animal', read_only=True, required=False)
     insumos: InsumoSerializer = InsumoSerializer(many=True, read_only=True)
+    tipo_nombre: serializers.CharField = serializers.CharField(source='id_tipo_cirugia.nombre', read_only=True)
+    estado_nombre: serializers.CharField = serializers.CharField(source='id_estado_egreso.nombre', read_only=True)
 
     class Meta:
-        model = Atencion
+        model = Cirugia
         fields = '__all__'
 
 
-class AtencionInsumoSerializer(serializers.ModelSerializer[AtencionInsumo]):
+class CirugiaInsumoSerializer(serializers.ModelSerializer[CirugiaInsumo]):
     class Meta:
-        model = AtencionInsumo
+        model = CirugiaInsumo
+        fields = '__all__'
+
+
+class EstadoEgresoSerializer(serializers.ModelSerializer[EstadoEgreso]):
+    class Meta:
+        model = EstadoEgreso
+        fields = '__all__'
+
+
+class MotivoConsultaSerializer(serializers.ModelSerializer[MotivoConsulta]):
+    class Meta:
+        model = MotivoConsulta
+        fields = '__all__'
+
+class ConsultaMotivoConsultaSerializer(serializers.ModelSerializer[ConsultaMotivoConsulta]):
+    class Meta:
+        model = ConsultaMotivoConsulta
+        fields = '__all__'
+
+
+class ConsultaSerializer(serializers.ModelSerializer[Consulta]):
+    efector_nombre = serializers.CharField(source='id_efector.nombre', read_only=True)
+    personal_nombre: serializers.CharField  = serializers.CharField(source='personal_full_name', read_only=True)
+    animal: AnimalSerializer = AnimalSerializer(source='id_animal', read_only=True, required=False)
+    insumos: InsumoSerializer = InsumoSerializer(many=True, read_only=True)
+    motivos: MotivoConsultaSerializer = MotivoConsultaSerializer(many=True, read_only=True)
+    nombre_diagnostico =  serializers.CharField(source='id_diagnostico.nombre', read_only=True)
+
+    class Meta:
+        model = Consulta
+        fields = '__all__'
+
+class ConsultaInsumoSerializer(serializers.ModelSerializer[ConsultaInsumo]):
+    class Meta:
+        model = ConsultaInsumo
         fields = '__all__'
 
 

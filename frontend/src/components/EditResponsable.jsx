@@ -1,7 +1,7 @@
 import { Box, Button } from '@mui/material';
 import React, { useState } from 'react';
 import ContactoForm from './ContactoForm';
-import { addDomicilio, getDomicilio, updateResponsable } from '../services/api';
+import { addDomicilio, getDomicilio, updatePersona } from '../services/api';
 import AlertMessage from './AlertMessage';
 import DomicilioForm from './DomicilioForm';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -80,7 +80,7 @@ const EditResponsable = ({ editDomicilio, setEditDomicilio, editContacto, setEdi
 
     const onSubmitContacto = async (data) => {
         try{
-            await updateResponsable(responsable.id, data.contacto);
+            await updatePersona(responsable.id, data.contacto);
             
             setResponsable(prev => ({
                 ...prev,
@@ -114,7 +114,7 @@ const EditResponsable = ({ editDomicilio, setEditDomicilio, editContacto, setEdi
             }));
 
             // Actualizo el nuevo domicilio en la db
-            await updateResponsable(responsable.id, { id_domicilio_actual: newDomicilio.id });
+            await updatePersona(responsable.id, { id_domicilio_actual: newDomicilio.id });
 
             setAlertSeverity('success');
             setAlertMsg('Modificación realizada con éxito!');

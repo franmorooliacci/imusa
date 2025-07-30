@@ -10,7 +10,7 @@ const AtencionTable = ({ atenciones, animalDetails, onSendEmail }) => {
     const navigate = useNavigate();
     
     const sortedAtenciones = atenciones.sort((a, b) => {
-        const dateDiff = new Date(b.fecha_ingreso) - new Date(a.fecha_ingreso);
+        const dateDiff = new Date(b.fecha_) - new Date(a.fecha);
         if (dateDiff !== 0) return dateDiff;
         return b.hora_ingreso.localeCompare(a.hora_ingreso);
     });
@@ -71,17 +71,17 @@ const AtencionTable = ({ atenciones, animalDetails, onSendEmail }) => {
                                 <TableCell>{atencion.animal.nombre}</TableCell>
                             }
 
-                            <TableCell>{formatDate(atencion.fecha_ingreso)}</TableCell>
+                            <TableCell>{formatDate(atencion.fecha)}</TableCell>
                             <TableCell>{formatTime(atencion.hora_ingreso)}</TableCell>
                             <TableCell>{atencion.efector_nombre}</TableCell>
-                            <TableCell>{'Esterilización'}</TableCell>
+                            <TableCell>{atencion.servicio === 'consulta' ? 'Consulta' : 'Cirugía'}</TableCell>
                             <TableCell>{atencion.personal_nombre}</TableCell>
                             <TableCell sx={{ display: 'flex', flexDirection: 'row' }}>
                                 <Tooltip title='Ver detalles' arrow>
                                     <IconButton 
                                         variant='outlined' 
                                         color='primary' 
-                                        onClick={() => navigate(`/atencion/${atencion.id}`)}
+                                        onClick={() => navigate(`/${atencion.servicio}/${atencion.id}`)}
                                         sx={{
                                             '&:hover': {
                                                 backgroundColor: 'rgba(0, 0, 0, 0.08)',

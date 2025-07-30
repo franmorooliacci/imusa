@@ -2,7 +2,7 @@ import React from 'react';
 import { TextField, Button, Typography, Box, Grid2, MenuItem, Divider } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { getCiudadano, getResponsable } from '../services/api';
+import { getCiudadano, getPersona } from '../services/api';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import searchSchema from '../validation/searchSchema';
@@ -49,7 +49,7 @@ const SearchResponsable = ({ setResponsable, setIsLoading, setSearched, setIsInD
         let foundInDb = false;
 
         try {
-            const data = await getResponsable(dni, sexo);
+            const data = await getPersona(dni, sexo);
             setResponsable(data);
             foundInDb = true;
             setIsInDb(true);

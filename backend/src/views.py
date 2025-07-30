@@ -13,18 +13,22 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.serializers import BaseSerializer, ListSerializer
 from typing import Any, cast
-from .utils import build_atencion_context, generate_pdf_bytes
+from .utils import build_cirugia_context, generate_pdf_bytes
 from .models import (
     Persona, Especie, Raza, 
-    Efector, Animal, Atencion, 
-    Insumo, Domicilio, AtencionInsumo, 
-    Personal, Color, Tamaño
+    Efector, Animal, Cirugia, 
+    Insumo, Domicilio, CirugiaInsumo, 
+    Personal, Color, Tamaño, TipoCirugia,
+    EstadoEgreso, Consulta, ConsultaInsumo, 
+    MotivoConsulta, ConsultaMotivoConsulta
 )
 from .serializers import (
     PersonaSerializer, AnimalSerializer, RazaSerializer, 
-    EfectorSerializer, AtencionSerializer, InsumoSerializer, 
-    DomicilioSerializer, AtencionInsumoSerializer, PersonalSerializer, 
-    CustomTokenObtainPairSerializer, ColorSerializer, TamañoSerializer
+    EfectorSerializer, CirugiaSerializer, InsumoSerializer, 
+    DomicilioSerializer, CirugiaInsumoSerializer, PersonalSerializer, 
+    CustomTokenObtainPairSerializer, ColorSerializer, TamañoSerializer,
+    TipoCirugiaSerializer, EstadoEgresoSerializer, ConsultaSerializer,
+    ConsultaInsumoSerializer, MotivoConsultaSerializer
 )
 
 
@@ -135,9 +139,9 @@ class TamañoViewSet(viewsets.ModelViewSet):
     serializer_class = TamañoSerializer
 
 
-class AtencionViewSet(viewsets.ModelViewSet):
+class CirugiaViewSet(viewsets.ModelViewSet):
     queryset = (
-        Atencion.objects
+        Cirugia.objects
             .select_related('id_efector', 'id_personal__id_persona', 'id_animal')
             .prefetch_related('insumos')
             .annotate(
@@ -150,13 +154,13 @@ class AtencionViewSet(viewsets.ModelViewSet):
             )
             .all()
     )
-    serializer_class = AtencionSerializer
+    serializer_class = CirugiaSerializer
 
     @action(detail=False, methods=['get'], url_path='buscar')
     def search(self, request: Request) -> Response:
         id_animal: str | None = request.query_params.get('id_animal')
         id_responsable: str | None = request.query_params.get('id_responsable')
-        id_atencion: str | None = request.query_params.get('id_atencion')
+        id_cirugia: str | None = request.query_params.get('id_cirugia')
         id_efector: str | None = request.query_params.get('id_efector')
         finalizada: str | None = request.query_params.get('finalizada')
 
@@ -168,8 +172,8 @@ class AtencionViewSet(viewsets.ModelViewSet):
         if id_responsable:
             queryset = queryset.filter(id_responsable=id_responsable)
 
-        if id_atencion:
-            queryset = queryset.filter(id_atencion=id_atencion)
+        if id_cirugia:
+            queryset = queryset.filter(id_cirugia=id_cirugia)
 
         if id_efector:
             queryset = queryset.filter(id_efector=id_efector)
@@ -234,9 +238,9 @@ class DomicilioViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class AtencionInsumoViewSet(viewsets.ModelViewSet):
-    queryset = AtencionInsumo.objects.all()
-    serializer_class = AtencionInsumoSerializer
+class CirugiaInsumoViewSet(viewsets.ModelViewSet):
+    queryset = CirugiaInsumo.objects.all()
+    serializer_class = CirugiaInsumoSerializer
 
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         if isinstance(request.data, list):
@@ -249,18 +253,144 @@ class AtencionInsumoViewSet(viewsets.ModelViewSet):
             return super().create(request, *args, **kwargs)
 
     def perform_bulk_create(self, serializer: ListSerializer[Any]) -> None:
-        AtencionInsumo.objects.bulk_create([
-            AtencionInsumo(**item) for item in serializer.validated_data
+        CirugiaInsumo.objects.bulk_create([
+            CirugiaInsumo(**item) for item in serializer.validated_data
         ])
 
     @action(detail=False, methods=['get'], url_path='buscar')
     def search(self, request: Request) -> Response:
-        id_atencion: str | None = request.query_params.get('id_atencion')
+        id_cirugia: str | None = request.query_params.get('id_cirugia')
 
         queryset = self.get_queryset()
 
-        if id_atencion:
-            queryset = queryset.filter(id_atencion=id_atencion)
+        if id_cirugia:
+            queryset = queryset.filter(id=id_cirugia)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TipoCirugiaViewSet(viewsets.ModelViewSet):
+    queryset = TipoCirugia.objects.all()
+    serializer_class = TipoCirugiaSerializer
+
+
+class EstadoEgresoViewSet(viewsets.ModelViewSet):
+    queryset = EstadoEgreso.objects.all()
+    serializer_class = EstadoEgresoSerializer
+
+
+
+class ConsultaViewSet(viewsets.ModelViewSet):
+    queryset = (
+        Consulta.objects
+            .select_related('id_efector', 'id_personal__id_persona', 'id_animal')
+            .prefetch_related('insumos')
+            .annotate(
+                personal_full_name=Concat(
+                    F('id_personal__id_persona__nombre'),
+                    Value(' '),
+                    F('id_personal__id_persona__apellido'),
+                    output_field=CharField()
+                )
+            )
+            .all()
+    )
+    serializer_class = ConsultaSerializer
+
+    @action(detail=False, methods=['get'], url_path='buscar')
+    def search(self, request: Request) -> Response:
+        id_animal: str | None = request.query_params.get('id_animal')
+        id_responsable: str | None = request.query_params.get('id_responsable')
+        id_consulta: str | None = request.query_params.get('id_consulta')
+        id_efector: str | None = request.query_params.get('id_efector')
+        finalizada: str | None = request.query_params.get('finalizada')
+
+        queryset = self.get_queryset()
+
+        if id_animal:
+            queryset = queryset.filter(id_animal=id_animal)
+
+        if id_responsable:
+            queryset = queryset.filter(id_responsable=id_responsable)
+
+        if id_consulta:
+            queryset = queryset.filter(id_consulta=id_consulta)
+
+        if id_efector:
+            queryset = queryset.filter(id_efector=id_efector)
+
+        if finalizada:
+            queryset = queryset.filter(finalizada=finalizada)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ConsultaInsumoViewSet(viewsets.ModelViewSet):
+    queryset = ConsultaInsumo.objects.all()
+    serializer_class = ConsultaInsumoSerializer
+
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        if isinstance(request.data, list):
+            serializer = self.get_serializer(data=request.data, many=True)
+            serializer.is_valid(raise_exception=True)
+            list_serializer = cast(ListSerializer[Any], serializer)
+            self.perform_bulk_create(list_serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return super().create(request, *args, **kwargs)
+
+    def perform_bulk_create(self, serializer: ListSerializer[Any]) -> None:
+        ConsultaInsumo.objects.bulk_create([
+            ConsultaInsumo(**item) for item in serializer.validated_data
+        ])
+
+    @action(detail=False, methods=['get'], url_path='buscar')
+    def search(self, request: Request) -> Response:
+        id_consulta: str | None = request.query_params.get('id_consulta')
+
+        queryset = self.get_queryset()
+
+        if id_consulta:
+            queryset = queryset.filter(id=id_consulta)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class MotivoConsultaViewSet(viewsets.ModelViewSet):
+    queryset = MotivoConsulta.objects.all()
+    serializer_class = MotivoConsultaSerializer
+
+
+class ConsultaMotivoConsultaViewSet(viewsets.ModelViewSet):
+    queryset = ConsultaMotivoConsulta.objects.all()
+    serializer_class = ConsultaMotivoConsulta
+
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        if isinstance(request.data, list):
+            serializer = self.get_serializer(data=request.data, many=True)
+            serializer.is_valid(raise_exception=True)
+            list_serializer = cast(ListSerializer[Any], serializer)
+            self.perform_bulk_create(list_serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return super().create(request, *args, **kwargs)
+
+    def perform_bulk_create(self, serializer: ListSerializer[Any]) -> None:
+        ConsultaMotivoConsulta.objects.bulk_create([
+            ConsultaMotivoConsulta(**item) for item in serializer.validated_data
+        ])
+
+    @action(detail=False, methods=['get'], url_path='buscar')
+    def search(self, request: Request) -> Response:
+        id_consulta: str | None = request.query_params.get('id_consulta')
+
+        queryset = self.get_queryset()
+
+        if id_consulta:
+            queryset = queryset.filter(id=id_consulta)
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -403,12 +533,12 @@ class ExternalDataViewSet(viewsets.ViewSet):
 
 class InformeAPIView(APIView):
     def get(self, request: Request, *args: Any, **kwargs: Any) -> HttpResponseBase:
-        id_atencion: str | None = request.GET.get('id_atencion')
-        if not id_atencion:
-            return Response({'error': 'id_atencion parameter is required'},
+        id_cirugia: str | None = request.GET.get('id_cirugia')
+        if not id_cirugia:
+            return Response({'error': 'id_cirugia parameter is required'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        ctx = build_atencion_context(int(id_atencion))
+        ctx = build_cirugia_context(int(id_cirugia))
         return PDFTemplateView.as_view(
             template_name='esterilizacion.html',
             extra_context=ctx
@@ -418,15 +548,15 @@ class InformeAPIView(APIView):
 class SendInformeEmailAPIView(APIView):
     def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         try:
-            id_atencion: int = cast(int,request.data.get('id_atencion'))
+            id_cirugia: int = cast(int,request.data.get('id_cirugia'))
         except (TypeError, ValueError):
             return Response(
-                {'error': 'id_atencion (integer) is required'},
+                {'error': 'id_cirugia (integer) is required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         try:
-            ctx       = build_atencion_context(id_atencion)
+            ctx       = build_cirugia_context(id_cirugia)
             pdf_bytes: bytes = generate_pdf_bytes('esterilizacion.html', ctx)
         except Exception as e:
             return Response(
@@ -437,11 +567,11 @@ class SendInformeEmailAPIView(APIView):
         to_emails: list[str] = list(request.data.get('to_emails', []))
         if not to_emails:
             return Response(
-                {'error': 'No recipient found for this atención'},
+                {'error': 'No recipient found for this cirugia'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        subject: str = cast(str, config('EMAIL_SUBJECT')).format(id_atencion=id_atencion)
+        subject: str = cast(str, config('EMAIL_SUBJECT')).format(id_cirugia=id_cirugia)
 
         data: dict[str, Any] = {
             'from_email': config('EMAIL_SENDER'),
@@ -451,7 +581,7 @@ class SendInformeEmailAPIView(APIView):
         }
         files = {
             'attachment': (
-                f'esterilizacion-{id_atencion}.pdf',
+                f'esterilizacion-{id_cirugia}.pdf',
                 pdf_bytes,
                 'application/pdf'
             )
@@ -480,3 +610,48 @@ class SendInformeEmailAPIView(APIView):
             payload = {'text': resp.text}
 
         return Response(payload, status=resp.status_code)
+    
+
+class AtencionesView(APIView):
+    def get(self, request):
+        id_animal = request.query_params.get('id_animal')
+        id_responsable = request.query_params.get('id_responsable')
+        id_consulta = request.query_params.get('id_consulta')
+        id_efector = request.query_params.get('id_efector')
+        finalizada = request.query_params.get('finalizada')
+
+        # Empezamos con todos los objetos
+        consultas = Consulta.objects.all()
+        cirugias = Cirugia.objects.all()
+
+        # Aplicamos filtros si se pasan parámetros
+        if id_animal:
+            consultas = consultas.filter(id_animal=id_animal)
+            cirugias = cirugias.filter(id_animal=id_animal)
+
+        if id_responsable:
+            consultas = consultas.filter(id_responsable=id_responsable)
+            cirugias = cirugias.filter(id_responsable=id_responsable)
+
+        if id_consulta:
+            consultas = consultas.filter(id=id_consulta)
+
+        if id_efector:
+            consultas = consultas.filter(id_efector=id_efector)
+            cirugias = cirugias.filter(id_efector=id_efector)
+
+        if finalizada is not None:
+            # Convertir a booleano si es necesario
+            finalizada_bool = finalizada.lower() == 'true'
+            consultas = consultas.filter(finalizada=finalizada_bool)
+            cirugias = cirugias.filter(finalizada=finalizada_bool)
+
+        consultas_serializadas = ConsultaSerializer(consultas, many=True).data
+        cirugias_serializadas = CirugiaSerializer(cirugias, many=True).data
+
+        atenciones = (
+            [{"tipo": "consulta", "data": c} for c in consultas_serializadas] +
+            [{"tipo": "cirugia", "data": c} for c in cirugias_serializadas]
+        )
+
+        return Response(atenciones)

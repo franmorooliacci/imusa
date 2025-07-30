@@ -1,17 +1,17 @@
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import SearchPage from './pages/SearchPage';
 import ResponsablePage from './pages/ResponsablePage';
-import AddResponsablePage from './pages/AddResponsablePage';
+import addPersonaPage from './pages/addPersonaPage';
 import React from 'react';
 import Layout from './pages/Layout';
 import AnimalPage from './pages/AnimalPage';
-import AtencionPDFViewerPage from './pages/AtencionPDFViewerPage';
-import AddAtencionPage from './pages/AddAtencionPage';
+import CirugiaPDFViewerPage from './pages/CirugiaPDFViewerPage';
+import AddCirugiaPage from './pages/AddCirugiaPage';
 import LoginPage from './pages/LoginPage';
 import PrivateRoute from './components/PrivateRoute';
 import RedirectOnLogout from './components/RedirectOnLogout';
 import AtencionesListPage from './pages/AtencionesListPage';
-import FinishAtencionPage from './pages/FinishAtencionPage';
+import FinishCirugiaPage from './pages/FinishCirugiaPage';
 
 const App = () => {
 
@@ -41,7 +41,7 @@ const App = () => {
                         path='/responsable/agregar' 
                         element={
                             <PrivateRoute>        
-                                <AddResponsablePage />
+                                <addPersonaPage />
                             </PrivateRoute>
                         } 
                     />
@@ -62,18 +62,18 @@ const App = () => {
                         }
                     />
                     <Route 
-                        path='/atencion/:id' 
+                        path='/cirugia/:id' 
                         element={
                             <PrivateRoute>
-                                <AtencionPDFViewerPage />
+                                <CirugiaPDFViewerPage />
                             </PrivateRoute>
                         }
                     />
                     <Route 
-                        path='/atencion/agregar/:responsableId/:animalId' 
+                        path='/cirugia/agregar/:responsableId/:animalId' 
                         element={
                             <PrivateRoute>
-                                <AddAtencionPage />
+                                <AddCirugiaPage />
                             </PrivateRoute>
                         }
                     />
@@ -86,10 +86,10 @@ const App = () => {
                         }
                     />
                     <Route 
-                        path='/atencion/finalizar/:atencionId/:responsableId/:animalId' 
+                        path='/cirugia/finalizar/:cirugiaId/:responsableId/:animalId' 
                         element={
                             <PrivateRoute>
-                                <FinishAtencionPage />
+                                <FinishCirugiaPage />
                             </PrivateRoute>
                         }
                     />

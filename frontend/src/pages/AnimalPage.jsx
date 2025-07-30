@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getAnimalById, getAtenciones, getResponsableById, sendInformeEmail } from '../services/api';
+import { getAnimalById, getCirugias,getConsultas, getPersonaById, sendInformeEmail } from '../services/api';
 import { Typography, Button, Box, Divider, Grid2, Skeleton, Stack } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCat, faDog, faStethoscope } from '@fortawesome/free-solid-svg-icons';
 import SkeletonList from '../components/SkeletonList';
 import AtencionTable from '../components/AtencionTable';
+import SearchPage from './SearchPage';
 import AnimalForm from '../components/AnimalForm';
 import BackHeader from '../components/BackHeader';
 import AlertMessage from '../components/AlertMessage';
@@ -14,6 +15,7 @@ const AnimalPage = () => {
     const { especie, animalId, responsableId } = useParams();
     const [animal, setAnimal] = useState({});
     const [editMode, setEditMode] = useState(false);
+    const [transferMode, setTransferMode] = useState(false);
     const [loading, setLoading] = useState(true);
     const [atenciones, setAtenciones] = useState([]);
     const visibleAtenciones = atenciones.filter(a => a.finalizada === 1);
@@ -25,9 +27,17 @@ const AnimalPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [animalList, atencionesList] = await Promise.all([getAnimalById(animalId), getAtenciones({ id_animal: animalId })]);
+
+                const [animalList, cirugiasList, consultasList] = await Promise.all([
+                getAnimalById(animalId),
+                getCirugias({ id_animal: animalId }),
+                getConsultas({ id_animal: animalId }),
+                ]);
+                const cirugias = cirugiasList.map(c => ({ ...c, servicio: 'cirugia' }));
+                const consultas = consultasList.map(c => ({ ...c, servicio: 'consulta' }));
+                const data = [...consultas, ...cirugias];
                 setAnimal(animalList);
-                setAtenciones(atencionesList);
+                setAtenciones(data);
             } catch (error) {
 
             } finally {
@@ -61,8 +71,8 @@ const AnimalPage = () => {
     //     }
     // };
 
-    const handleAddAtencion = () => {
-        // Busca si el animal tiene alguna atencion en curso
+    const handleAddCirugia = () => {
+        // Busca si el animal tiene alguna cirugia en curso
         const ongoing = atenciones.find(a => a.finalizada === 0);
 
         if (ongoing) {
@@ -74,14 +84,14 @@ const AnimalPage = () => {
             );
             setAlertOpen(true);
         } else {
-            // false, redirige a la pagina de atenciones
-            navigate(`/atencion/agregar/${responsableId}/${animalId}`);
+            // false, redirige a la pagina de cirugias
+            navigate(`/cirugia/agregar/${responsableId}/${animalId}`);
         }
     };
 
-    const handleSendInformeEmail = async (id_atencion) => {
+    const handleSendInformeEmail = async (id_cirugia) => {
         try {
-            const response = await getResponsableById(responsableId);
+            const response = await getPersonaById(responsableId);
             const email = response.mail;
 
             if (!email) {
@@ -91,7 +101,7 @@ const AnimalPage = () => {
                 return;
             }
 
-            await sendInformeEmail({ id_atencion: id_atencion, to_emails: [email] });
+            await sendInformeEmail({ id_cirugia: id_cirugia, to_emails: [email] });
 
             setAlertSeverity('success');
             setAlertMsg('Se ha enviado el informe con éxito!');
@@ -132,7 +142,12 @@ const AnimalPage = () => {
                     onSuccess = {(updatedAnimal) => {setAnimal(updatedAnimal); setEditMode(false)}}
                     onCancel = {() => setEditMode(false)}
                 />
-            ) : (
+            ) : transferMode ?
+                <SearchPage    
+                Transfer = {animal} 
+                />
+             :
+                (
                 <Grid2 container spacing={2} sx={{ width: '100%' }}>
                     <Grid2 size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
                         <BackHeader navigateTo = {`/responsable/${responsableId}`} />
@@ -148,7 +163,9 @@ const AnimalPage = () => {
                                     {animal.nombre}
                                 </Typography>
                             </Box>
-
+                            <Button size='small' variant='outlined' color='primary' onClick={() => setTransferMode(true)}>
+                                Transferir
+                            </Button>
                             <Button size='small' variant='outlined' color='primary' onClick={() => setEditMode(true)}>
                                 Editar
                             </Button>
@@ -206,7 +223,7 @@ const AnimalPage = () => {
                                 </Typography>
                             </Box>
 
-                            <Button size='small' variant='outlined' color='primary' onClick={() => handleAddAtencion()}>
+                            <Button size='small' variant='outlined' color='primary' onClick={() => handleAddCirugia()}>
                                 Agregar
                             </Button>
                         </Box>

@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getAtencionById, getInforme } from '../services/api';
+import { getCirugiaById, getInforme } from '../services/api';
 import { Box, CircularProgress, Grid2 } from '@mui/material';
 import BackHeader from '../components/BackHeader';
 
-const AtencionPDFViewerPage = () => {
+const CirugiaPDFViewerPage = () => {
     const { id } = useParams();
-    const [atencion, setAtencion] = useState({});
+    const [cirugia, setCirugia] = useState({});
     const [url, setUrl] = useState('');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchAtencion = async () => {
+        const fetchCirugia = async () => {
             try{
-                const atencion = await getAtencionById(id);
-                setAtencion(atencion);
+                const cirugia = await getCirugiaById(id);
+                setCirugia(cirugia);
 
                 const url = await getInforme(id);
                 setUrl(url);
@@ -25,14 +25,14 @@ const AtencionPDFViewerPage = () => {
             }
         };
 
-        fetchAtencion();
+        fetchCirugia();
     }, [id]);
 
     return (
         <Grid2 container spacing={1} sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Grid2 size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
-                {atencion?.animal && (
-                    <BackHeader navigateTo = {`/responsable/${atencion.id_responsable}/${atencion.animal.id_especie === 1 ? 'canino' : 'felino'}/${atencion.id_animal}`} />
+                {cirugia?.animal && (
+                    <BackHeader navigateTo = {`/responsable/${cirugia.id_responsable}/${cirugia.animal.id_especie === 1 ? 'canino' : 'felino'}/${cirugia.id_animal}`} />
                 )}
             </Grid2>
             <Grid2 size={{ xs: 12, sm: 12, md: 12, lg: 12 }} sx={{ bgcolor: 'background.paper', p: 2, boxShadow: 3, borderRadius: 4 }}>
@@ -55,4 +55,4 @@ const AtencionPDFViewerPage = () => {
     );
 };
 
-export default AtencionPDFViewerPage;
+export default CirugiaPDFViewerPage;

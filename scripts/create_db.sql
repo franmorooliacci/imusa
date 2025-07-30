@@ -23,25 +23,40 @@ VALUES ('Esterilización');
 CREATE TABLE insumo (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
-    tope_max INT NULL,
-    tope_min INT NULL
+    cant_min INT NULL,
+    cant_max INT NULL,
+    cirugia  TINYINt (1) NOT NULL,
+    consulta TINYINT (1) NOT NULL
 );
 
-INSERT INTO insumo (nombre)
+INSERT INTO insumo (nombre,cirugia,consulta)
 VALUES
-    ('Acepromacina'),
-    ('Triancinolona'),
-    ('Atropina'),
-    ('Dexametasona'),
-    ('Diazepan'),
-    ('Antibiotico'),
-    ('Doxapram'),
-    ('Coagulante'),
-    ('Ivermectina'),
-    ('Complejo Vit. B'),
-    ('Mezcla (keta-Diazep.) 2+1'),
-    ('Dipirona'),
-    ('Ketamina');
+    ('Acepromacina',1,0),
+    ('Triancinolona',1,0),    
+    ('Atropina',1,0),
+    
+    ('Dexametasona',1,1),
+    
+    ('Diazepan',1,0),
+    ('Antibiotico',1,0),
+    ('Doxapram',1,0),
+    ('Coagulante',1,0),
+    
+    ('Ivermectina',1,1),
+    
+    ('Complejo Vit. B',1,0),
+    ('Mezcla (keta-Diazep.) 2+1',1,0),
+    ('Dipirona',1,0),
+    ('Ketamina',1,0),
+
+    ('Penicilina / Estreptomicina',0,1),
+    ('Enrofloxacina',0,1),
+    ('Metoclopramida',0,1),
+    ('Tramadol',0,1),
+    ('Furosemida',0,1),
+    ('Fluidoterapia',0,1),
+    ('ATP en Comprimidos',0,1),
+    ('ATP en Suspensión',0,1);
 
 CREATE TABLE domicilio (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -278,6 +293,14 @@ CREATE TABLE persona (
     FOREIGN KEY (id_domicilio_actual) REFERENCES domicilio (id)
 );
 
+
+CREATE TABLE institucion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    id_representante INT NOT NULL,
+    FOREIGN KEY (id_representante) REFERENCES persona (id)
+);
+
 CREATE TABLE raza (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_especie INT NOT NULL,
@@ -359,7 +382,7 @@ CREATE TABLE tamaño (
     nombre VARCHAR(255) NOT NULL
 );
 
-INSERT INTO tamaño (nombre)
+INSERT INTO  tamaño (nombre)
 VALUES ('Mini'), ('Pequeño'), ('Mediano'), ('Grande'), ('Gigante');
 
 CREATE TABLE animal (
@@ -369,6 +392,7 @@ CREATE TABLE animal (
     fecha_nacimiento DATE NULL,
     id_tamaño INT NOT NULL,
     id_responsable INT NULL,
+    id_institucion INT NULL,
     id_especie INT NOT NULL,
     id_raza INT NOT NULL,
     fallecido TINYINT (1) NOT NULL,
@@ -377,7 +401,8 @@ CREATE TABLE animal (
     FOREIGN KEY (id_tamaño) REFERENCES tamaño (id),
     FOREIGN KEY (id_especie) REFERENCES especie (id),
     FOREIGN KEY (id_raza) REFERENCES raza (id),
-    FOREIGN KEY (id_responsable) REFERENCES persona (id)
+    FOREIGN KEY (id_responsable) REFERENCES persona (id),
+    FOREIGN KEY (id_institucion) REFERENCES institucion (id)
 );
 
 CREATE TABLE animal_color (
@@ -409,39 +434,221 @@ CREATE TABLE personal (
     FOREIGN KEY (id_tipo_personal) REFERENCES tipo_personal (id)
 );
 
-CREATE TABLE atencion (
+
+CREATE TABLE diagnostico (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    id_efector INT NOT NULL,
-    id_responsable INT NOT NULL,
-    id_domicilio_responsable INT NULL,
-    id_animal INT NOT NULL,
-    id_servicio INT NOT NULL,
-    id_personal INT NOT NULL,
-    fecha_ingreso DATE NULL,
-    hora_ingreso TIME NULL,
-    firma_ingreso TEXT NULL,
-    fecha_egreso DATE NULL,
-    hora_egreso TIME NULL,
-    firma_egreso TEXT NULL,
-    observaciones VARCHAR(255) NULL,
-    finalizada TINYINT (1) NOT NULL,
-    FOREIGN KEY (id_efector) REFERENCES efector (id),
-    FOREIGN KEY (id_responsable) REFERENCES persona (id),
-    FOREIGN KEY (id_domicilio_responsable) REFERENCES domicilio (id),
-    FOREIGN KEY (id_animal) REFERENCES animal (id),
-    FOREIGN KEY (id_servicio) REFERENCES servicio (id),
-    FOREIGN KEY (id_personal) REFERENCES personal (id)
+    nombre VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE atencion_insumo (
+
+CREATE TABLE consulta (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    id_atencion INT NOT NULL,
+    id_animal INT NOT NULL,
+    id_responsable INT NULL,
+    id_responsable_atencion INT NULL,
+    id_domicilio_responsable INT NULL,
+    id_institucion INT NULL,
+    id_efector INT NOT NULL,
+    id_personal INT NOT NULL,
+    fecha DATE NULL,
+    hora_ingreso TIME NULL,
+    hora_egreso TIME NULL,
+    id_diagnostico INT NOT NULL,
+    observaciones VARCHAR(255) NULL,
+    finalizada TINYINT (1) NOT NULL,
+    FOREIGN KEY (id_animal) REFERENCES animal (id),
+    FOREIGN KEY (id_responsable) REFERENCES persona (id),
+    FOREIGN KEY (id_responsable_atencion) REFERENCES persona (id),
+    FOREIGN KEY (id_domicilio_responsable) REFERENCES domicilio (id),
+    FOREIGN KEY (id_institucion) REFERENCES institucion (id),
+    FOREIGN KEY (id_efector) REFERENCES efector (id),
+    FOREIGN KEY (id_personal) REFERENCES personal (id),
+    FOREIGN KEY (id_diagnostico) REFERENCES diagnostico (id)
+);
+
+CREATE TABLE consulta_insumo (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_consulta INT NOT NULL,
+    id_insumo INT NOT NULL,
+    numero_control INT NOT NULL,   
+    FOREIGN KEY (id_consulta) REFERENCES consulta (id),
+    FOREIGN KEY (id_insumo) REFERENCES insumo (id)
+);
+
+
+CREATE TABLE motivo_consulta (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL
+);
+
+INSERT INTO motivo_consulta(nombre)
+VALUES 
+('Alteración del sensorio'),
+('Claudicación'),
+('Contacto con Tóxicos'),
+('Control de Signos Vitales'),
+('Control Post Operatorio'),
+('Convulsiones'),
+('Descarga Vulvar'),
+('Diarrea'),
+('Dificultad para Parir'),
+('Disnea'),
+('Distención Abdominal'),
+('Edema'),
+('Enterorragia'),
+('Epistaxis'),
+('Fractura'),
+('Hematemesis'),
+('Hematuria'),
+('Hemorragia'),
+('Lesiones en pelo y/o piel'),
+('Lesiones en uña'),
+('Letargia / Adinamia'),
+('Melena'),
+('Nauseas'),
+('Paro Cardio-Respiratorio'),
+('Patología Ocular'),
+('Problemas en oído'),
+('Prolapso'),
+('Síncope'),
+('T.V.T'),
+('Tos y Mucosidad'),
+('Traumatismo'),
+('Vómitos');
+
+CREATE TABLE consulta_motivoconsulta (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_consulta INT NOT NULL,
+    id_motivo INT NOT NULL,
+    FOREIGN KEY (id_consulta) REFERENCES consulta(id),
+    FOREIGN KEY (id_motivo) REFERENCES motivo_consulta(id)
+);
+
+
+
+CREATE TABLE seguimiento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_consulta INT NOT NULL,
+    id_seguimiento INT NOT NULL,
+    FOREIGN KEY (id_consulta) REFERENCES consulta (id),
+    FOREIGN KEY (id_seguimiento) REFERENCES consulta (id)
+);
+
+
+CREATE TABLE tipo_lesion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL
+);
+
+INSERT INTO tipo_lesion (nombre)
+VALUES 
+('Dolor'),
+('Deformación'),
+('Contusión / Hematoma'),
+('Pérdida de Movilidad'),
+('Pérdida de Sensibilidad'),
+('Laceración / Abrasión'),
+('Herida Cortante-Penetrante;'),
+('Trauma Cerrado'),
+('Luxación'),
+('Fractura'),
+('Amputación'),
+('Hemorragia');
+
+
+CREATE TABLE parte_animal (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL
+);
+
+INSERT INTO parte_animal (nombre)
+VALUES
+('Cara'),
+('Cráneo'),
+('Cuello'),
+('Tórax'),
+('Abdomen'),
+('Periné'),
+('Aparato Reproductor'),
+('Cadera'),
+('Columna'),
+('Miembro Anterior'),
+('Miembro Posterior'),
+('Rabo');
+
+
+
+CREATE TABLE trauma (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_consulta INT NOT NULL,
+    id_tipo_lesion INT NOT NULL,
+    id_parte_animal INT NOT NULL,
+    FOREIGN KEY (id_consulta) REFERENCES consulta (id),
+    FOREIGN KEY (id_tipo_lesion) REFERENCES tipo_lesion (id),
+    FOREIGN KEY (id_parte_animal) REFERENCES parte_animal (id)    
+);
+
+
+CREATE TABLE tipo_cirugia (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL
+);
+
+INSERT INTO tipo_cirugia (nombre)
+VALUES ('Esterilización');
+
+
+CREATE TABLE estado_egreso (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL
+);
+
+
+INSERT INTO estado_egreso (nombre)
+VALUES
+('Alta'),
+('Alta con seguimiento'),
+('Obito');
+
+
+CREATE TABLE cirugia (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_animal INT NOT NULL,
+    id_responsable INT NULL,
+    id_responsable_atencion INT NULL,
+    id_domicilio_responsable INT NULL,
+    id_institucion INT NULL,
+    id_efector INT NOT NULL,
+    id_personal INT NOT NULL,
+    fecha DATE NULL,
+    hora_ingreso TIME NULL,
+    firma_ingreso TEXT NULL, 
+    hora_egreso TIME NULL,
+    firma_egreso TEXT NULL,
+    id_tipo_cirugia INT NOT NULL,
+    id_estado_egreso INT NULL,
+    observaciones VARCHAR(255) NULL,
+    finalizada TINYINT (1) NOT NULL,
+    FOREIGN KEY (id_animal) REFERENCES animal (id),
+    FOREIGN KEY (id_responsable) REFERENCES persona (id),
+    FOREIGN KEY (id_responsable_atencion) REFERENCES persona (id),
+    FOREIGN KEY (id_domicilio_responsable) REFERENCES domicilio (id),
+    FOREIGN KEY (id_institucion) REFERENCES institucion (id),
+    FOREIGN KEY (id_efector) REFERENCES efector (id),
+    FOREIGN KEY (id_personal) REFERENCES personal (id),
+    FOREIGN KEY (id_tipo_cirugia) REFERENCES tipo_cirugia (id),
+    FOREIGN KEY (id_estado_egreso) REFERENCES estado_egreso (id)
+);
+
+CREATE TABLE cirugia_insumo (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_cirugia INT NOT NULL,
     id_insumo INT NOT NULL,
     cant_ml INT NULL,
     cant_ml_prequirurgico INT NULL,
     cant_ml_induccion INT NULL,
     cant_ml_quirofano INT NULL,
-    FOREIGN KEY (id_atencion) REFERENCES atencion (id),
+    FOREIGN KEY (id_cirugia) REFERENCES cirugia (id),
     FOREIGN KEY (id_insumo) REFERENCES insumo (id)
 );
 

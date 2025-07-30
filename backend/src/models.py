@@ -47,6 +47,15 @@ class Persona(models.Model):
         managed = False
         db_table = 'persona'
 
+class Institucion(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre  = models.CharField(max_length=255)
+    id_representante = models.ForeignKey(
+        Persona, models.DO_NOTHING, db_column='id_responsable')
+    
+    class Meta:
+        managed = False
+        db_table = 'institucion'
 
 class Especie(models.Model):
     id = models.AutoField(primary_key=True)
@@ -186,48 +195,72 @@ class PersonalEfector(models.Model):
 class Insumo(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=255)
-    tope_max = models.IntegerField(blank=True, null=True)
-    tope_min = models.IntegerField(blank=True, null=True)
+    cant_min = models.IntegerField()
+    cant_max = models.IntegerField()
+    consulta = models.IntegerField()
+    cirugia = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = 'insumo'
 
 
-class Atencion(models.Model):
+class TipoCirugia(models.Model):
     id = models.AutoField(primary_key=True)
-    id_efector = models.ForeignKey(
-        Efector, models.DO_NOTHING, db_column='id_efector')
-    id_responsable = models.ForeignKey(
-        Persona, models.DO_NOTHING, db_column='id_responsable')
-    id_domicilio_responsable = models.ForeignKey(
-        Domicilio, models.DO_NOTHING, db_column='id_domicilio_responsable', blank=True, null=True)
-    id_animal = models.ForeignKey(
-        Animal, models.DO_NOTHING, db_column='id_animal')
-    id_servicio = models.ForeignKey(
-        Servicio, models.DO_NOTHING, db_column='id_servicio')
-    id_personal = models.ForeignKey(
-        Personal, models.DO_NOTHING, db_column='id_personal')
-    fecha_ingreso = models.DateField(blank=True, null=True)
-    hora_ingreso = models.TimeField(blank=True, null=True)
-    firma_ingreso = models.TextField(null=True)
-    fecha_egreso = models.DateField(blank=True, null=True)
-    hora_egreso = models.TimeField(blank=True, null=True)
-    firma_egreso = models.TextField(null=True)
-    observaciones = models.CharField(
-        max_length=255, blank=True, null=True)
-    finalizada = models.IntegerField()
-    insumos = models.ManyToManyField(Insumo, through='AtencionInsumo')
+    nombre = models.CharField(max_length=255)
+    
+    class Meta:
+        managed = False
+        db_table = 'tipo_cirugia'
+
+
+class EstadoEgreso(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=255)
 
     class Meta:
         managed = False
-        db_table = 'atencion'
+        db_table = 'estado_egreso' 
 
-
-class AtencionInsumo(models.Model):
+class Cirugia(models.Model):
     id = models.AutoField(primary_key=True)
-    id_atencion = models.ForeignKey(
-        Atencion, models.DO_NOTHING, db_column='id_atencion')
+    id_animal = models.ForeignKey(
+        Animal, models.DO_NOTHING, db_column='id_animal')
+    id_responsable = models.ForeignKey(
+        Persona, models.DO_NOTHING, db_column='id_responsable',  blank=True, null=True, related_name='cirugia_responsable')
+    id_responsable_atencion = models.ForeignKey(
+        Persona, models.DO_NOTHING, db_column='id_responsable_atencion',  blank=True, null=True, related_name='cirugia_responsable_atencion')
+    id_domicilio_responsable = models.ForeignKey(
+        Domicilio, models.DO_NOTHING, db_column='id_domicilio_responsable', blank=True, null=True)
+    id_intitucion = models.ForeignKey(
+        Institucion, models.DO_NOTHING, db_column='id_institucion', blank=True, null=True)
+    id_efector = models.ForeignKey(
+        Efector, models.DO_NOTHING, db_column='id_efector')
+    id_personal = models.ForeignKey(
+        Personal, models.DO_NOTHING, db_column='id_personal')
+    fecha = models.DateField(blank=True, null=True)
+    hora_ingreso = models.TimeField(blank=True, null=True)
+    firma_ingreso = models.TextField(null=True)
+    hora_egreso = models.TimeField(blank=True, null=True)
+    firma_egreso = models.TextField(null=True)
+    insumos = models.ManyToManyField(Insumo, through='CirugiaInsumo', related_name='cirugias') 
+    id_tipo_cirugia = models.ForeignKey(
+        TipoCirugia, models.DO_NOTHING, db_column='id_tipo_cirugia')
+    id_estado_egreso =  models.ForeignKey(
+        EstadoEgreso, models.DO_NOTHING, db_column='id_estado_egreso', blank=True, null=True)
+    observaciones = models.CharField(
+        max_length=255, blank=True, null=True)
+    finalizada = models.IntegerField()
+    
+    class Meta:
+        managed = False
+        db_table = 'cirugia'
+
+
+class CirugiaInsumo(models.Model):
+    id = models.AutoField(primary_key=True)
+    id_cirugia = models.ForeignKey(
+        Cirugia, models.DO_NOTHING, db_column='id_cirugia')
     id_insumo = models.ForeignKey(
         Insumo, models.DO_NOTHING, db_column='id_insumo')
     cant_ml = models.IntegerField(blank=True, null=True)
@@ -237,5 +270,119 @@ class AtencionInsumo(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'atencion_insumo'
+        db_table = 'cirugia_insumo'
 
+
+class Diagnotisco(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=255)
+    
+    class Meta:
+        managed = False
+        db_table = 'diagnostico'
+
+
+class MotivoConsulta(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'motivo_consulta'
+
+
+
+class Consulta(models.Model):
+    id = models.AutoField(primary_key=True)
+    id_animal = models.ForeignKey(
+        Animal, models.DO_NOTHING, db_column='id_animal')
+    id_responsable = models.ForeignKey(
+        Persona, models.DO_NOTHING, db_column='id_responsable',  blank=True, null=True, related_name='consulta_responsable')
+    id_responsable_atencion = models.ForeignKey(
+        Persona, models.DO_NOTHING, db_column='id_responsable_atencion',  blank=True, null=True, related_name='consulta_responsable_atencion')
+    id_domicilio_responsable = models.ForeignKey(
+        Domicilio, models.DO_NOTHING, db_column='id_domicilio_responsable', blank=True, null=True)
+    id_intitucion = models.ForeignKey(
+        Institucion, models.DO_NOTHING, db_column='id_institucion', blank=True, null=True)
+    id_efector = models.ForeignKey(
+        Efector, models.DO_NOTHING, db_column='id_efector')
+    id_personal = models.ForeignKey(
+        Personal, models.DO_NOTHING, db_column='id_personal')    
+    fecha = models.DateField(blank=True, null=True)
+    hora_ingreso = models.TimeField(blank=True, null=True)
+    hora_egreso = models.TimeField(blank=True, null=True)
+    insumos = models.ManyToManyField(Insumo, through='ConsultaInsumo', related_name='consultas') 
+    motivos = models.ManyToManyField(MotivoConsulta, through='ConsultaMotivoConsulta')
+    id_diagnostico = models.ForeignKey(
+        Diagnotisco, models.DO_NOTHING, db_column='id_diagnostico')
+    finalizada = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'consulta'
+
+
+
+class ConsultaInsumo(models.Model):
+    id = models.AutoField(primary_key=True)
+    id_consulta = models.ForeignKey(
+        Consulta, models.DO_NOTHING, db_column='id_consulta')
+    id_insumo = models.ForeignKey(
+        Insumo, models.DO_NOTHING, db_column='id_insumo')
+    cant_ml = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'consulta_insumo'
+
+
+class ConsultaMotivoConsulta(models.Model):
+    id = models.AutoField(primary_key=True)
+    id_consulta = models.ForeignKey(
+        Consulta, models.DO_NOTHING, db_column='id_consulta')
+    id_motivo = models.ForeignKey(
+        MotivoConsulta, models.DO_NOTHING, db_column='id_motivo')
+    
+    class Meta:
+        managed = False
+        db_table = 'consulta_motivoconsulta'
+
+
+
+
+class TipoLesion(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'tipo_lesion'
+
+
+class ParteAnimal(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'parte_animal'
+
+
+class Trauma(models.Model):
+    id = models.AutoField(primary_key=True)
+    id_consulta = models.ForeignKey(
+        Consulta, models.DO_NOTHING, db_column='id_consulta')
+    id_tipo_lesion = models.ForeignKey(
+        TipoLesion, models.DO_NOTHING, db_column='id_tipo_lesion')
+    id_parte_animal = models.ForeignKey(
+        ParteAnimal, models.DO_NOTHING, db_column='id_parte_animal')
+    
+    class Meta:
+        managed = False
+        db_table = 'trauma'
+
+class Seguimiento(models.Model):
+    id_consulta = models.ForeignKey(
+        Consulta, models.DO_NOTHING, db_column='id_consulta', related_name='seguimientos_asociados')
+    id_seguimiento = models.ForeignKey(
+        Consulta, models.DO_NOTHING, db_column='id_seguimiento', related_name='como_seguimiento_de')

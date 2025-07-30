@@ -77,6 +77,25 @@ const Sidebar = ({ open, toggleSidebar }) => {
                     <FontAwesomeIcon icon={faFileMedical} size='1x' />
                     <ListItemText primary='Atenciones' />
                 </ListItemButton>
+
+                <Divider variant='middle' />
+
+                <ListItemButton 
+                    component={Link} 
+                    to='/usuarios' 
+                    sx={{ 
+                        color: (theme) => theme.palette.text.primary, 
+                        gap: 2
+                    }}
+                >
+                    <FontAwesomeIcon icon={faFileMedical} size='1x' />
+                    <ListItemText primary='Usuarios' />
+                </ListItemButton>
+
+
+
+
+
             </List>
         </Drawer>
     );

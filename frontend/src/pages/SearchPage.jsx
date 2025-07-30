@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Box } from '@mui/material';
 import SearchResponsableResults from '../components/SearchResponsableResults';
 import SearchResponsable from '../components/SearchResponsable';
-import AddResponsable from '../components/AddResponsable';
+import addPersona from '../components/addPersona';
 import EditResponsable from '../components/EditResponsable';
 
-const SearchPage = () => {
+const SearchPage = (Transfer = {}, cirugia = {}) => {
     const [responsable, setResponsable] = useState({
         id: '',
         nombre: '',
@@ -61,10 +61,14 @@ const SearchPage = () => {
                     editContacto = {editContacto}
                     setEditContacto = {setEditContacto}
                     renaperFound =  {renaperFound}
+                    Transfer = {Transfer}
                 />
                 
                 {addingResponsable &&
-                    <AddResponsable responsable = {responsable} />
+                    <addPersona
+                    responsable = {responsable}
+                    Transfer = {Transfer} 
+                    cirugia = {cirugia}/>
                 }
 
                 {(editContacto || editDomicilio) &&
