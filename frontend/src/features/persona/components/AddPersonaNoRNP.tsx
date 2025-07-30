@@ -5,17 +5,18 @@ import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { FormProvider, Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { PersonaDTO, Setter } from '@common/types';
-import { addPersona } from '@features/persona/services/persona-api';
-import { personaNoRnp, PersonaNoRnpFormValues } from '@features/persona/schemas';
-import { formatDomicilio, domicilioExists } from '@features/persona/utils';
+import type { AlertSeverity, Setter } from '@common/types';
+import type { PersonaDTO } from '../types';
+import { addPersona } from '../api';
+import { personaNoRnp, PersonaNoRnpFormValues } from '../schemas';
+import { formatDomicilio, domicilioExists } from '../utils';
 import ContactoForm from './ContactoForm';
 import DomicilioForm from './DomicilioForm';
 
 type Props = {
     setAlertOpen: Setter<boolean>;
     setAlertMsg: Setter<string>;
-    setAlertSeverity: Setter<string>;
+    setAlertSeverity: Setter<AlertSeverity>;
 };
 
 const AddPersonaNoRNP = (props: Props) => {
@@ -210,6 +211,9 @@ const AddPersonaNoRNP = (props: Props) => {
                     name='domicilioActual'
                     title='Domicilio'
                     setDomicilioDone={setDomicilioDone}
+                    setAlertOpen = {setAlertOpen}
+                    setAlertMsg = {setAlertMsg}
+                    setAlertSeverity = {setAlertSeverity}
                 />
 
                 <ContactoForm name="contacto" />
