@@ -3,27 +3,27 @@ import { Alert, Box, Button, CircularProgress, Grid2, List, ListItemButton, List
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { useFormContext } from 'react-hook-form';
-import AlertMessage from '@common/components/AlertMessage';
-import { APIResponseList, DomicilioBuffer, Setter } from '@common/types';
-import { getDireccion, getFeatures } from '@features/persona/services/persona-api';
-import { convertCoordinates } from '@features/persona/utils';
-import MapView from './MapView';
+import { MapView } from '@common/components';
+import type { AlertSeverity, APIResponseList, Setter } from '@common/types';
+import { convertCoordinates } from '@common/utils';
+import { getDireccion, getFeatures } from '../api';
+import type { DomicilioBuffer } from '../types';
 
 type Props = {
     name: string;
     setDone: Setter<boolean>;
     domicilioRenaper: string;
+    setAlertOpen: Setter<boolean>;
+    setAlertMsg: Setter<string>;
+    setAlertSeverity: Setter<AlertSeverity>;
 };
 
 const ValidateDomicilio = (props: Props) => {
-    const { name, setDone, domicilioRenaper } = props;
+    const { name, setDone, domicilioRenaper, setAlertOpen, setAlertMsg, setAlertSeverity } = props;
     const [toValidate, setToValidate] = useState<string>(domicilioRenaper);
     const [features, setFeatures] = useState<APIResponseList>([]);
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     const [domicilioBuffer, setDomicilioBuffer] = useState<DomicilioBuffer>({ piso: '', depto: '', monoblock: '' });
-    const [alertOpen, setAlertOpen] = useState<boolean>(false);
-    const [alertMsg, setAlertMsg] = useState<string>('');
-    const [alertSeverity, setAlertSeverity] = useState<string>('');
     const { setValue, getValues, trigger, formState: { errors, isSubmitted } } = useFormContext();
     const domicilioErrors = errors[name] || {};
     const [loading, setLoading] = useState<boolean>(false);
@@ -217,13 +217,6 @@ const ValidateDomicilio = (props: Props) => {
                     }
                 </Grid2>
             }
-
-            <AlertMessage
-                open = {alertOpen}
-                handleClose = {() => setAlertOpen(false)}
-                message = {alertMsg}
-                severity = {alertSeverity}
-            />
         </Box>
     );
 };
