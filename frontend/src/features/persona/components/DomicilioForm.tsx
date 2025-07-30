@@ -3,7 +3,7 @@ import { Box, Button, Checkbox, Divider, FormControlLabel, Grid2, Radio, RadioGr
 import { faCheck, faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFormContext, Controller } from 'react-hook-form';
-import { Setter } from '@common/types';
+import type { AlertSeverity, Setter } from '@common/types';
 import ValidateDomicilio from './ValidateDomicilio';
 
 type Props = {
@@ -11,9 +11,12 @@ type Props = {
     title: string;
     domicilioRenaper?: string;
     setDomicilioDone: Setter<boolean>;
+    setAlertOpen: Setter<boolean>;
+    setAlertMsg: Setter<string>;
+    setAlertSeverity: Setter<AlertSeverity>;
 }
 
-const DomicilioForm = ({name, title, domicilioRenaper = '', setDomicilioDone}: Props) => {
+const DomicilioForm = ({name, title, domicilioRenaper = '', setDomicilioDone, setAlertOpen, setAlertMsg, setAlertSeverity}: Props) => {
     const [option, setOption] = useState<string>('rosario');
     const [done, setDone] = useState<boolean>(false);
     const { control, trigger, setValue } = useFormContext();
@@ -97,6 +100,9 @@ const DomicilioForm = ({name, title, domicilioRenaper = '', setDomicilioDone}: P
                             name = {name} 
                             setDone = {(val) => { setDone(val); setDomicilioDone(val); }}
                             domicilioRenaper = {domicilioRenaper} 
+                            setAlertOpen = {setAlertOpen}
+                            setAlertMsg = {setAlertMsg}
+                            setAlertSeverity = {setAlertSeverity}
                         />
                     ): (
                         <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', mt: 2 }}>
