@@ -1,6 +1,5 @@
-import { addDomicilio, getDomicilio } from '@features/persona/services/persona-api';
-import { Domicilio } from '@common/types/entities';
-import { DomicilioDTO } from '@common/types/dto';
+import { addDomicilio, getDomicilio } from '../api';
+import type { Domicilio, DomicilioDTO } from '../types';
 
 // Verifica si el domicilio ya existe en la db,
 // si no existe lo agrega
