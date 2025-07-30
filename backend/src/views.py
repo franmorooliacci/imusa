@@ -302,9 +302,15 @@ class ExternalDataViewSet(viewsets.ViewSet):
             data = response.json()
             result = data.get('features')
             result = [ f for f in result if (
+<<<<<<< HEAD
                 f.get("geometry") is not None and
                 f["geometry"].get("type") == "Point" and
                 "nombreCalle" in f.get("properties", {}))]
+=======
+                    f.get("geometry") is not None and
+                    f["geometry"].get("type") == "Point" and
+                    "nombreCalle" in f.get("properties", {}))]
+>>>>>>> origin/main
             return Response(result)
         except NotFound:
             raise
