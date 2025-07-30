@@ -1,5 +1,5 @@
-import { Persona } from '@common/types/entities';
-import { PersonaDTO } from '@common/types/dto';
+import type { PersonaDTO, Persona } from '../types';
+import { createEmptyDomicilio } from './create-empty-domicilio';
 
 export const createEmptyPersona = (): Persona => {
     return {
@@ -8,13 +8,13 @@ export const createEmptyPersona = (): Persona => {
         apellido: '',
         dni: 0,
         sexo: '',
-        fecha_nacimiento: null,
+        fecha_nacimiento: '',
         id_domicilio_renaper: null,
         id_domicilio_actual: 0,
-        telefono: null,
+        telefono: '',
         mail: null,
-        edad: null,
-        domicilio_actual: null,
+        edad: 0,
+        domicilio_actual: createEmptyDomicilio(),
         caninos: [],
         felinos: []
     } as Persona;
@@ -26,10 +26,10 @@ export const createEmptyPersonaDTO = (): PersonaDTO => {
         apellido: '',
         dni: 0,
         sexo: '',
-        fecha_nacimiento: null,
+        fecha_nacimiento: '',
         id_domicilio_renaper: null,
         id_domicilio_actual: 0,
-        telefono: null,
+        telefono: '',
         mail: null
     } as PersonaDTO;
 };
