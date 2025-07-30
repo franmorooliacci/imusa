@@ -1,4 +1,4 @@
-import { DomicilioDTO } from '@common/types/dto';
+import type { DomicilioDTO } from '../types';
 
 // Formatea domicilio para agregar a la db
 export const formatDomicilio = (domicilio: Record<string, any>): DomicilioDTO => {
