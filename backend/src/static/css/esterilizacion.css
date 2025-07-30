@@ -113,8 +113,7 @@
 } 
 
 .firma-img {
-  width: 180px;
-  height: 115px;
-  object-fit: contain;
+    width: 180px;
+    height: 115px;
+    object-fit: contain;
 }
-

@@ -209,7 +209,7 @@ const FinishAtencionPage = () => {
 
             </Box>
         );
-    };
+    }
 
     return (
         <Box>
