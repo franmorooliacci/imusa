@@ -26,12 +26,12 @@ const ContactoForm = ({ name }: {name: string}) => {
                     <Controller
                         name={`${name}.telefono`}
                         control={control}
-                        defaultValue=""
+                        defaultValue={''}
                         render={({ field, fieldState }) => (
                             <TextField
                                 {...field}
-                                label="Teléfono"
-                                size="small"
+                                label='Teléfono'
+                                size='small'
                                 helperText={fieldState.error?.message || 'Característica sin 0, número sin 15'}
                                 error={!!fieldState.error}
                             />
@@ -42,13 +42,13 @@ const ContactoForm = ({ name }: {name: string}) => {
                     <Controller
                         name={`${name}.mail`}
                         control={control}
-                        defaultValue=""
+                        defaultValue={''}
                         render={({ field, fieldState }) => (
                             <TextField
                                 {...field}
-                                label="Mail"
-                                type="email"
-                                size="small"
+                                label='Correo'
+                                type='email'
+                                size='small'
                                 helperText={fieldState.error?.message}
                                 error={!!fieldState.error}
                             />
