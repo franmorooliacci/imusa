@@ -3,10 +3,11 @@ import { Box, Button } from '@mui/material';
 import { useForm, FormProvider } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Setter, Persona } from '@common/types';
-import { updatePersona } from '@features/persona/services/persona-api';
-import { domicilio, contacto } from '@features/persona/schemas';
-import { formatDomicilio, domicilioExists } from '@features/persona/utils';
+import type { Setter, AlertSeverity } from '@common/types';
+import type { Persona } from '../types';
+import { updatePersona } from '../api';
+import { domicilio, contacto } from '../schemas';
+import { formatDomicilio, domicilioExists } from '../utils';
 import DomicilioForm from './DomicilioForm';
 import ContactoForm from './ContactoForm';
 
@@ -19,7 +20,7 @@ type Props = {
     setExistingPersona: Setter<Persona>;
     setAlertOpen: Setter<boolean>;
     setAlertMsg: Setter<string>;
-    setAlertSeverity: Setter<string>;
+    setAlertSeverity: Setter<AlertSeverity>;
 };
 
 const EditPersona = (props: Props) => {
@@ -142,7 +143,14 @@ const EditPersona = (props: Props) => {
             {editDomicilio && (
                 <FormProvider {...domicilioMethods}>
                     <Box component='form' onSubmit={handleSubmitDomicilio(onSubmitDomicilio)} noValidate>
-                        <DomicilioForm name = {'domicilio'} title = {'Domicilio'} setDomicilioDone = {setDomicilioDone} />
+                        <DomicilioForm 
+                            name = {'domicilio'} 
+                            title = {'Domicilio'} 
+                            setDomicilioDone = {setDomicilioDone} 
+                            setAlertOpen = {setAlertOpen}
+                            setAlertMsg = {setAlertMsg}
+                            setAlertSeverity = {setAlertSeverity}    
+                        />
                         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 2 }}>
                             <Button 
                                 variant='outlined' 
