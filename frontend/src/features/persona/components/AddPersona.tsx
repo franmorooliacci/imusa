@@ -3,10 +3,11 @@ import { Box, Button, Divider, FormControlLabel, Grid2, Radio, RadioGroup, Typog
 import { useNavigate } from 'react-router-dom';
 import { useForm, FormProvider, Controller, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { PersonaDTO, Setter } from '@common/types';
-import { addPersona } from '@features/persona/services/persona-api';
-import { persona, PersonaFormValues } from '@features/persona/schemas';
-import { formatDomicilio, domicilioExists } from '@features/persona/utils';
+import type { AlertSeverity, Setter } from '@common/types';
+import { addPersona } from '../api';
+import { persona, PersonaFormValues } from '../schemas';
+import { formatDomicilio, domicilioExists } from '../utils';
+import type { PersonaDTO } from '../types';
 import DomicilioForm from './DomicilioForm';
 import ContactoForm from './ContactoForm';
 
@@ -15,7 +16,7 @@ type Props = {
     domicilioActual: string;
     setAlertOpen: Setter<boolean>;
     setAlertMsg: Setter<string>;
-    setAlertSeverity: Setter<string>;
+    setAlertSeverity: Setter<AlertSeverity>;
 };
 
 const AddPersona = (props: Props) => {
@@ -55,7 +56,7 @@ const AddPersona = (props: Props) => {
     const formatResponsable = (): PersonaDTO => {
 
         const date = newPersona.fecha_nacimiento ? new Date(newPersona.fecha_nacimiento) : null;
-        const formattedDate = date ? date.toISOString().split('T')[0] : null;
+        const formattedDate = date ? date.toISOString().split('T')[0] : '';
 
         const values = methods.getValues();
     
@@ -67,7 +68,7 @@ const AddPersona = (props: Props) => {
             fecha_nacimiento: formattedDate,
             id_domicilio_renaper: 0,
             id_domicilio_actual: 0,
-            telefono: values.contacto.telefono === '' ? null : values.contacto.telefono,
+            telefono: values.contacto.telefono,
             mail: values.contacto.mail === '' ? null : values.contacto.mail
         };
     };
@@ -117,6 +118,9 @@ const AddPersona = (props: Props) => {
                     title = {'Domicilio (ReNaPer)'} 
                     domicilioRenaper = {domicilioActual} 
                     setDomicilioDone = {setDomRenaperDone}
+                    setAlertOpen = {setAlertOpen}
+                    setAlertMsg = {setAlertMsg}
+                    setAlertSeverity = {setAlertSeverity}
                 />
 
                 <Divider sx={{ mt: 2 }} />
@@ -145,6 +149,9 @@ const AddPersona = (props: Props) => {
                         name = {'domicilioActual'} 
                         title = {'Domicilio (Actual)'} 
                         setDomicilioDone = {setDomActualDone}
+                        setAlertOpen = {setAlertOpen}
+                        setAlertMsg = {setAlertMsg}
+                        setAlertSeverity = {setAlertSeverity}
                     />
                 }
 
