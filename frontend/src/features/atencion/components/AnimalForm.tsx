@@ -13,7 +13,7 @@ const AnimalForm = ({ animal }: { animal: Animal }) => {
                     <Box sx={{ color: (theme) => theme.palette.text.primary }}>
                         <FontAwesomeIcon icon={animal.id_especie === 1 ? faDog : faCat} size='1x' />
                     </Box>
-                    <Typography variant='subtitle2'>
+                    <Typography variant='subtitle1'>
                         Datos del animal
                     </Typography>
                 </Stack>

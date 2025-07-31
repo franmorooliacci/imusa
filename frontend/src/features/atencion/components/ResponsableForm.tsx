@@ -14,7 +14,7 @@ const ResponsableForm = ({ responsable }: { responsable: Persona }) => {
                     <Box sx={{ color: (theme) => theme.palette.text.primary }}>
                         <FontAwesomeIcon icon={faUser} size='1x' />
                     </Box>
-                    <Typography variant='subtitle2'>
+                    <Typography variant='subtitle1'>
                         Datos del responsable
                     </Typography>
                 </Stack>

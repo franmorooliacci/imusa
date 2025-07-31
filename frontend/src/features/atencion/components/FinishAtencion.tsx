@@ -217,7 +217,7 @@ const FinishAtencion = () => {
                             <Box sx={{ color: (theme) => theme.palette.text.primary }}>
                                 <FontAwesomeIcon icon={faAsterisk} size='1x' />
                             </Box>
-                            <Typography variant='subtitle2'>
+                            <Typography variant='subtitle1'>
                                 Observaciones
                             </Typography>
                         </Stack>

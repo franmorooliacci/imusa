@@ -44,7 +44,7 @@ const MedicamentosForm = ({ options, onOptionChange, ketamina, onChange }: Props
                         <FontAwesomeIcon icon={faSyringe} size='1x' />
                     </Box>
 
-                    <Typography variant='subtitle2'>
+                    <Typography variant='subtitle1'>
                         Medicamentos - Inyectables generales
                     </Typography>
                 </Stack>
