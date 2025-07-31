@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Typography, Button, Box, Divider, Grid2, Skeleton, Stack, Tooltip, IconButton } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCat, faCircleInfo, faDog, faPaperPlane, faStethoscope } from '@fortawesome/free-solid-svg-icons';
+import { faCat, faDog, faEye, faFileArrowDown, faPaperPlane, faPrint, faStethoscope } from '@fortawesome/free-solid-svg-icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SkeletonList, GenericTable, BackHeader, AlertMessage } from '@common/components';
 import type { AlertSeverity, Column } from '@common/types';
 import { formatDate } from '@common/utils';
 import { getResponsableById } from '@features/persona';
 import type { Atencion } from '@features/atencion';
-import { getAtenciones, sendInformeEmail, sortAtencionesAsc } from '@features/atencion';
+import { downloadAtencion, getAtenciones, printAtencion, sendInformeEmail, sortAtencionesAsc } from '@features/atencion';
 import type { Animal as AnimalType } from '../types';
 import { createEmptyAnimal } from '../utils/create-empty-animal';
 import { getAnimalById } from '../api';
@@ -65,6 +65,21 @@ const Animal = () => {
         }
     };
 
+    const handleDownload = useCallback(async (id_atencion: number): Promise<void> => {
+        try {
+            await downloadAtencion(id_atencion);
+
+            setAlertSeverity('success');
+            setAlertMsg('Se ha descargado el informe con éxito!');
+            setAlertOpen(true);
+        } catch (error: any) {
+            console.error('Download failed', error);
+            setAlertSeverity('error');
+            setAlertMsg('No se ha podido descargar el informe.');
+            setAlertOpen(true);
+        }
+    }, []);
+    
     const handleSendInformeEmail = useCallback(async (id_atencion: number): Promise<void> => {
         try {
             const response = await getResponsableById(Number(responsableId));
@@ -116,9 +131,10 @@ const Animal = () => {
         {
             id: 'acciones',
             label: 'Acciones',
+            align: 'center',
             render: (_v, atencion) => (
-                <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                    <Tooltip title='Ver detalles' arrow>
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                    <Tooltip title='Ver' arrow>
                         <IconButton
                             color='primary'
                             onClick={() => navigate(`/atencion/${atencion.id}`)}
@@ -130,11 +146,11 @@ const Animal = () => {
                                 },
                             }}
                         >
-                            <FontAwesomeIcon icon={faCircleInfo} />
+                            <FontAwesomeIcon icon={faEye} />
                         </IconButton>
                     </Tooltip>
 
-                    <Tooltip title='Enviar informe por mail' arrow>
+                    <Tooltip title='Enviar por correo' arrow>
                         <IconButton
                             color='success'
                             onClick={() => handleSendInformeEmail(atencion.id)}
@@ -146,13 +162,45 @@ const Animal = () => {
                                 },
                             }}
                         >
-                            <FontAwesomeIcon icon={faPaperPlane} />
+                            <FontAwesomeIcon icon={faPaperPlane} size='1x' />
+                        </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title='Descargar' arrow>
+                        <IconButton
+                            color='success'
+                            onClick={() => handleDownload(atencion.id)}
+                            sx={{
+                                '&:hover': {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                                    transform: 'scale(1.1)',
+                                    transition: 'transform 0.2s',
+                                },
+                            }}
+                        >
+                            <FontAwesomeIcon icon={faFileArrowDown} />
+                        </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title='Imprimir' arrow>
+                        <IconButton
+                            color='success'
+                            onClick={() => printAtencion(atencion.id)}
+                            sx={{
+                                '&:hover': {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                                    transform: 'scale(1.1)',
+                                    transition: 'transform 0.2s',
+                                },
+                            }}
+                        >
+                            <FontAwesomeIcon icon={faPrint} size='1x' />
                         </IconButton>
                     </Tooltip>
                 </Box>
             ),
         },
-    ], [navigate, handleSendInformeEmail]);
+    ], [navigate, handleDownload, handleSendInformeEmail, printAtencion]);
 
     if (loading) {
         return (
