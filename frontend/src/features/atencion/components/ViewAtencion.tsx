@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Box, CircularProgress, Grid2 } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import BackHeader from '@common/components/BackHeader';
+import { BackHeader } from '@common/components';
 import { getAtencionById, getInforme } from '../api';
 import type { Atencion } from '../types';
-import { createEmptyAtencion } from '../utils/create-empty-atencion';
+import { createEmptyAtencion } from '../utils';
 
 const ViewAtencion = () => {
     const { id } = useParams();
