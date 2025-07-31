@@ -31,28 +31,24 @@ const AddAtencion = () => {
 
     useEffect(() => {
         const fetchResponsable = async () => {
-            try{
-                const response: Persona = await getResponsableById(Number(responsableId));
-                setResponsable(response);
-
-            } catch(error){
-
-            }
+            const response: Persona = await getResponsableById(Number(responsableId));
+            setResponsable(response);
         };
 
         const fetchAnimal = async () => {
-            try{
-                const response: Animal = await getAnimalById(Number(animalId));
-                setAnimal(response);
-
-            } catch(error){
-
-            }
+            const response: Animal = await getAnimalById(Number(animalId));
+            setAnimal(response);
         };
 
         const fetchData = async () => {
-            await Promise.all([fetchResponsable(), fetchAnimal()]);
-            setLoading(false);
+            try {
+                await Promise.all([fetchResponsable(), fetchAnimal()]);
+                setLoading(false);
+            } catch(error) {
+                setAlertSeverity('error');
+                setAlertMsg('No se pudo cargar la información. Por favor, inténtalo de nuevo más tarde.');
+                setAlertOpen(true);
+            }
         };
 
         fetchData();
@@ -95,7 +91,7 @@ const AddAtencion = () => {
 
         } catch(error) {
             setAlertSeverity('error');
-            setAlertMsg('No se ha podido agregar la atención.');
+            setAlertMsg('No se pudo agregar la atención. Por favor, inténtalo de nuevo más tarde.');
             setAlertOpen(true);
             setSubmitting(false);
         }

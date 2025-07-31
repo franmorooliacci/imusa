@@ -31,26 +31,25 @@ const ResponsablePage = () => {
 
     useEffect(() => {
         const fetchResponsable = async () => {
-            try {
-                const data: Persona = await getResponsableById(Number(id));
-                setResponsable(data);
-            } catch (error) {
-                console.error('Error fetching responsable details:', error);
-            }
+            const data: Persona = await getResponsableById(Number(id));
+            setResponsable(data);
         };
 
         const fetchAtenciones = async () => {
-            try {
-                const params: Record<string, any> = {id_responsable: id};
-                const data: Atencion[] = await getAtenciones(params);
-                setAtenciones(data);
-            } catch (error) {
-            }
+            const params: Record<string, any> = {id_responsable: id};
+            const data: Atencion[] = await getAtenciones(params);
+            setAtenciones(data);
         }
 
         const fetchData = async () => {
-            await Promise.all([fetchResponsable(), fetchAtenciones()]);
-            setLoading(false);
+            try {
+                await Promise.all([fetchResponsable(), fetchAtenciones()]);
+                setLoading(false);
+            } catch(error) {
+                setAlertSeverity('error');
+                setAlertMsg('No se pudo cargar la información. Por favor, inténtalo de nuevo más tarde.');
+                setAlertOpen(true);
+            }
         };
     
         fetchData();
@@ -69,7 +68,7 @@ const ResponsablePage = () => {
         } catch (error: any) {
             console.error('Download failed', error);
             setAlertSeverity('error');
-            setAlertMsg('No se ha podido descargar el informe.');
+            setAlertMsg('No se pudo descargar el informe. Por favor, inténtalo de nuevo más tarde.');
             setAlertOpen(true);
         }
     }, []);
@@ -90,7 +89,7 @@ const ResponsablePage = () => {
             setAlertOpen(true);
         } catch (error) {
             setAlertSeverity('error');
-            setAlertMsg('No se ha podido enviar el informe.');
+            setAlertMsg('No se pudo enviar el informe. Por favor, inténtalo de nuevo más tarde.');
             setAlertOpen(true);
         }
     },[responsable.mail]);

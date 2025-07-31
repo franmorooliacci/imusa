@@ -78,7 +78,7 @@ const EditPersona = (props: Props) => {
             }, 3000); // Timeout para que se muestre la alerta
         } catch(error){
             setAlertSeverity('error');
-            setAlertMsg('No se ha podido realizar la modificación.');
+            setAlertMsg('No se pudo realizar la modificación. Por favor, inténtalo de nuevo más tarde.');
             setAlertOpen(true);
         }
     };
@@ -107,7 +107,7 @@ const EditPersona = (props: Props) => {
 
         } catch(error){
             setAlertSeverity('error');
-            setAlertMsg('No se ha podido realizar la modificación.');
+            setAlertMsg('No se pudo realizar la modificación. Por favor, inténtalo de nuevo más tarde.');
             setAlertOpen(true);
         }
     };

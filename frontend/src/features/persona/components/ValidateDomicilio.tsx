@@ -47,7 +47,7 @@ const ValidateDomicilio = (props: Props) => {
 
         } catch(error){
             setAlertSeverity('error');
-            setAlertMsg('No se ha podido validar el domicilio.');
+            setAlertMsg('No se pudo validar el domicilio. Por favor, inténtalo de nuevo más tarde.');
             setAlertOpen(true);
         } finally {
             setLoading(false);
@@ -105,7 +105,9 @@ const ValidateDomicilio = (props: Props) => {
             if (valid) setDone(true);
 
         } catch (error) {
-        
+            setAlertSeverity('error');
+            setAlertMsg('No se pudo cargar la información. Por favor, inténtalo de nuevo.');
+            setAlertOpen(true);
         }
     };
 

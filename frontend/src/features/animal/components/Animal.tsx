@@ -35,7 +35,9 @@ const Animal = () => {
                 setAnimal(animalList);
                 setAtenciones(atencionesList);
             } catch (error) {
-
+                setAlertSeverity('error');
+                setAlertMsg('No se pudo cargar la información. Por favor, inténtalo de nuevo más tarde.');
+                setAlertOpen(true);
             } finally {
                 setLoading(false);
             }
@@ -75,7 +77,7 @@ const Animal = () => {
         } catch (error: any) {
             console.error('Download failed', error);
             setAlertSeverity('error');
-            setAlertMsg('No se ha podido descargar el informe.');
+            setAlertMsg('No se pudo descargar el informe. Por favor, inténtalo de nuevo más tarde.');
             setAlertOpen(true);
         }
     }, []);
@@ -87,7 +89,7 @@ const Animal = () => {
 
             if (!email) {
                 setAlertSeverity('warning');
-                setAlertMsg(`La persona responsable no tiene asociada una dirección de correo.`);
+                setAlertMsg(`La persona no tiene asociada una dirección de correo.`);
                 setAlertOpen(true);
                 return;
             }
@@ -99,7 +101,7 @@ const Animal = () => {
             setAlertOpen(true);
         } catch (error) {
             setAlertSeverity('error');
-            setAlertMsg('No se ha podido enviar el informe.');
+            setAlertMsg('No se pudo enviar el informe. Por favor, inténtalo de nuevo más tarde.');
             setAlertOpen(true);
         }
     }, [responsableId]);

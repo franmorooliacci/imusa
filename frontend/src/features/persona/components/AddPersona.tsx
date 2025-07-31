@@ -104,7 +104,7 @@ const AddPersona = (props: Props) => {
             }, 3000); // Timeout para que se muestre la alerta
         } catch (error) {
             setAlertSeverity('error');
-            setAlertMsg('No se ha podido agregar al responsable.');
+            setAlertMsg('No se pudo agregar al responsable. Por favor, inténtalo de nuevo más tarde.');
             setAlertOpen(true);
             setSubmitting(false);
         }

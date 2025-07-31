@@ -75,7 +75,7 @@ const SearchPersonaForm = (props: Props) => {
             setRenaperFound(true);
 
         } catch (error) {
-
+            console.error(error);
         }
 
         if(!foundInDb){

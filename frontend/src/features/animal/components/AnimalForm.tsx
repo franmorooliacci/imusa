@@ -85,7 +85,9 @@ const AnimalForm = ({ mode, initialData = createEmptyAnimal(), onSuccess, onCanc
                 setTamaños(tamañosList);
                 setColores(coloresList);
             } catch (error) {
-
+                setAlertSeverity('error');
+                setAlertMsg('No se pudo cargar la información. Por favor, inténtalo de nuevo más tarde.');
+                setAlertOpen(true);
             } finally {
                 setLoading(false);
             }
@@ -133,12 +135,12 @@ const AnimalForm = ({ mode, initialData = createEmptyAnimal(), onSuccess, onCanc
         } catch (error) {
             if (mode === 'add') {
                 setAlertSeverity('error');
-                setAlertMsg(`No se ha podido agregar ${data.id_especie === 1 ? 'canino' : 'felino'}.`);
+                setAlertMsg(`No se pudo agregar el ${data.id_especie === 1 ? 'canino' : 'felino'}. Por favor, inténtalo de nuevo más tarde.`);
                 setAlertOpen(true);
                 setSubmitting(false);
             } else {
                 setAlertSeverity('error');
-                setAlertMsg(`No se ha podido modificar ${data.id_especie === 1 ? 'canino' : 'felino'}.`);
+                setAlertMsg(`No se pudo modificar el ${data.id_especie === 1 ? 'canino' : 'felino'}. Por favor, inténtalo de nuevo más tarde.`);
                 setAlertOpen(true);
                 setSubmitting(false);
             }

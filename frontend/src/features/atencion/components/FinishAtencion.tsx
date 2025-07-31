@@ -58,38 +58,29 @@ const FinishAtencion = () => {
 
     useEffect(() => {
         const fetchAtencion = async () => {
-            try{
-                const response: Atencion = await getAtencionById(Number(atencionId));
-                setAtencion(response);
-
-            } catch(error){
-
-            }
+            const response: Atencion = await getAtencionById(Number(atencionId));
+            setAtencion(response);
         };
 
         const fetchResponsable = async () => {
-            try{
-                const response: Persona = await getResponsableById(Number(responsableId));
-                setResponsable(response);
-
-            } catch(error){
-
-            }
+            const response: Persona = await getResponsableById(Number(responsableId));
+            setResponsable(response);
         };
 
         const fetchAnimal = async () => {
-            try{
-                const response: Animal = await getAnimalById(Number(animalId));
-                setAnimal(response);
-
-            } catch(error){
-
-            }
+            const response: Animal = await getAnimalById(Number(animalId));
+            setAnimal(response);
         };
 
         const fetchData = async () => {
-            await Promise.all([fetchAtencion(), fetchResponsable(), fetchAnimal()]);
-            setLoading(false);
+            try {
+                await Promise.all([fetchAtencion(), fetchResponsable(), fetchAnimal()]);
+                setLoading(false);
+            } catch(error) {
+                setAlertSeverity('error');
+                setAlertMsg('No se pudo cargar la información. Por favor, inténtalo de nuevo más tarde.');
+                setAlertOpen(true);
+            }
         };
 
         fetchData();
@@ -97,21 +88,6 @@ const FinishAtencion = () => {
         //     fetchData();
         // }, 3000);
     }, [atencionId, responsableId, animalId]);
-
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setFormData((prev) => ({ ...prev, [name]: value }));
-    // };
-
-    // const handleOptionChange = (option, newValue) => {
-    //     setOptions((prevOptions) => ({
-    //         ...prevOptions,
-    //         [option]: {
-    //             ...prevOptions[option],
-    //             ...newValue
-    //         }
-    //     }));
-    // };
 
     const handleOptionChange = (option: keyof InsumoOptions, newValue: Partial<InsumoOption>): void => {
         setOptions(prevOptions => ({
@@ -143,30 +119,6 @@ const FinishAtencion = () => {
                 
             await updateAtencion(atencion.id, finishedAtencion);
 
-            // const insumos = Object.entries(options)
-            //     .filter(([_, insumo]) => insumo.selected && Number(insumo.value) > 0)
-            //     .map(([_, insumo]) => ({
-            //         id_atencion: atencion.id,
-            //         id_insumo: insumo.id,
-            //         cant_ml: Number(insumo.value)
-            //     }))
-            // ;
-
-            // const keta_induccion = Number(ketamina.induccion);
-            // const keta_prequirurgico = Number(ketamina.prequirurgico);
-            // const keta_quirofano = Number(ketamina.quirofano);
-
-            // if(keta_induccion > 0 || keta_prequirurgico > 0 || keta_quirofano > 0){
-            //     insumos.push({
-            //         id_atencion: atencion.id,
-            //         id_insumo: 13,
-            //         cant_ml: keta_induccion + keta_prequirurgico + keta_quirofano,
-            //         cant_ml_prequirurgico: keta_prequirurgico === 0 ? null : keta_prequirurgico,
-            //         cant_ml_induccion: keta_induccion === 0 ? null : keta_induccion,
-            //         cant_ml_quirofano: keta_quirofano === 0 ? null : keta_quirofano
-            //     });
-            // }
-
             const insumos: AtencionInsumo[] = buildAtencionInsumos(options, ketamina, atencion);
 
             await addAtencionInsumo(insumos);
@@ -186,7 +138,7 @@ const FinishAtencion = () => {
 
         } catch(error) {
             setAlertSeverity('error');
-            setAlertMsg('No se ha podido finalizar la atención.');
+            setAlertMsg('No se pudo finalizar la atención. Por favor, inténtalo de nuevo más tarde.');
             setAlertOpen(true);
             setSubmitting(false);
         }
