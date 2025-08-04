@@ -64,6 +64,7 @@ const SearchPersonaForm = (props: Props) => {
         setEditDomicilio(false);
         setEditContacto(false);
         setDomicilioActual('');
+        setFallecido(false);
 
         let foundInDb = false;
 
