@@ -17,10 +17,11 @@ type Props = {
     setAlertOpen: Setter<boolean>;
     setAlertMsg: Setter<string>;
     setAlertSeverity: Setter<AlertSeverity>;
+    onSubmit?: (...args: any[]) => void;
 };
 
 const AddPersonaNoRNP = (props: Props) => {
-    const { setAlertOpen, setAlertMsg, setAlertSeverity } = props;
+    const { setAlertOpen, setAlertMsg, setAlertSeverity, onSubmit } = props;
     const methods = useForm<PersonaNoRnpFormValues>({
         mode: 'onChange',
         resolver: yupResolver(personaNoRnp),
@@ -58,7 +59,7 @@ const AddPersonaNoRNP = (props: Props) => {
         };
     };
 
-    const onSubmit = async (data: Record<string, any>): Promise<void> => {
+    const defaultSubmitHandler = async (data: Record<string, any>): Promise<void> => {
         if (submitting) return;
         setSubmitting(true);
 
@@ -86,14 +87,11 @@ const AddPersonaNoRNP = (props: Props) => {
         }
     };
 
+    const submitHandler = onSubmit ?? defaultSubmitHandler;
+
     return (
         <FormProvider {...methods}>
-            <Box
-                component='form'
-                onSubmit={handleSubmit(onSubmit)}
-                noValidate
-                sx={{ p: 2, bgcolor: 'background.paper', boxShadow: 3, borderRadius: 4 }}
-            >
+            <Box sx={{ p: 2, bgcolor: 'background.paper', boxShadow: 3, borderRadius: 4 }}>
                 <Divider>
                     <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
                         <FontAwesomeIcon icon={faUserPlus} size='2x' />
@@ -216,10 +214,15 @@ const AddPersonaNoRNP = (props: Props) => {
                     setAlertSeverity = {setAlertSeverity}
                 />
 
-                <ContactoForm name="contacto" />
+                <ContactoForm name='contacto' />
 
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                    <Button type='submit' variant='contained' color='primary' disabled={!canSubmit || submitting}> 
+                    <Button 
+                        variant='contained' 
+                        color='primary' 
+                        disabled={!canSubmit || submitting}
+                        onClick={handleSubmit(submitHandler)}
+                    > 
                         { submitting ? <CircularProgress size={24}  /> : 'Agregar'}
                     </Button>
                 </Box>

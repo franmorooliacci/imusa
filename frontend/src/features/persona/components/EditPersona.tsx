@@ -116,7 +116,7 @@ const EditPersona = (props: Props) => {
         <Box>
             {editContacto && (
                 <FormProvider {...contactoMethods}>
-                    <Box component='form' onSubmit={handleSubmitContacto(onSubmitContacto)} noValidate>
+                    <Box>
                         <ContactoForm name = {'contacto'} />
                         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
                             <Button 
@@ -128,10 +128,10 @@ const EditPersona = (props: Props) => {
                                 Cancelar
                             </Button>
                             <Button 
-                                type='submit' 
                                 variant='contained' 
                                 color='primary'
                                 size='small'
+                                onClick={handleSubmitContacto(onSubmitContacto)}
                             >
                                 Guardar
                             </Button>
@@ -142,7 +142,7 @@ const EditPersona = (props: Props) => {
 
             {editDomicilio && (
                 <FormProvider {...domicilioMethods}>
-                    <Box component='form' onSubmit={handleSubmitDomicilio(onSubmitDomicilio)} noValidate>
+                    <Box>
                         <DomicilioForm 
                             name = {'domicilio'} 
                             title = {'Domicilio'} 
@@ -160,12 +160,12 @@ const EditPersona = (props: Props) => {
                             >
                                 Cancelar
                             </Button>
-                            <Button 
-                                type='submit' 
+                            <Button
                                 variant='contained' 
                                 color='primary'
                                 size='small'
                                 disabled={!domicilioDone}
+                                onClick={handleSubmitDomicilio(onSubmitDomicilio)}
                             >
                                 Guardar
                             </Button>

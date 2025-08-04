@@ -104,7 +104,7 @@ const SearchPersonaForm = (props: Props) => {
     };
     
     return (
-        <Box component='form' onSubmit={handleSubmit(onSubmit)} noValidate>
+        <Box>
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
                 <Box sx={{ color: theme => theme.palette.text.primary }}>
                     <FontAwesomeIcon icon={faMagnifyingGlass} size='2x' />
@@ -156,7 +156,14 @@ const SearchPersonaForm = (props: Props) => {
             </Grid2>
 
             <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                <Button type='submit' variant='contained' color='primary' disabled={isSubmitting}>Buscar</Button>
+                <Button 
+                    variant='contained' 
+                    color='primary' 
+                    disabled={isSubmitting}
+                    onClick={handleSubmit(onSubmit)}
+                >
+                    Buscar
+                </Button>
             </Box>
         </Box>
     );

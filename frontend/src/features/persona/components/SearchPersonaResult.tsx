@@ -22,6 +22,7 @@ type Props = {
     renaperFound: boolean | null;
     fallecido: boolean;
     setNoRNP: Setter<boolean>;
+    onContinue?: (...args: any[]) => void;
 };
 
 const SearchPersonaResult = (props: Props) => {
@@ -39,9 +40,17 @@ const SearchPersonaResult = (props: Props) => {
         setEditContacto,
         renaperFound,
         fallecido,
-        setNoRNP
+        setNoRNP,
+        onContinue
     } = props;
+
     const navigate = useNavigate();
+
+    const defaultContinueHandler = (): void => {
+        navigate(`/responsable/${existingPersona.id}`);
+    };
+
+    const continueHandler = onContinue ?? defaultContinueHandler;
 
     return (
         <Box sx={{ mt: 2 }}>
@@ -75,7 +84,7 @@ const SearchPersonaResult = (props: Props) => {
                                         size='small' 
                                         variant='contained' 
                                         color='primary' 
-                                        onClick={() => navigate(`/responsable/${existingPersona.id}`)}
+                                        onClick={continueHandler}
                                     >
                                         Continuar
                                     </Button>

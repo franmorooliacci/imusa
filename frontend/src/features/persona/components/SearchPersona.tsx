@@ -10,7 +10,13 @@ import AddPersona from './AddPersona';
 import EditPersona from './EditPersona';
 import AddPersonaNoRNP from './AddPersonaNoRNP';
 
-const SearchPersona = () => {
+type Props = {
+    onSubmitAdd?: (...args: any[]) => void;
+    onSubmitAddNR?: (...args: any[]) => void;
+    onContinue?: (...args: any[]) => void;
+};
+
+const SearchPersona = ({ onSubmitAdd, onSubmitAddNR, onContinue }: Props) => {
     const [newPersona, setNewPersona] = useState<PersonaDTO>(() => createEmptyPersonaDTO());
     const [existingPersona, setExistingPersona] = useState<Persona>(() => createEmptyPersona());
     const [fallecido, setFallecido] = useState<boolean>(false);
@@ -23,7 +29,7 @@ const SearchPersona = () => {
     // null = no se realizo la busqueda
     // true = la persona esta en renaper
     // false = la persona no esta en renaper
-    const [renaperFound, setRenaperFound] = useState<boolean | null>(null)
+    const [renaperFound, setRenaperFound] = useState<boolean | null>(null);
     const [addingResponsable, setAddingResponsable] = useState<boolean>(false);
     const [editDomicilio, setEditDomicilio] = useState<boolean>(false);
     const [editContacto, setEditContacto] = useState<boolean>(false);
@@ -65,6 +71,7 @@ const SearchPersona = () => {
                     renaperFound =  {renaperFound}
                     fallecido = {fallecido}
                     setNoRNP = {setNoRNP}
+                    onContinue = {onContinue}
                 />
                 
                 {addingResponsable &&
@@ -73,7 +80,8 @@ const SearchPersona = () => {
                         domicilioActual = {domicilioActual} 
                         setAlertOpen = {setAlertOpen}
                         setAlertMsg = {setAlertMsg}
-                        setAlertSeverity = {setAlertSeverity}    
+                        setAlertSeverity = {setAlertSeverity}
+                        onSubmit = {onSubmitAdd}    
                     />
                 }
 
@@ -96,6 +104,7 @@ const SearchPersona = () => {
                         setAlertOpen = {setAlertOpen}
                         setAlertMsg = {setAlertMsg}
                         setAlertSeverity = {setAlertSeverity}
+                        onSubmit = {onSubmitAddNR}
                     />
                 }
 

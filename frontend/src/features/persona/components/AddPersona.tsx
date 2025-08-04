@@ -17,10 +17,10 @@ type Props = {
     setAlertOpen: Setter<boolean>;
     setAlertMsg: Setter<string>;
     setAlertSeverity: Setter<AlertSeverity>;
+    onSubmit?: (...args: any[]) => void;
 };
 
-const AddPersona = (props: Props) => {
-    const { newPersona, domicilioActual, setAlertOpen, setAlertMsg, setAlertSeverity } = props;
+const AddPersona = ({ newPersona, domicilioActual, setAlertOpen, setAlertMsg, setAlertSeverity, onSubmit }: Props) => {
     const methods = useForm<PersonaFormValues>({
         mode: 'onChange',
         resolver: yupResolver(persona) as Resolver<PersonaFormValues>,
@@ -73,7 +73,7 @@ const AddPersona = (props: Props) => {
         };
     };
 
-    const onSubmit = async (data: Record<string, any>): Promise<void> => {
+    const defaultSubmitHandler = async (data: Record<string, any>): Promise<void> => {
 
         if (submitting) return;
         setSubmitting(true);
@@ -109,10 +109,12 @@ const AddPersona = (props: Props) => {
             setSubmitting(false);
         }
     };
+
+    const submitHandler = onSubmit ?? defaultSubmitHandler;
     
     return (
         <FormProvider {...methods}>
-            <Box component='form' onSubmit={handleSubmit(onSubmit)} noValidate>
+            <Box>
                 <DomicilioForm 
                     name = {'domicilioRenaper'} 
                     title = {'Domicilio (ReNaPer)'} 
@@ -158,8 +160,14 @@ const AddPersona = (props: Props) => {
                 <ContactoForm name = {'contacto'} />
 
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                    <Button type='submit' variant='contained' color='primary' disabled={!canSubmit || submitting}> 
-                        { submitting ? <CircularProgress size={24}  /> : 'Agregar'}</Button>
+                    <Button 
+                        variant='contained' 
+                        color='primary' 
+                        disabled={!canSubmit || submitting}
+                        onClick={handleSubmit(submitHandler)}
+                    > 
+                        { submitting ? <CircularProgress size={24}  /> : 'Agregar'}
+                    </Button>
                 </Box>
             </Box>
         </FormProvider>
