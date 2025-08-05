@@ -46,11 +46,13 @@ const SearchPersonaResult = (props: Props) => {
 
     const navigate = useNavigate();
 
-    const defaultContinueHandler = (): void => {
-        navigate(`/responsable/${existingPersona.id}`);
+    const continueHandler = (): void => {
+        if(onContinue) {
+            onContinue(existingPersona);
+        } else {
+            navigate(`/responsable/${existingPersona.id}`);
+        }
     };
-
-    const continueHandler = onContinue ?? defaultContinueHandler;
 
     return (
         <Box sx={{ mt: 2 }}>

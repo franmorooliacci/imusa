@@ -11,12 +11,11 @@ import EditPersona from './EditPersona';
 import AddPersonaNoRNP from './AddPersonaNoRNP';
 
 type Props = {
-    onSubmitAdd?: (...args: any[]) => void;
-    onSubmitAddNR?: (...args: any[]) => void;
-    onContinue?: (...args: any[]) => void;
+    onSubmit?: (persona: Persona) => void;
+    onContinue?: (persona: Persona) => void;
 };
 
-const SearchPersona = ({ onSubmitAdd, onSubmitAddNR, onContinue }: Props) => {
+const SearchPersona = ({ onSubmit, onContinue }: Props) => {
     const [newPersona, setNewPersona] = useState<PersonaDTO>(() => createEmptyPersonaDTO());
     const [existingPersona, setExistingPersona] = useState<Persona>(() => createEmptyPersona());
     const [fallecido, setFallecido] = useState<boolean>(false);
@@ -81,7 +80,7 @@ const SearchPersona = ({ onSubmitAdd, onSubmitAddNR, onContinue }: Props) => {
                         setAlertOpen = {setAlertOpen}
                         setAlertMsg = {setAlertMsg}
                         setAlertSeverity = {setAlertSeverity}
-                        onSubmit = {onSubmitAdd}    
+                        onSubmit = {onSubmit}    
                     />
                 }
 
@@ -104,7 +103,7 @@ const SearchPersona = ({ onSubmitAdd, onSubmitAddNR, onContinue }: Props) => {
                         setAlertOpen = {setAlertOpen}
                         setAlertMsg = {setAlertMsg}
                         setAlertSeverity = {setAlertSeverity}
-                        onSubmit = {onSubmitAddNR}
+                        onSubmit = {onSubmit}
                     />
                 }
 
