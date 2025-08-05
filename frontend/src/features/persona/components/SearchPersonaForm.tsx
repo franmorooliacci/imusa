@@ -76,7 +76,7 @@ const SearchPersonaForm = (props: Props) => {
             setRenaperFound(true);
 
         } catch (error) {
-            console.error(error);
+            console.warn('La persona no esta en la base de datos del IMuSA');
         }
 
         if(!foundInDb){
