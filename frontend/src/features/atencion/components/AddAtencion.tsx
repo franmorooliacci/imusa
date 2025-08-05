@@ -3,7 +3,7 @@ import { Box, Button, Divider, Skeleton, Stack, Typography, CircularProgress } f
 import { faFileMedical } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AlertMessage, SkeletonList, BackHeader, SignaturePad } from '@common/components';
+import { AlertMessage, SkeletonList, BackHeader } from '@common/components';
 import { AuthContext } from '@common/context/auth';
 import type { AlertSeverity } from '@common/types';
 import type { Animal } from '@features/animal';
@@ -14,11 +14,13 @@ import type { AtencionDTO } from '../types';
 import { addAtencion } from '../api';
 import ResponsableForm from './ResponsableForm';
 import AnimalForm from './AnimalForm';
+import AutorizacionForm from './AutorizacionForm';
 
 const AddAtencion = () => {
     const { responsableId, animalId } = useParams();
     const [firma, setFirma] = useState<string>('');
     const [responsable, setResponsable] = useState<Persona>(() => createEmptyPersona());
+    const [autorizado, setAutorizado] = useState<Persona>(() => createEmptyPersona());
     const [animal, setAnimal] = useState<Animal>(() => createEmptyAnimal());
     const [loading, setLoading] = useState<boolean>(true);
     const [alertOpen, setAlertOpen] = useState<boolean>(false);
@@ -33,6 +35,7 @@ const AddAtencion = () => {
         const fetchResponsable = async () => {
             const response: Persona = await getResponsableById(Number(responsableId));
             setResponsable(response);
+            setAutorizado(response);
         };
 
         const fetchAnimal = async () => {
@@ -68,8 +71,8 @@ const AddAtencion = () => {
         try{ 
             const newAtencion: AtencionDTO = {
                 id_efector: Number(selectedEfectorId),
-                id_responsable: responsable.id,
-                id_domicilio_responsable: responsable.id_domicilio_actual,
+                id_responsable: responsable.id === autorizado.id ? responsable.id : autorizado.id,
+                id_domicilio_responsable: responsable.id === autorizado.id ? responsable.id_domicilio_actual : autorizado.id_domicilio_actual,
                 id_animal: animal.id,
                 id_servicio: 1,
                 id_personal: personal!.id,
@@ -148,8 +151,10 @@ const AddAtencion = () => {
 
                 <AnimalForm animal = {animal} />
 
-                <SignaturePad
-                    onChange={(base64) => setFirma(base64)}
+                <AutorizacionForm 
+                    responsable = {autorizado} 
+                    setResponsable = {setAutorizado}
+                    setFirma = {setFirma}
                 />
 
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
