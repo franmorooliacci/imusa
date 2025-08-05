@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Divider, Skeleton, TextField, Typography, Stack, FormControlLabel, Checkbox, CircularProgress } from '@mui/material';
-import { faAsterisk, faFileMedical } from '@fortawesome/free-solid-svg-icons';
+import { faAsterisk, faFileMedical, faSignature } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AlertMessage, SkeletonList, BackHeader, SignaturePad } from '@common/components';
@@ -234,7 +234,21 @@ const FinishAtencion = () => {
                     />
                 </Box>
 
-                <SignaturePad onChange={(base64) => setFirma(base64)} />
+                {/* Firma */}
+                <Box sx={{ mb: 2 }}>
+                    <Divider textAlign='left'>
+                        <Stack direction='row' alignItems='center' spacing={1} sx={{ mb: 2 }}>
+                            <Box sx={{ color: (theme) => theme.palette.text.primary }}>
+                                <FontAwesomeIcon icon={faSignature} size='1x' />
+                            </Box>
+                            <Typography variant='subtitle1'>
+                                Firma responsable
+                            </Typography>
+                        </Stack>
+                    </Divider>
+
+                    <SignaturePad onChange={(base64) => setFirma(base64)} />
+                </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                     <FormControlLabel
