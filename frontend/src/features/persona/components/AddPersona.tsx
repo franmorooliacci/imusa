@@ -4,10 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, FormProvider, Controller, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { AlertSeverity, Setter } from '@common/types';
-import { addPersona } from '../api';
 import { persona, PersonaFormValues } from '../schemas';
-import { formatDomicilio, domicilioExists } from '../utils';
 import type { PersonaDTO } from '../types';
+import { addHandler } from '../utils/persona-handlers';
 import DomicilioForm from './DomicilioForm';
 import ContactoForm from './ContactoForm';
 
@@ -52,56 +51,40 @@ const AddPersona = ({ newPersona, domicilioActual, setAlertOpen, setAlertMsg, se
     //console.log('isValid', isValid, 'errors', methods.formState.errors, 'values', methods.getValues());
     //console.log('domRenaperDone', domRenaperDone,'domActualDone', domActualDone, 'isValid', isValid, 'canSubmit', canSubmit);
 
-    // Formatea responsable para agregar a la db
-    const formatResponsable = (): PersonaDTO => {
+    const submitHandler = async (data: Record<string, any>): Promise<void> => {
+        if (submitting) return;
+        setSubmitting(true);
 
-        const date = newPersona.fecha_nacimiento ? new Date(newPersona.fecha_nacimiento) : null;
-        const formattedDate = date ? date.toISOString().split('T')[0] : '';
-
-        const values = methods.getValues();
-    
-        return { 
+        const values: PersonaFormValues = methods.getValues();
+        const persona: Record<string, any> = {
             nombre: newPersona.nombre,
             apellido: newPersona.apellido,
             dni: newPersona.dni,
             sexo: newPersona.sexo,
-            fecha_nacimiento: formattedDate,
+            fecha_nacimiento: newPersona.fecha_nacimiento,
             id_domicilio_renaper: 0,
             id_domicilio_actual: 0,
             telefono: values.contacto.telefono,
-            mail: values.contacto.mail === '' ? null : values.contacto.mail
+            mail: values.contacto.mail === '' ? null : values.contacto.mail,
+            domicilioRenaper: data.domicilioRenaper,
+            domicilioActual: data.domicilioActual,
+            mismoDomicilio: data.mismoDomicilio
         };
-    };
-
-    const defaultSubmitHandler = async (data: Record<string, any>): Promise<void> => {
-
-        if (submitting) return;
-        setSubmitting(true);
         
         try {
-            const formattedResponsable = formatResponsable();
-            const formattedDomRNP = formatDomicilio(data.domicilioRenaper);
-
-            const domicilio = await domicilioExists(formattedDomRNP);
-            formattedResponsable.id_domicilio_renaper = domicilio.id;
-
-            if(data.mismoDomicilio === 'no'){
-                const formattedDomAct = formatDomicilio(data.domicilioActual);
-                const domicilio = await domicilioExists(formattedDomAct);
-                formattedResponsable.id_domicilio_actual = domicilio.id;
-            } else {
-                formattedResponsable.id_domicilio_actual = formattedResponsable.id_domicilio_renaper;
-            }
-                
-            const response = await addPersona(formattedResponsable);
+            const response = await addHandler(persona);
                 
             setAlertSeverity('success');
             setAlertMsg('Responsable agregado con éxito!');
             setAlertOpen(true);
-        
-            setTimeout(() => {
-                navigate(`/responsable/${response.id}`);
-            }, 3000); // Timeout para que se muestre la alerta
+
+            if(onSubmit) {
+                onSubmit(response);
+            } else {
+                setTimeout(() => {
+                    navigate(`/responsable/${response.id}`);
+                }, 3000); // Timeout para que se muestre la alerta
+            }
         } catch (error) {
             setAlertSeverity('error');
             setAlertMsg('No se pudo agregar al responsable. Por favor, inténtalo de nuevo más tarde.');
@@ -109,8 +92,6 @@ const AddPersona = ({ newPersona, domicilioActual, setAlertOpen, setAlertMsg, se
             setSubmitting(false);
         }
     };
-
-    const submitHandler = onSubmit ?? defaultSubmitHandler;
     
     return (
         <FormProvider {...methods}>
@@ -133,13 +114,13 @@ const AddPersona = ({ newPersona, domicilioActual, setAlertOpen, setAlertMsg, se
                     </Grid2>
                     <Grid2>
                         <Controller
-                            name="mismoDomicilio"
+                            name='mismoDomicilio'
                             control={methods.control}
-                            defaultValue="si"
+                            defaultValue='si'
                             render={({ field }) => (
                                 <RadioGroup row {...field}>
-                                    <FormControlLabel value="si" control={<Radio />} label="SI" />
-                                    <FormControlLabel value="no" control={<Radio />} label="NO" />
+                                    <FormControlLabel value="si" control={<Radio />} label='SI' />
+                                    <FormControlLabel value="no" control={<Radio />} label='NO' />
                                 </RadioGroup>
                             )}
                         />

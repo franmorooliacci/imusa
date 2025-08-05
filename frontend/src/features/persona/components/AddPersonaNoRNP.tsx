@@ -6,10 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { FormProvider, Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { AlertSeverity, Setter } from '@common/types';
-import type { PersonaDTO } from '../types';
-import { addPersona } from '../api';
 import { personaNoRnp, PersonaNoRnpFormValues } from '../schemas';
-import { formatDomicilio, domicilioExists } from '../utils';
+import { addNoRNPHandler } from '../utils/persona-handlers';
 import ContactoForm from './ContactoForm';
 import DomicilioForm from './DomicilioForm';
 
@@ -41,44 +39,37 @@ const AddPersonaNoRNP = (props: Props) => {
     const canSubmit = domicilioDone && isValid;
     const [submitting, setSubmitting] = useState<boolean>(false);
 
-    const formatResponsable = (data: Record<string, any>): PersonaDTO => {
+    const submitHandler = async (data: Record<string, any>): Promise<void> => {
+        if (submitting) return;
+        setSubmitting(true);
 
-        const date = new Date(data.fecha_nacimiento);
-        const formattedDate = date.toISOString().split('T')[0];
-    
-        return { 
+        const persona: Record<string, any> = {
             nombre: data.nombre,
             apellido: data.apellido,
             dni: data.dni,
             sexo: data.sexo,
-            fecha_nacimiento: formattedDate,
+            fecha_nacimiento: data.fecha_nacimiento,
             id_domicilio_renaper: null,
             id_domicilio_actual: 0,
-            telefono: data.contacto.telefono === '' ? null : data.contacto.telefono,
-            mail: data.contacto.mail === '' ? null : data.contacto.mail
+            telefono: data.contacto.telefono,
+            mail: data.contacto.mail === '' ? null : data.contacto.mail,
+            domicilioActual: data.domicilioActual
         };
-    };
-
-    const defaultSubmitHandler = async (data: Record<string, any>): Promise<void> => {
-        if (submitting) return;
-        setSubmitting(true);
 
         try {
-            const formattedResponsable = formatResponsable(data);
-            const formattedDomicilio = formatDomicilio(data.domicilioActual);
-            
-            const domicilio = await domicilioExists(formattedDomicilio);
-            formattedResponsable.id_domicilio_actual = domicilio.id;
-            
-            const response = await addPersona(formattedResponsable);
+            const response = await addNoRNPHandler(persona);
 
             setAlertSeverity('success');
             setAlertMsg('Responsable agregado con éxito!');
             setAlertOpen(true);
 
-            setTimeout(() => {
-                navigate(`/responsable/${response.id}`);
-            }, 3000);
+            if(onSubmit) {
+                onSubmit(response);
+            } else {
+                setTimeout(() => {
+                    navigate(`/responsable/${response.id}`);
+                }, 3000); // Timeout para que se muestre la alerta
+            }
         } catch (error) {
             setAlertSeverity('error');
             setAlertMsg('No se pudo agregar al responsable. Por favor, inténtalo de nuevo más tarde.');
@@ -86,8 +77,6 @@ const AddPersonaNoRNP = (props: Props) => {
             setSubmitting(false);
         }
     };
-
-    const submitHandler = onSubmit ?? defaultSubmitHandler;
 
     return (
         <FormProvider {...methods}>
