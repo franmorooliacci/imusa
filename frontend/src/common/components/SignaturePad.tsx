@@ -1,15 +1,10 @@
 import React, { useRef, useState } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
-import { Box, Divider, Typography, Button, Stack } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faSignature } from '@fortawesome/free-solid-svg-icons';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
-type Props = {
-    onChange: (base64: string) => void;
-    title?: string;
-};
-
-const SignaturePad = ({ onChange, title = 'Firma' }: Props) => {
+const SignaturePad = ({ onChange }: { onChange: (base64: string) => void }) => {
     const sigCanvas = useRef<SignatureCanvas | null>(null);
     const [done, setDone] = useState<boolean>(false);
 
@@ -34,14 +29,7 @@ const SignaturePad = ({ onChange, title = 'Firma' }: Props) => {
     };
 
     return (
-        <Box>
-            <Divider textAlign='left' sx={{ mb: 2 }}>
-                <Stack direction='row' alignItems='center' spacing={1}>
-                    <FontAwesomeIcon icon={faSignature} />
-                    <Typography variant='subtitle2'>{title}</Typography>
-                </Stack>
-            </Divider>
-
+        <>
             <Box
                 sx={{
                     position: 'relative',
@@ -99,7 +87,7 @@ const SignaturePad = ({ onChange, title = 'Firma' }: Props) => {
                     </Button>
                 )}
             </Stack>
-        </Box>
+        </>
     );
 };
 
