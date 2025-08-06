@@ -126,10 +126,10 @@ const AnimalForm = ({ mode, initialData = createEmptyAnimal(), onSuccess, onCanc
                 const response = await updateAnimal(initialData.id, data);
 
                 setAlertSeverity('success');
-                setAlertMsg(`${data.id_especie === 1 ? 'Canino' : 'Felino'} modificado con éxito!`);
+                setAlertMsg(`${response.id_especie === 1 ? 'Canino' : 'Felino'} modificado con éxito!`);
                 setAlertOpen(true);                
                 setTimeout(() => {
-                    onSuccess(`/${data.id_especie === 1 ? 'canino' : 'felino'}/${response.id}`);
+                    onSuccess(response);
                 }, 3000);
             }
         } catch (error) {
