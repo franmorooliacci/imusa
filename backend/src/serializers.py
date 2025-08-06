@@ -68,10 +68,24 @@ class AnimalSerializer(serializers.ModelSerializer[Animal]):
         data['colores'] = ColorSerializer(instance.colores.all(), many=True).data
         return data
 
+    # def get_edad(self, obj: Animal) -> str | None:
+    #     birth = obj.fecha_nacimiento
+    #     if not birth:
+    #         return None
+    #     from datetime import date
+    #     today  = date.today()
+    #     years  = today.year  - birth.year
+    #     months = today.month - birth.month
+    #     if months < 0:
+    #         years  -= 1
+    #         months += 12
+    #     return f"{years} años {months} meses"
+
     def get_edad(self, obj: Animal) -> str | None:
         birth = obj.fecha_nacimiento
         if not birth:
             return None
+        
         from datetime import date
         today  = date.today()
         years  = today.year  - birth.year
@@ -79,7 +93,16 @@ class AnimalSerializer(serializers.ModelSerializer[Animal]):
         if months < 0:
             years  -= 1
             months += 12
-        return f"{years} años {months} meses"
+
+        parts: list[str] = []
+        if years:
+            label = 'año' if years == 1 else 'años'
+            parts.append(f"{years} {label}")
+        if months:
+            label = 'mes' if months == 1 else 'meses'
+            parts.append(f"{months} {label}")
+
+        return ' '.join(parts) or '0 meses'
 
 
 class DomicilioSerializer(serializers.ModelSerializer[Domicilio]):
