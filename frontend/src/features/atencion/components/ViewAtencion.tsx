@@ -41,7 +41,7 @@ const ViewAtencion = () => {
             <Grid2 container spacing={1} sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <Grid2 size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
                     {atencion?.animal && (
-                        <BackHeader navigateTo = {`/responsable/${atencion.id_responsable}/${atencion.animal.id_especie === 1 ? 'canino' : 'felino'}/${atencion.id_animal}`} />
+                        <BackHeader navigateTo = {`/${atencion.animal.id_especie === 1 ? 'canino' : 'felino'}/${atencion.id_animal}`} />
                     )}
                 </Grid2>
                 <Grid2 size={{ xs: 12, sm: 12, md: 12, lg: 12 }} sx={{ bgcolor: 'background.paper', p: 2, boxShadow: 3, borderRadius: 4 }}>

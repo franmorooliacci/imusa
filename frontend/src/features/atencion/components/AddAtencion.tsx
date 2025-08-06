@@ -17,7 +17,7 @@ import AnimalForm from './AnimalForm';
 import AutorizacionForm from './AutorizacionForm';
 
 const AddAtencion = () => {
-    const { responsableId, animalId } = useParams();
+    const { animalId } = useParams();
     const [firma, setFirma] = useState<string>('');
     const [responsable, setResponsable] = useState<Persona>(() => createEmptyPersona());
     const [autorizado, setAutorizado] = useState<Persona>(() => createEmptyPersona());
@@ -32,20 +32,15 @@ const AddAtencion = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchResponsable = async () => {
-            const response: Persona = await getResponsableById(Number(responsableId));
-            setResponsable(response);
-            setAutorizado(response);
-        };
-
-        const fetchAnimal = async () => {
-            const response: Animal = await getAnimalById(Number(animalId));
-            setAnimal(response);
-        };
-
         const fetchData = async () => {
             try {
-                await Promise.all([fetchResponsable(), fetchAnimal()]);
+                const animalResp: Animal = await getAnimalById(Number(animalId));
+                setAnimal(animalResp);
+
+                const personaResp: Persona = await getResponsableById(Number(animalResp.id_responsable));
+                setResponsable(personaResp);
+                setAutorizado(personaResp);
+
                 setLoading(false);
             } catch(error) {
                 setAlertSeverity('error');
@@ -58,7 +53,7 @@ const AddAtencion = () => {
         // setTimeout(() => {
         //     fetchData();
         // }, 3000);
-    }, [responsableId, animalId]);
+    }, [animalId]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
@@ -119,7 +114,7 @@ const AddAtencion = () => {
 
     return (
         <Box>
-            <BackHeader navigateTo = {`/responsable/${responsableId}/${animal.id_especie === 1 ? 'canino' : 'felino'}/${animalId}`} />
+            <BackHeader navigateTo = {`/${animal.id_especie === 1 ? 'canino' : 'felino'}/${animalId}`} />
             
             <Box
                 component='form'
@@ -161,7 +156,7 @@ const AddAtencion = () => {
                     <Button 
                         variant='outlined' 
                         color='error' 
-                        onClick={() => navigate(`/responsable/${responsableId}/${animal.id_especie === 1 ? 'canino' : 'felino'}/${animalId}`)}
+                        onClick={() => navigate(`/${animal.id_especie === 1 ? 'canino' : 'felino'}/${animalId}`)}
                     >
                         Cancelar
                     </Button>

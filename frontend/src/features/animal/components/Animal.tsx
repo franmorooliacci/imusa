@@ -15,7 +15,7 @@ import { getAnimalById } from '../api';
 import AnimalForm from './AnimalForm';
 
 const Animal = () => {
-    const { especie, animalId, responsableId } = useParams();
+    const { especie, animalId } = useParams();
     const [animal, setAnimal] = useState<AnimalType>(() => createEmptyAnimal());
     const [editMode, setEditMode] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
@@ -47,7 +47,7 @@ const Animal = () => {
         // setTimeout(() => {
         //     fetchData();
         // }, 3000);
-    }, [animalId, responsableId, especie]);
+    }, [animalId, especie]);
 
     const handleAddAtencion = () => {
         // Busca si el animal tiene alguna atencion en curso
@@ -63,7 +63,7 @@ const Animal = () => {
             setAlertOpen(true);
         } else {
             // false, redirige a la pagina de atenciones
-            navigate(`/atencion/agregar/${responsableId}/${animalId}`);
+            navigate(`/atencion/agregar/${animalId}`);
         }
     };
 
@@ -84,7 +84,7 @@ const Animal = () => {
     
     const handleSendInformeEmail = useCallback(async (id_atencion: number): Promise<void> => {
         try {
-            const response = await getResponsableById(Number(responsableId));
+            const response = await getResponsableById(Number(animal.id_responsable));
             const email = response.mail;
 
             if (!email) {
@@ -104,7 +104,7 @@ const Animal = () => {
             setAlertMsg('No se pudo enviar el informe. Por favor, inténtalo de nuevo más tarde.');
             setAlertOpen(true);
         }
-    }, [responsableId]);
+    }, [animal.id_responsable]);
 
     const atencionColumns = useMemo<Column<Atencion>[]>(() => [
         { 
@@ -236,7 +236,7 @@ const Animal = () => {
             ) : (
                 <Grid2 container spacing={2} sx={{ width: '100%' }}>
                     <Grid2 size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
-                        <BackHeader navigateTo = {`/responsable/${responsableId}`} />
+                        <BackHeader navigateTo = {`/responsable/${animal.id_responsable}`} />
                     </Grid2>
                     <Grid2 size={{ xs: 12, sm: 12, md: 4, lg: 4 }} sx={{ bgcolor: 'background.paper', p: 2, boxShadow: 3, borderRadius: 4, flexGrow: 1 }}>    
                         
@@ -280,7 +280,7 @@ const Animal = () => {
                                 <strong>Tamaño:</strong> {animal.tamaño}
                             </Typography>
 
-                            <Typography variant="body1">
+                            <Typography variant='body1'>
                                 <strong>Pelaje:</strong> {animal.colores?.map(c => c.nombre).join(', ') || 'No especificado'}
                             </Typography>
 

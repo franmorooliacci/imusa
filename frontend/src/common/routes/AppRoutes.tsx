@@ -42,7 +42,7 @@ const AppRoutes = () => {
                         }
                     />
                     <Route 
-                        path='/responsable/:responsableId/:especie/:animalId' 
+                        path='/:especie/:animalId' 
                         element={
                             <PrivateRoute>            
                                 <AnimalPage />
@@ -58,7 +58,7 @@ const AppRoutes = () => {
                         }
                     />
                     <Route 
-                        path='/atencion/agregar/:responsableId/:animalId' 
+                        path='/atencion/agregar/:animalId' 
                         element={
                             <PrivateRoute>
                                 <AddAtencionPage />
@@ -74,7 +74,7 @@ const AppRoutes = () => {
                         }
                     />
                     <Route 
-                        path='/atencion/finalizar/:atencionId/:responsableId/:animalId' 
+                        path='/atencion/:atencionId/finalizar' 
                         element={
                             <PrivateRoute>
                                 <FinishAtencionPage />

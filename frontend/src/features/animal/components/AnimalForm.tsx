@@ -120,7 +120,7 @@ const AnimalForm = ({ mode, initialData = createEmptyAnimal(), onSuccess, onCanc
                 setAlertOpen(true);
 
                 setTimeout(() => {
-                    onSuccess(`/responsable/${response.id_responsable}/${response.id_especie === 1 ? 'canino' : 'felino'}/${response.id}`);
+                    onSuccess(`/${response.id_especie === 1 ? 'canino' : 'felino'}/${response.id}`);
                 }, 3000);
             } else {
                 const response = await updateAnimal(initialData.id, data);
@@ -129,7 +129,7 @@ const AnimalForm = ({ mode, initialData = createEmptyAnimal(), onSuccess, onCanc
                 setAlertMsg(`${data.id_especie === 1 ? 'Canino' : 'Felino'} modificado con éxito!`);
                 setAlertOpen(true);                
                 setTimeout(() => {
-                    onSuccess(`/responsable/${data.id_responsable}/${data.id_especie === 1 ? 'canino' : 'felino'}/${response.id}`);
+                    onSuccess(`/${data.id_especie === 1 ? 'canino' : 'felino'}/${response.id}`);
                 }, 3000);
             }
         } catch (error) {

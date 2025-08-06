@@ -31,7 +31,7 @@ const initialOptions: InsumoOptions = {
 };
 
 const FinishAtencion = () => {
-    const { atencionId, responsableId, animalId } = useParams();
+    const { atencionId } = useParams();
     const [atencion, setAtencion] = useState<Atencion>(() => createEmptyAtencion());
     const [responsable, setResponsable] = useState<Persona>(() => createEmptyPersona());
     const [animal, setAnimal] = useState<Animal>(() => createEmptyAnimal());
@@ -57,24 +57,17 @@ const FinishAtencion = () => {
 
 
     useEffect(() => {
-        const fetchAtencion = async () => {
-            const response: Atencion = await getAtencionById(Number(atencionId));
-            setAtencion(response);
-        };
-
-        const fetchResponsable = async () => {
-            const response: Persona = await getResponsableById(Number(responsableId));
-            setResponsable(response);
-        };
-
-        const fetchAnimal = async () => {
-            const response: Animal = await getAnimalById(Number(animalId));
-            setAnimal(response);
-        };
-
         const fetchData = async () => {
             try {
-                await Promise.all([fetchAtencion(), fetchResponsable(), fetchAnimal()]);
+                const atencionResp: Atencion = await getAtencionById(Number(atencionId));
+                setAtencion(atencionResp);
+
+                const personaResp: Persona = await getResponsableById(Number(atencionResp.id_responsable));
+                setResponsable(personaResp);
+
+                const animalResp: Animal = await getAnimalById(Number(atencionResp.id_animal));
+                setAnimal(animalResp);
+
                 setLoading(false);
             } catch(error) {
                 setAlertSeverity('error');
@@ -87,7 +80,7 @@ const FinishAtencion = () => {
         // setTimeout(() => {
         //     fetchData();
         // }, 3000);
-    }, [atencionId, responsableId, animalId]);
+    }, [atencionId]);
 
     const handleOptionChange = (option: keyof InsumoOptions, newValue: Partial<InsumoOption>): void => {
         setOptions(prevOptions => ({
@@ -123,7 +116,7 @@ const FinishAtencion = () => {
 
             await addAtencionInsumo(insumos);
 
-            await updateAnimal(Number(animalId), { esterilizado: 1 });
+            await updateAnimal(Number(atencion.id_animal), { esterilizado: 1 });
 
             if(sendEmail)
                 await sendInformeEmail({ id_atencion: finishedAtencion.id, to_emails: [email] });

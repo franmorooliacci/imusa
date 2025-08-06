@@ -101,7 +101,7 @@ const ListAtencion = () => {
                             sx={{ bgcolor: 'background.paper', boxShadow: 3, borderRadius: 4, overflow: 'hidden' }}
                         >
                             <ListItemButton 
-                                onClick={() => navigate(`/atencion/finalizar/${atencion.id}/${atencion.id_responsable}/${atencion.id_animal}`)} 
+                                onClick={() => navigate(`/atencion/${atencion.id}/finalizar`)} 
                                 sx={
                                     (theme) => ({
                                         '&:hover': {

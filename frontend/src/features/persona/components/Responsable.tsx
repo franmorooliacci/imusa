@@ -106,7 +106,7 @@ const ResponsablePage = () => {
                 <IconButton
                     color='primary'
                     onClick={() =>
-                        navigate(`/responsable/${animal.id_responsable}/canino/${animal.id}`)
+                        navigate(`/canino/${animal.id}`)
                     }
                     sx={{
                         '&:hover': {
@@ -134,7 +134,7 @@ const ResponsablePage = () => {
                 <IconButton
                     color='primary'
                     onClick={() =>
-                        navigate(`/responsable/${animal.id_responsable}/felino/${animal.id}`)
+                        navigate(`/felino/${animal.id}`)
                     }
                     sx={{
                         '&:hover': {
