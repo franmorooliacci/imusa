@@ -41,7 +41,7 @@ class Persona(models.Model):
     id_domicilio_actual = models.ForeignKey(
         Domicilio, models.DO_NOTHING, db_column='id_domicilio_actual', related_name='domicilio_actual')
     telefono = models.CharField(max_length=15, blank=True, null=True)
-    mail = models.CharField(max_length=255, blank=True, null=True)
+    correo = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -194,6 +194,15 @@ class Insumo(models.Model):
         db_table = 'insumo'
 
 
+class EstadoEgreso(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'estado_egreso'
+        managed = False
+
+
 class Atencion(models.Model):
     id = models.AutoField(primary_key=True)
     id_efector = models.ForeignKey(
@@ -218,6 +227,7 @@ class Atencion(models.Model):
         max_length=255, blank=True, null=True)
     finalizada = models.IntegerField()
     insumos = models.ManyToManyField(Insumo, through='AtencionInsumo')
+    id_estado_egreso = models.ForeignKey(EstadoEgreso, models.DO_NOTHING, db_column='id_estado_egreso', blank=True, null=True)
 
     class Meta:
         managed = False
