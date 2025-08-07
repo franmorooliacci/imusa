@@ -91,7 +91,7 @@ const SearchPersonaForm = (props: Props) => {
                     id_domicilio_renaper: 0,
                     id_domicilio_actual: 0,
                     telefono: '',
-                    mail: ''
+                    correo: ''
                 });
                 if (response.fechaFallecido) setFallecido(true);
                 setDomicilioActual(response.domicilio as string);

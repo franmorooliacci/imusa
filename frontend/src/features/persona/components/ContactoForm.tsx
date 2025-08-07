@@ -40,7 +40,7 @@ const ContactoForm = ({ name }: {name: string}) => {
                 </Grid2>
                 <Grid2>
                     <Controller
-                        name={`${name}.mail`}
+                        name={`${name}.correo`}
                         control={control}
                         defaultValue={''}
                         render={({ field, fieldState }) => (

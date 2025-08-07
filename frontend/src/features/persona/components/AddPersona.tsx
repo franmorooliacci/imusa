@@ -27,7 +27,7 @@ const AddPersona = ({ newPersona, domicilioActual, setAlertOpen, setAlertMsg, se
             mismoDomicilio: 'si',
             domicilioRenaper: {},
             domicilioActual: {},
-            contacto: { telefono:'', mail:'' }
+            contacto: { telefono:'', correo:'' }
         },
         shouldUnregister: false
     });
@@ -65,7 +65,7 @@ const AddPersona = ({ newPersona, domicilioActual, setAlertOpen, setAlertMsg, se
             id_domicilio_renaper: 0,
             id_domicilio_actual: 0,
             telefono: values.contacto.telefono,
-            mail: values.contacto.mail === '' ? null : values.contacto.mail,
+            correo: values.contacto.correo === '' ? null : values.contacto.correo,
             domicilioRenaper: data.domicilioRenaper,
             domicilioActual: data.domicilioActual,
             mismoDomicilio: data.mismoDomicilio

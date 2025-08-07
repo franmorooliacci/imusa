@@ -7,7 +7,7 @@ export const contacto = yup
 			.required('Campo obligatorio')
 			.matches(/^\d{10}$/, 'Teléfono inválido'),
 
-		mail: yup
+		correo: yup
 			.string()
 			.notRequired()
 			.test(

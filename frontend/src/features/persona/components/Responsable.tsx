@@ -74,7 +74,7 @@ const ResponsablePage = () => {
     }, []);
 
     const handleSendInformeEmail = useCallback(async (id_atencion: number): Promise<void> => {
-        if (!responsable.mail) {
+        if (!responsable.correo) {
             setAlertSeverity('warning');
             setAlertMsg(`La persona no tiene asociada una dirección de correo.`);
             setAlertOpen(true);
@@ -82,7 +82,7 @@ const ResponsablePage = () => {
         }
         
         try {
-            await sendInformeEmail({ id_atencion: id_atencion, to_emails: [responsable.mail] });
+            await sendInformeEmail({ id_atencion: id_atencion, to_emails: [responsable.correo] });
 
             setAlertSeverity('success');
             setAlertMsg('Se ha enviado el informe con éxito!');
@@ -92,7 +92,7 @@ const ResponsablePage = () => {
             setAlertMsg('No se pudo enviar el informe. Por favor, inténtalo de nuevo más tarde.');
             setAlertOpen(true);
         }
-    },[responsable.mail]);
+    },[responsable.correo]);
 
     const caninoColumns = useMemo<Column<Animal>[]>(() => [
         { id: 'nombre', label: 'Nombre' },
@@ -355,7 +355,7 @@ const ResponsablePage = () => {
 
                             <Typography variant='body1'>
                                 <strong>Correo:</strong>{' '}
-                                {responsable.mail || ' - '}
+                                {responsable.correo || ' - '}
                             </Typography>
 
                             <Typography variant='body1'>

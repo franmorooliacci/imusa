@@ -43,7 +43,7 @@ const EditPersona = (props: Props) => {
         defaultValues: {
             contacto: { 
                 telefono: existingPersona.telefono ?? '', 
-                mail: existingPersona.mail ?? '' 
+                correo: existingPersona.correo ?? '' 
             }
         }
     });
@@ -65,7 +65,7 @@ const EditPersona = (props: Props) => {
             setExistingPersona((prev) => ({
                 ...prev,
                 telefono: data.contacto.telefono,
-                mail: data.contacto.mail,
+                correo: data.contacto.correo,
             }));
 
             

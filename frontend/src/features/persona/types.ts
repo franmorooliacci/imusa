@@ -41,7 +41,7 @@ export interface PersonaDTO {
     id_domicilio_renaper?: number | null;
     id_domicilio_actual: number;
     telefono: string;
-    mail?: string | null;
+    correo?: string | null;
 }
 
 export interface Persona extends PersonaDTO {

@@ -30,7 +30,7 @@ const AddPersonaNoRNP = (props: Props) => {
             sexo: undefined,
             fecha_nacimiento: undefined,
             domicilioActual: {},
-            contacto: { telefono: '', mail: '' }
+            contacto: { telefono: '', correo: '' }
         }
     });
     const { handleSubmit, control, formState: { isValid } } = methods;
@@ -52,7 +52,7 @@ const AddPersonaNoRNP = (props: Props) => {
             id_domicilio_renaper: null,
             id_domicilio_actual: 0,
             telefono: data.contacto.telefono,
-            mail: data.contacto.mail === '' ? null : data.contacto.mail,
+            correo: data.contacto.correo === '' ? null : data.contacto.correo,
             domicilioActual: data.domicilioActual
         };
 

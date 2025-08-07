@@ -12,7 +12,7 @@ export const createEmptyPersona = (): Persona => {
         id_domicilio_renaper: null,
         id_domicilio_actual: 0,
         telefono: '',
-        mail: null,
+        correo: null,
         edad: 0,
         domicilio_actual: createEmptyDomicilio(),
         caninos: [],
@@ -30,6 +30,6 @@ export const createEmptyPersonaDTO = (): PersonaDTO => {
         id_domicilio_renaper: null,
         id_domicilio_actual: 0,
         telefono: '',
-        mail: null
+        correo: null
     } as PersonaDTO;
 };

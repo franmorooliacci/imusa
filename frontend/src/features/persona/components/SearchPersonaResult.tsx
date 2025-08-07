@@ -157,7 +157,7 @@ const SearchPersonaResult = (props: Props) => {
                                             <strong>
                                                 Correo:
                                             </strong>
-                                            {` ${existingPersona.mail || ' - '}`}
+                                            {` ${existingPersona.correo || ' - '}`}
                                         </Typography>
                                         <Typography variant='body2'>
                                             <strong>

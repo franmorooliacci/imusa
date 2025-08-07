@@ -13,6 +13,6 @@ export const formatPersona = (data: Record<string, any>): PersonaDTO => {
         id_domicilio_renaper: data.id_domicilio_renaper,
         id_domicilio_actual: data.id_domicilio_actual,
         telefono: data.telefono,
-        mail: data.mail === '' ? null : data.mail
+        correo: data.correo === '' ? null : data.correo
     };
 };
