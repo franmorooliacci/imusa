@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Divider, Skeleton, TextField, Typography, Stack, FormControlLabel, Checkbox, CircularProgress } from '@mui/material';
-import { faAsterisk, faFileMedical, faSignature } from '@fortawesome/free-solid-svg-icons';
+import { Box, Button, Divider, Skeleton, Typography, Stack, FormControlLabel, Checkbox, CircularProgress } from '@mui/material';
+import { faFileMedical, faSignature } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AlertMessage, SkeletonList, BackHeader, SignaturePad } from '@common/components';
 import type { AlertSeverity } from '@common/types';
 import { Animal, createEmptyAnimal, getAnimalById, updateAnimal } from '@features/animal';
 import { createEmptyPersona, getResponsableById, Persona } from '@features/persona';
-import { addAtencionInsumo, getAtencionById, sendInformeEmail, updateAtencion } from '../api';
+import { addAtencionInsumo, getAtencionById, getEstadosEgreso, sendInformeEmail, updateAtencion } from '../api';
 import ResponsableForm from './ResponsableForm';
 import AnimalForm from './AnimalForm';
 import MedicamentosForm from './MedicamentosForm';
-import { Atencion, AtencionInsumo, InsumoOption, KetaminaState, type InsumoOptions } from '../types';
+import type { Atencion, AtencionInsumo, EstadoEgreso, InsumoOption, KetaminaState, InsumoOptions } from '../types';
 import { createEmptyAtencion } from '../utils/create-empty-atencion';
 import { buildAtencionInsumos } from '../utils/build-atencion-insumos';
+import ObservacionesForm from './ObservacionesForm';
 
 const initialOptions: InsumoOptions = {
     acepromacina: { selected: false, value: '', id: 1 },
@@ -41,7 +42,9 @@ const FinishAtencion = () => {
         quirofano: ''
     });
     const [firma, setFirma] = useState<string>('');
+    const [estados, setEstados] = useState<EstadoEgreso[]>([]);
     const [observaciones, setObservaciones] = useState<string>('');
+    const [estadoEgreso, setEstadoEgreso] = useState<EstadoEgreso>({ id: 1, nombre: 'Favorable' });
     const [sendEmail, setSendEmail] = useState<boolean>(false);
     const [options, setOptions] = useState<InsumoOptions>(initialOptions);
     const [loading, setLoading] = useState<boolean>(true);
@@ -52,7 +55,7 @@ const FinishAtencion = () => {
     const navigate = useNavigate();
 
     const isValidEmail = (email: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const email = responsable.mail;
+    const email = responsable.correo;
     const emailValid = typeof email === 'string' && isValidEmail(email);
 
 
@@ -67,6 +70,9 @@ const FinishAtencion = () => {
 
                 const animalResp: Animal = await getAnimalById(Number(atencionResp.id_animal));
                 setAnimal(animalResp);
+
+                const estEgrResp: EstadoEgreso[] = await getEstadosEgreso();
+                setEstados(estEgrResp);
 
                 setLoading(false);
             } catch(error) {
@@ -107,7 +113,8 @@ const FinishAtencion = () => {
                 hora_egreso: now.toTimeString().slice(0, 5),
                 firma_egreso: firma === '' ? null : firma,
                 observaciones: observaciones === '' ? null : observaciones,
-                finalizada: 1
+                finalizada: 1,
+                id_estado_egreso: estadoEgreso.id
             };
                 
             await updateAtencion(atencion.id, finishedAtencion);
@@ -116,7 +123,12 @@ const FinishAtencion = () => {
 
             await addAtencionInsumo(insumos);
 
-            await updateAnimal(Number(atencion.id_animal), { esterilizado: 1 });
+            // id_estado_egreso === 2 = Óbito
+            if(finishedAtencion.id_estado_egreso !== 2) {
+                await updateAnimal(Number(atencion.id_animal), { esterilizado: 1 });
+            } else {
+                await updateAnimal(Number(atencion.id_animal), { fallecido: 1 });
+            }
 
             if(sendEmail)
                 await sendInformeEmail({ id_atencion: finishedAtencion.id, to_emails: [email] });
@@ -203,29 +215,13 @@ const FinishAtencion = () => {
                     onChange = {setKetamina}
                 />
 
-                {/* Observaciones */}
-                <Box sx={{ mb: 2 }}>
-                    <Divider textAlign='left'>
-                        <Stack direction='row' alignItems='center' spacing={1} sx={{ mb: 2 }}>
-                            <Box sx={{ color: (theme) => theme.palette.text.primary }}>
-                                <FontAwesomeIcon icon={faAsterisk} size='1x' />
-                            </Box>
-                            <Typography variant='subtitle1'>
-                                Observaciones
-                            </Typography>
-                        </Stack>
-                    </Divider>
-        
-                    <TextField
-                        label='Observaciones'
-                        name='observaciones'
-                        value={observaciones}
-                        variant='outlined'
-                        fullWidth
-                        size='small'
-                        onChange={(e) => setObservaciones(e.target.value)}
-                    />
-                </Box>
+                <ObservacionesForm 
+                    observaciones={observaciones}
+                    setObservaciones={setObservaciones}
+                    estados={estados}
+                    estadoEgreso={estadoEgreso}
+                    setEstadoEgreso={setEstadoEgreso}
+                />
 
                 {/* Firma */}
                 <Box sx={{ mb: 2 }}>
