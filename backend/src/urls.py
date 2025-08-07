@@ -6,7 +6,8 @@ from .views import (
     EfectorViewSet, AtencionViewSet, InsumoViewSet, 
     DomicilioViewSet, AtencionInsumoViewSet, PersonalViewSet, 
     CustomTokenObtainPairView, ExternalDataViewSet, InformeAPIView,
-    ColorViewSet, TamañoViewSet, SendInformeEmailAPIView
+    ColorViewSet, TamañoViewSet, SendInformeEmailAPIView, 
+    EstadoEgresoViewSet
 )
 
 router = DefaultRouter()
@@ -22,6 +23,7 @@ router.register('personal', PersonalViewSet, basename='personal')
 router.register('external_data', ExternalDataViewSet, basename='external_data')
 router.register('colores', ColorViewSet, basename='color')
 router.register('tamaños', TamañoViewSet, basename='tamaño')
+router.register('estados_egreso', EstadoEgresoViewSet, basename='estado_egreso')
 
 urlpatterns = [
     path('', include(router.urls)),
