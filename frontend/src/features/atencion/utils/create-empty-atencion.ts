@@ -21,6 +21,8 @@ export const createEmptyAtencion = (): Atencion => {
         efector_nombre: '',
         personal_nombre: '',
         animal: createEmptyAnimal(),
-        insumos: []
+        insumos: [],
+        id_estado_egreso: 0,
+        estado_egreso: ''
     } as Atencion;
 };
