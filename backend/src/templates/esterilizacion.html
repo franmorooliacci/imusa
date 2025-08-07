@@ -87,6 +87,16 @@
         </div>
       {% endif %}
 
+      <div class="cuadro" id="egreso">
+        <h3>Egreso</h3>
+        <div class="mi-row">
+          <div class="column">  
+            <p><strong>Estado sanitario al egreso:</strong> {{ estado_egreso.nombre }}</p>
+            <p><strong>Observaciones:</strong> {{ atencion.observaciones|default:"No especificado" }}</p>
+          </div>
+        </div>
+      </div>
+
       <div class="cuadro" id="datos_veterinario">
         <h3>Datos del Veterinario</h3>
         <div class="mi-row">
@@ -94,7 +104,9 @@
             <p><strong>Nombre:</strong> {{ veterinario.nombre }}</p>
             <p><strong>Apellido:</strong> {{ veterinario.apellido }}</p>
             <p><strong>DNI:</strong> {{ veterinario.dni }}</p>
-            <p><strong>Matricula:</strong> {{ personal.matricula }}</p>
+            {% if personal.matricula %}
+              <p><strong>Matricula:</strong> {{ personal.matricula }}</p>
+            {% endif %}
             <p><strong>Efector:</strong> {{ efector.nombre }}</p>
           </div>
           <div class="column">
@@ -102,14 +114,7 @@
           </div>
         </div>
       </div>
-    {% if estado_sanitario %}
-          <div class="cuadro" id="egreso">
-            <h3>Estado sanitario egreso</h3>
-            <div class="mi-row">
-              <p>{{estado_sanitario }}</p>
-            </div>
-          </div>
-    {% endif %}
+
       <div class="cuadro" id="autorizacion">
         <h3>Autorización</h3>
         <div class="mi-row">

@@ -17,6 +17,7 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
                 'id_responsable__id_domicilio_actual',
                 'id_personal__id_persona',
                 'id_efector',
+                'id_estado_egreso'
             )
             .prefetch_related('id_animal__colores')
             .get(pk=id_atencion)
@@ -28,7 +29,7 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
     personal = atencion.id_personal
     veterinario = personal.id_persona
     efector     = atencion.id_efector
-    #estado_sanitario = atencion.estado_sanitario_egreso
+    estado_egreso = atencion.id_estado_egreso
 
     # Acomodo medicamentos
     medicamentos_queryset = AtencionInsumo.objects.filter(id_atencion=atencion)
@@ -119,7 +120,7 @@ def build_atencion_context(id_atencion: int) -> dict[str, Any]:
         'responsable'           : responsable,
         'domicilio_actual'      : domicilio_actual,
         'medicamentos'          : medicamentos_completos,
-        #'estado_sanitario'      : estado_sanitario,
+        'estado_egreso'         : estado_egreso,
         'personal'              : personal,
         'veterinario'           : veterinario,
         'efector'               : efector,
