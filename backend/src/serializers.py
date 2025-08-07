@@ -157,7 +157,7 @@ class AtencionInsumoSerializer(serializers.ModelSerializer[AtencionInsumo]):
 
 class PersonalSerializer(serializers.ModelSerializer[Personal]):
     persona: PersonaSerializer = PersonaSerializer(source='id_persona', read_only=True, required=False)
-    efectores: EfectorSerializer = EfectorSerializer(many=True, read_only=True)
+    efectores: EfectorSerializer = EfectorSerializer(source='efectores_activos', many=True, read_only=True)
 
     class Meta:
         model = Personal
