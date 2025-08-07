@@ -18,13 +18,14 @@ from .models import (
     Persona, Especie, Raza, 
     Efector, Animal, Atencion, 
     Insumo, Domicilio, AtencionInsumo, 
-    Personal, Color, Tamaño
+    Personal, Color, Tamaño, EstadoEgreso
 )
 from .serializers import (
     PersonaSerializer, AnimalSerializer, RazaSerializer, 
     EfectorSerializer, AtencionSerializer, InsumoSerializer, 
     DomicilioSerializer, AtencionInsumoSerializer, PersonalSerializer, 
-    CustomTokenObtainPairSerializer, ColorSerializer, TamañoSerializer
+    CustomTokenObtainPairSerializer, ColorSerializer, TamañoSerializer,
+    EstadoEgresoSerializer
 )
 
 
@@ -133,6 +134,11 @@ class ColorViewSet(viewsets.ModelViewSet):
 class TamañoViewSet(viewsets.ModelViewSet):
     queryset = Tamaño.objects.all()
     serializer_class = TamañoSerializer
+
+
+class EstadoEgresoViewSet(viewsets.ModelViewSet):
+    queryset = EstadoEgreso.objects.all()
+    serializer_class = EstadoEgresoSerializer
 
 
 class AtencionViewSet(viewsets.ModelViewSet):
