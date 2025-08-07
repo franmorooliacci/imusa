@@ -101,7 +101,6 @@ export interface Personal {
     matricula: string;
     firma?: string | null;
     legajo: number;
-    estado: number;
     user?: number | null;
     efectores: Efector[];
     id_tipo_personal: TipoPersonal;
