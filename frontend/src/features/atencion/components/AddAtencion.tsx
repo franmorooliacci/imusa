@@ -166,7 +166,7 @@ const AddAtencion = () => {
                         color='primary'
                         disabled={!firma || submitting}
                     >
-                        { submitting ? <CircularProgress size={24}  /> : 'Finalizar'}
+                        { submitting ? <CircularProgress size={24}  /> : 'Agregar'}
                     </Button>
                 </Box>
             </Box>
