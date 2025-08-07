@@ -49,7 +49,14 @@ const Animal = () => {
         // }, 3000);
     }, [animalId, especie]);
 
-    const handleAddAtencion = () => {
+    const handleAddAtencion = (): void => {
+        if(animal.fallecido === 1) {
+            setAlertSeverity('warning');
+            setAlertMsg('No se le puede agregar una atención a un animal fallecido.');
+            setAlertOpen(true);
+            return;
+        }
+
         // Busca si el animal tiene alguna atencion en curso
         const ongoing = atenciones.find(a => a.finalizada === 0);
 
@@ -85,7 +92,7 @@ const Animal = () => {
     const handleSendInformeEmail = useCallback(async (id_atencion: number): Promise<void> => {
         try {
             const response = await getResponsableById(Number(animal.id_responsable));
-            const email = response.mail;
+            const email = response.correo;
 
             if (!email) {
                 setAlertSeverity('warning');
@@ -252,7 +259,21 @@ const Animal = () => {
                                 </Typography>
                             </Box>
 
-                            <Button size='small' variant='outlined' color='primary' onClick={() => setEditMode(true)}>
+                            <Button 
+                                size='small' 
+                                variant='outlined' 
+                                color='primary' 
+                                onClick={() => {
+                                    if(animal.fallecido === 1) {
+                                        setAlertSeverity('warning');
+                                        setAlertMsg('No se puede editar la información de un animal fallecido.');
+                                        setAlertOpen(true);
+                                        return;
+                                    } else {
+                                        setEditMode(true);
+                                    }
+                                }}
+                            >
                                 Editar
                             </Button>
                         </Box>
@@ -294,7 +315,7 @@ const Animal = () => {
 
                             {animal.fallecido === 1 &&
                                 <Typography variant='body1'>
-                                    <strong>Fallecido:</strong> {'SI'}
+                                    <strong>Fallecido:</strong> {'Si'}
                                 </Typography>
                             }
                         </Stack>
