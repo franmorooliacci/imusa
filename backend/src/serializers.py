@@ -7,7 +7,7 @@ from .models import (
     Persona, Animal, Raza,
     Efector, Insumo, Atencion, 
     Domicilio, AtencionInsumo, Personal, 
-    Color, Tamaño
+    Color, Tamaño, EstadoEgreso
 )
 
 
@@ -67,19 +67,6 @@ class AnimalSerializer(serializers.ModelSerializer[Animal]):
         data = super().to_representation(instance)
         data['colores'] = ColorSerializer(instance.colores.all(), many=True).data
         return data
-
-    # def get_edad(self, obj: Animal) -> str | None:
-    #     birth = obj.fecha_nacimiento
-    #     if not birth:
-    #         return None
-    #     from datetime import date
-    #     today  = date.today()
-    #     years  = today.year  - birth.year
-    #     months = today.month - birth.month
-    #     if months < 0:
-    #         years  -= 1
-    #         months += 12
-    #     return f"{years} años {months} meses"
 
     def get_edad(self, obj: Animal) -> str | None:
         birth = obj.fecha_nacimiento
@@ -144,11 +131,18 @@ class InsumoSerializer(serializers.ModelSerializer[Insumo]):
         fields = '__all__'
 
 
+class EstadoEgresoSerializer(serializers.ModelSerializer[EstadoEgreso]):
+    class Meta:
+        model = EstadoEgreso
+        fields = '__all__'
+
+
 class AtencionSerializer(serializers.ModelSerializer[Atencion]):
     efector_nombre: serializers.CharField = serializers.CharField(source='id_efector.nombre', read_only=True)
     personal_nombre: serializers.CharField  = serializers.CharField(source='personal_full_name', read_only=True)
     animal: AnimalSerializer = AnimalSerializer(source='id_animal', read_only=True, required=False)
     insumos: InsumoSerializer = InsumoSerializer(many=True, read_only=True)
+    estado_egreso: serializers.CharField = serializers.CharField(source='id_estado_egreso.nombre', read_only=True, required=False)
 
     class Meta:
         model = Atencion
