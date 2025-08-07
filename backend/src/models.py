@@ -157,10 +157,9 @@ class TipoPersonal(models.Model):
 class Personal(models.Model):
     id = models.AutoField(primary_key=True)
     id_persona = models.ForeignKey(Persona, models.DO_NOTHING, db_column='id_persona')
-    matricula = models.CharField(max_length=15)
+    matricula = models.CharField(max_length=15, blank=True, null=True)
     firma = models.TextField(null=True)
     legajo = models.IntegerField()
-    estado = models.IntegerField()
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, null=True)
     efectores = models.ManyToManyField(Efector, through='PersonalEfector')
     id_tipo_personal = models.ForeignKey(TipoPersonal, models.DO_NOTHING, db_column='id_tipo_personal')
@@ -176,6 +175,8 @@ class PersonalEfector(models.Model):
         Personal, models.DO_NOTHING, db_column='id_personal')
     id_efector = models.ForeignKey(
         Efector, models.DO_NOTHING, db_column='id_efector')
+    fecha_inicio = models.DateField(blank=True, null=True)
+    fecha_fin = models.DateField(blank=True, null=True)
     estado = models.IntegerField()
 
     class Meta:
