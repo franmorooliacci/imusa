@@ -1,5 +1,5 @@
 import http from '@common/api/client';
-import type { Atencion, Insumo, Personal, Efector, AtencionDTO, AtencionInsumo } from './types';
+import type { Atencion, Insumo, Personal, Efector, AtencionDTO, AtencionInsumo, EstadoEgreso } from './types';
 
 // Atencion endpoints
 export const addAtencion = (newAtencion: AtencionDTO): Promise<Atencion> =>
@@ -19,6 +19,10 @@ export const updateAtencion = (id: number, data: Partial<Atencion>): Promise<Ate
 
 export const getInsumosByIdAtencion = (id_atencion: number): Promise<Insumo[]> =>
 	http.get<Insumo[]>(`atencion_insumo/buscar`, { params: { id_atencion } })
+		.then(res => res.data);
+
+export const getEstadosEgreso = (): Promise<EstadoEgreso[]> =>
+	http.get<EstadoEgreso[]>(`estados_egreso/`)
 		.then(res => res.data);
 
 // Personal endpoints
