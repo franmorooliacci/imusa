@@ -273,7 +273,7 @@ CREATE TABLE persona (
     id_domicilio_renaper INT NULL,
     id_domicilio_actual INT NOT NULL,
     telefono VARCHAR(15) NULL,
-    mail VARCHAR(255) NULL,
+    correo VARCHAR(255) NULL,
     FOREIGN KEY (id_domicilio_renaper) REFERENCES domicilio (id),
     FOREIGN KEY (id_domicilio_actual) REFERENCES domicilio (id)
 );
@@ -400,14 +400,21 @@ CREATE TABLE personal (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_persona INT NOT NULL,
     user_id INT NULL,
-    matricula VARCHAR(15) NOT NULL,
+    matricula VARCHAR(15) NULL,
     legajo INT NOT NULL,
-    estado TINYINT (1) NOT NULL,
     firma TEXT NULL,
     id_tipo_personal INT NOT NULL,
     FOREIGN KEY (id_persona) REFERENCES persona (id),
     FOREIGN KEY (id_tipo_personal) REFERENCES tipo_personal (id)
 );
+
+CREATE TABLE estado_egreso (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255)
+);
+
+INSERT INTO estado_egreso (nombre)
+VALUES ('Favorable'), ('Óbito');
 
 CREATE TABLE atencion (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -425,12 +432,14 @@ CREATE TABLE atencion (
     firma_egreso TEXT NULL,
     observaciones VARCHAR(255) NULL,
     finalizada TINYINT (1) NOT NULL,
+    id_estado_egreso INT NULL,
     FOREIGN KEY (id_efector) REFERENCES efector (id),
     FOREIGN KEY (id_responsable) REFERENCES persona (id),
     FOREIGN KEY (id_domicilio_responsable) REFERENCES domicilio (id),
     FOREIGN KEY (id_animal) REFERENCES animal (id),
     FOREIGN KEY (id_servicio) REFERENCES servicio (id),
-    FOREIGN KEY (id_personal) REFERENCES personal (id)
+    FOREIGN KEY (id_personal) REFERENCES personal (id),
+    FOREIGN KEY (id_estado_egreso) REFERENCES estado_egreso (id)
 );
 
 CREATE TABLE atencion_insumo (
@@ -449,6 +458,8 @@ CREATE TABLE personal_efector (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_personal INT NOT NULL,
     id_efector INT NOT NULL,
+    fecha_inicio DATE NULL,
+    fecha_fin DATE NULL,
     estado TINYINT (1) NOT NULL,
     FOREIGN KEY (id_personal) REFERENCES personal (id),
     FOREIGN KEY (id_efector) REFERENCES efector (id)
