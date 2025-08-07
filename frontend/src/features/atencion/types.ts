@@ -48,6 +48,12 @@ export type InsumoOptions = {
 export type KetaminaKeys = 'prequirurgico' | 'induccion' | 'quirofano';
 export type KetaminaState = Record<KetaminaKeys, string>;
 
+//---------- Estado Egreso ----------//
+export interface EstadoEgreso {
+    id: number;
+    nombre: string;
+}
+
 //---------- Atencion ----------//
 export interface AtencionDTO {
     id_efector: number;
@@ -59,6 +65,7 @@ export interface AtencionDTO {
     fecha_ingreso?: string | null;
     hora_ingreso?: string | null;
     firma_ingreso?: string | null;
+    id_estado_egreso?: number | null;
     fecha_egreso?: string | null;
     hora_egreso?: string | null;
     firma_egreso?: string | null;
@@ -72,6 +79,7 @@ export interface Atencion extends AtencionDTO{
 	personal_nombre: string;
 	animal: Animal;
 	insumos: Insumo[];
+    estado_egreso: string;
 }
 
 //---------- Efector ----------//
