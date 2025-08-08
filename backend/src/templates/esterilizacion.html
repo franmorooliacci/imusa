@@ -104,14 +104,15 @@
             <p><strong>Nombre:</strong> {{ veterinario.nombre }}</p>
             <p><strong>Apellido:</strong> {{ veterinario.apellido }}</p>
             <p><strong>DNI:</strong> {{ veterinario.dni }}</p>
-            {% if personal.matricula %}
-              <p><strong>Matricula:</strong> {{ personal.matricula }}</p>
-            {% endif %}
+            <p><strong>Matricula:</strong> {{ personal.matricula }}</p>
             <p><strong>Efector:</strong> {{ efector.nombre }}</p>
           </div>
-          <div class="column">
-            <img src="{{ veterinario_firma_uri }}" class="firma-img" />
-          </div>
+
+          {% if veterinario_firma_uri %}
+            <div class="column">
+              <img src="{{ veterinario_firma_uri }}" class="firma-img" />
+            </div>
+          {% endif %}
         </div>
       </div>
 
