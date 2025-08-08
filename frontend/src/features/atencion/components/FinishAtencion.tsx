@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Box, Button, Divider, Skeleton, Typography, Stack, FormControlLabel, Checkbox, CircularProgress } from '@mui/material';
 import { faFileMedical, faSignature } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AlertMessage, SkeletonList, BackHeader, SignaturePad } from '@common/components';
+import { AuthContext } from '@common/context/auth';
 import type { AlertSeverity } from '@common/types';
 import { Animal, createEmptyAnimal, getAnimalById, updateAnimal } from '@features/animal';
 import { createEmptyPersona, getResponsableById, Persona } from '@features/persona';
@@ -52,6 +53,7 @@ const FinishAtencion = () => {
     const [alertMsg, setAlertMsg] = useState<string>('');
     const [alertSeverity, setAlertSeverity] = useState<AlertSeverity>('info');
     const [submitting, setSubmitting] = useState<boolean>(false);
+    const { personal } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const isValidEmail = (email: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -114,7 +116,8 @@ const FinishAtencion = () => {
                 firma_egreso: firma === '' ? null : firma,
                 observaciones: observaciones === '' ? null : observaciones,
                 finalizada: 1,
-                id_estado_egreso: estadoEgreso.id
+                id_estado_egreso: estadoEgreso.id,
+                id_personal: personal!.id
             };
                 
             await updateAtencion(atencion.id, finishedAtencion);
