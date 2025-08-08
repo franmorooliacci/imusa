@@ -273,13 +273,7 @@ class AtencionInsumoViewSet(viewsets.ModelViewSet):
 
 
 class PersonalViewSet(viewsets.ModelViewSet):
-    queryset = Personal.objects.prefetch_related(
-        Prefetch(
-            'efectores',
-            queryset=Efector.objects.filter(personalefector__estado=1),
-            to_attr='efectores_activos'
-        )
-    ).all()
+    queryset = Personal.objects.prefetch_related('efectores').all()
     serializer_class = PersonalSerializer
 
 

@@ -157,12 +157,15 @@ class AtencionInsumoSerializer(serializers.ModelSerializer[AtencionInsumo]):
 
 class PersonalSerializer(serializers.ModelSerializer[Personal]):
     persona: PersonaSerializer = PersonaSerializer(source='id_persona', read_only=True, required=False)
-    efectores: EfectorSerializer = EfectorSerializer(source='efectores_activos', many=True, read_only=True)
+    efectores = serializers.SerializerMethodField()
 
     class Meta:
         model = Personal
         fields = '__all__'
 
+    def get_efectores(self, obj: Personal) -> dict[str, Any]:
+        active_efectores = obj.efectores.filter(personalefector__estado=1)
+        return EfectorSerializer(active_efectores, many=True).data
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
