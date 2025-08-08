@@ -145,7 +145,8 @@ VALUES
     (76,'DARREGUEIRA JOSE',45250,950,0,NULL,NULL,NULL,NULL,'SARMIENTO','Sarmiento','NORTE','Comisaría 10','Rosario','102 144 Negra,102 Roja,103 Negra,103 Roja,106 Ibarlucea,106 Municipal,107 Negra,107 Roja,143 136 137 Negra,143 136 137 Roja','5435320.096903424','6359414.101012166','07','0710'),
     (77,'TUELLA PEDRO',92350,952,1,NULL,NULL,NULL,NULL,'LISANDRO DE LA TORRE','Lisandro de la Torre','NORTE','Comisaría 9','Rosario','110,113,129,153 Negra,153 Roja,Linea de la Costa','5437102.053364454','6358327.204088542','09','0902'),
     (78,'BLANQUI ANDRES',30750,2120,0,NULL,NULL,NULL,NULL,'PARQUE FIELD','Barrio Parque Field','NORTE','Sub-comisaría 23','Rosario','102 144 Negra,153 Negra','5433640.634087266','6361067.552843998','06','0610'),
-    (79,'BOEDO MARIANO',30900,2330,0,NULL,NULL,NULL,NULL,'PARQUE FIELD','Barrio Parque Field','NORTE','Comisaría 30','Rosario','102 Roja,107 Negra,107 Roja','5433915.66331635','6360823.20165985','06','0604');
+    (79,'BOEDO MARIANO',30900,2330,0,NULL,NULL,NULL,NULL,'PARQUE FIELD','Barrio Parque Field','NORTE','Comisaría 30','Rosario','102 Roja,107 Negra,107 Roja','5433915.66331635','6360823.20165985','06','0604'),
+    (80,'PERON PTE. JUAN DOMINGO',53950,4602,0,NULL,NULL,NULL,NULL,'CINCO ESQUINAS','Bella Vista Oeste','OESTE','Comisaría 13','Rosario','121,122 Roja,122 Verde,133 125 Negra,133 125 Verde','5435371.518742696','6353633.180064166','35','3502');
 
 CREATE TABLE tipo_efector (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -261,7 +262,8 @@ VALUES
     ('Maciel Bochín Club',76,4,1),
     ('Club Náutico Sportivo Avellaneda',77,4,1),
     ('Club Residentes Parquefield',78,4,1),
-    ('Club Atlético El Torito',79,4,1);
+    ('Club Atlético El Torito',79,4,1),
+    ('Móvil Distrito Oeste',80,7,1);
 
 CREATE TABLE persona (
     id INT AUTO_INCREMENT PRIMARY KEY,
