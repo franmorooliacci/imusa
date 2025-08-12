@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS imusa;
+
+CREATE DATABASE imusa;
+
 USE imusa;
 
 CREATE TABLE especie (
