@@ -9,6 +9,8 @@ django-wkhtmltopdf==3.4.0
 djangorestframework==3.15.2
 djangorestframework-stubs==3.16.0
 djangorestframework_simplejwt==5.5.0
+gevent==25.9.1
+greenlet==3.3.0
 gunicorn==23.0.0
 idna==2.10
 packaging==25.0
@@ -24,3 +26,6 @@ types-requests==2.31.0.6
 types-urllib3==1.26.25.14
 typing_extensions==4.12.2
 urllib3==1.26.20
+whitenoise==6.11.0
+zope.event==6.1
+zope.interface==8.1.1
