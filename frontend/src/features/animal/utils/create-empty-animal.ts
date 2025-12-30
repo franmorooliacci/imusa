@@ -1,6 +1,9 @@
 import type { Animal } from '../types';
 
-export const createEmptyAnimal = (id_especie: number = 0, id_responsable: number | null = null): Animal => {
+export const createEmptyAnimal = (
+    id_especie: number = 0,
+    id_responsable: number | null = null,
+): Animal => {
     return {
         nombre: '',
         sexo: '',
@@ -12,10 +15,13 @@ export const createEmptyAnimal = (id_especie: number = 0, id_responsable: number
         fallecido: 0,
         esterilizado: 0,
         adoptado_imusa: 0,
+        es_peligroso: 0,
+        observaciones: null,
         id: 0,
         colores: [],
         raza: '',
         tamaño: '',
-        edad: ''
+        edad: '',
     } as Animal;
 };
+
