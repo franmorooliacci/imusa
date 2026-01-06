@@ -445,7 +445,7 @@ CREATE TABLE atencion (
     observaciones VARCHAR(255) NULL,
     finalizada TINYINT (1) NOT NULL,
     id_estado_egreso INT NULL,
-    peso_kg DECIMAL(6,2) NOT NULL,
+    peso_kg DECIMAL(6,2) NULL,
     FOREIGN KEY (id_efector) REFERENCES efector (id),
     FOREIGN KEY (id_responsable) REFERENCES persona (id),
     FOREIGN KEY (id_domicilio_responsable) REFERENCES domicilio (id),
