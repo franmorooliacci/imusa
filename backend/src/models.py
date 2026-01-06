@@ -261,7 +261,7 @@ class Atencion(models.Model):
         blank=True,
         null=True,
     )
-    peso_kg = models.DecimalField(max_digits=6, decimal_places=2)
+    peso_kg = models.DecimalField(max_digits=6, decimal_places=2, null=True)
 
     class Meta:
         managed = False

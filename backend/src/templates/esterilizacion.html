@@ -31,6 +31,7 @@
             <p><strong>Edad:</strong> {{ edad|default:"No especificado" }}</p>
             <p><strong>Tamaño:</strong> {{ animal.id_tamaño.nombre }}</p>
             <p><strong>Pelaje(color):</strong> {{ colores_nombres|default:"No especificado" }}</p>
+            <p><strong>Peso(kg):</strong> {{ atencion.peso_kg|default:"No especificado" }}</p>
           </div>
         </div>
         {% if animal.adoptado_imusa %}
