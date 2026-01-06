@@ -3,16 +3,16 @@ import type { Animal } from '@features/animal';
 
 //---------- Servicio ----------//
 export interface Servicio {
-	id: number;
-	nombre: string;
+    id: number;
+    nombre: string;
 }
 
 //---------- Insumo ----------//
 export interface Insumo {
-	id: number;
-	nombre: string;
-	tope_max?: number | null;
-	tope_min?: number | null;
+    id: number;
+    nombre: string;
+    tope_max?: number | null;
+    tope_min?: number | null;
 }
 
 export interface AtencionInsumo {
@@ -62,6 +62,7 @@ export interface AtencionDTO {
     id_animal: number;
     id_servicio: number;
     id_personal: number;
+    peso_kg?: number | null;
     fecha_ingreso?: string | null;
     hora_ingreso?: string | null;
     firma_ingreso?: string | null;
@@ -73,12 +74,12 @@ export interface AtencionDTO {
     finalizada: number;
 }
 
-export interface Atencion extends AtencionDTO{
-	id: number;
-	efector_nombre: string;
-	personal_nombre: string;
-	animal: Animal;
-	insumos: Insumo[];
+export interface Atencion extends AtencionDTO {
+    id: number;
+    efector_nombre: string;
+    personal_nombre: string;
+    animal: Animal;
+    insumos: Insumo[];
     estado_egreso: string;
 }
 
@@ -105,3 +106,4 @@ export interface Personal {
     efectores: Efector[];
     id_tipo_personal: TipoPersonal;
 }
+

@@ -9,6 +9,7 @@ export const createEmptyAtencion = (): Atencion => {
         id_animal: 0,
         id_servicio: 0,
         id_personal: 0,
+        peso_kg: 0.0,
         fecha_ingreso: null,
         hora_ingreso: null,
         firma_ingreso: null,
@@ -23,6 +24,7 @@ export const createEmptyAtencion = (): Atencion => {
         animal: createEmptyAnimal(),
         insumos: [],
         id_estado_egreso: 0,
-        estado_egreso: ''
+        estado_egreso: '',
     } as Atencion;
 };
+
