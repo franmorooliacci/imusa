@@ -11,3 +11,5 @@ frontend/build
 frontend/eslint.config.cjs
 
 test.http
+
+compile.sh

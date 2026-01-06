@@ -1,22 +1,23 @@
 export interface Especie {
-	id: number;
-	nombre: string;
+    id: number;
+    nombre: string;
 }
 
 export interface Raza {
-	id: number;
-	id_especie: number;
-	nombre: string;
+    id: number;
+    id_especie: number;
+    nombre: string;
+    es_peligrosa: number;
 }
 
 export interface Color {
-	id: number;
-	nombre: string;
+    id: number;
+    nombre: string;
 }
 
 export interface Tamaño {
-	id: number;
-	nombre: string;
+    id: number;
+    nombre: string;
 }
 
 export interface AnimalDTO {
@@ -30,12 +31,14 @@ export interface AnimalDTO {
     fallecido: number;
     esterilizado: number;
     adoptado_imusa: number;
+    es_peligroso: number;
+    observaciones: string | null;
 }
 
 export interface Animal extends AnimalDTO {
-	id: number;
-	colores: Color[];
-	raza: string;
-	tamaño: string;
-	edad: string;
+    id: number;
+    colores: Color[];
+    raza: string;
+    tamaño: string;
+    edad: string;
 }
